@@ -2,356 +2,692 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
-    <meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs" />
-    <meta name="description" content="网易云音乐 NodeJS API Enhanced" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>网易云音乐 API Enhanced</title>
     <link rel="icon" href="netease.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-    <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css" />
-
     <style>
-        /* ===== 完全覆盖默认绿色，改为网易红 ===== */
+        /* ===== 全局重置 & 变量 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --red: #ec4141;
-            --red-dark: #b83030;
-            --red-light: #fce8e8;
-            --red-glow: rgba(236, 65, 65, 0.3);
-            --bg-body: #f0f2f6;
-            --card-bg: rgba(255, 255, 255, 0.82);
-            --text-color: #1a1a2e;
-            --text-muted: #5a5a7a;
-            --border-color: rgba(0, 0, 0, 0.06);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-            --radius: 16px;
+            --red-dark: #c93535;
+            --red-light: #fde8e8;
+            --red-glow: rgba(236, 65, 65, 0.25);
+            --bg: #f5f6fa;
+            --card: #ffffff;
+            --text: #1e1e2a;
+            --text-secondary: #5a5a72;
+            --text-light: #8e8ea8;
+            --border: #e8e8ee;
+            --shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.10);
+            --radius: 14px;
             --radius-sm: 8px;
+            --sidebar-width: 260px;
+            --transition: 0.2s ease;
+        }
+
+        html,
+        body {
+            height: 100%;
         }
 
         body {
-            background: var(--bg-body);
-            color: var(--text-color);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            display: flex;
         }
 
-        /* ----- 侧边栏 ----- */
+        /* ===== 滚动条 ===== */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--red);
+            border-radius: 4px;
+        }
+
+        /* ===== 侧边栏 ===== */
         .sidebar {
-            background: rgba(255, 255, 255, 0.88) !important;
-            backdrop-filter: blur(16px) !important;
-            -webkit-backdrop-filter: blur(16px) !important;
-            border-right: 1px solid var(--border-color) !important;
-            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.04) !important;
-            padding-top: 20px !important;
-        }
-        .app-name-link {
-            color: var(--red) !important;
-            font-weight: 700 !important;
-        }
-        .sidebar-nav ul li a {
-            color: var(--text-color) !important;
-            font-weight: 500 !important;
-            border-radius: 6px !important;
-            padding: 5px 12px !important;
-            margin: 2px 0 !important;
-            transition: all 0.2s !important;
-            border-left: 3px solid transparent !important;
-        }
-        .sidebar-nav ul li a:hover {
-            background: var(--red-light) !important;
-            color: var(--red) !important;
-        }
-        .sidebar-nav ul li a.active {
-            background: var(--red) !important;
-            color: #fff !important;
-            border-left-color: var(--red-dark) !important;
-            box-shadow: 0 2px 12px var(--red-glow) !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: #fff;
+            border-right: 1px solid var(--border);
+            padding: 28px 18px 32px;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s ease;
         }
 
-        /* ----- 主内容 ----- */
-        .content {
-            padding-top: 30px !important;
-            background: transparent !important;
-        }
-        .markdown-section {
-            max-width: 900px !important;
-            margin: 0 auto !important;
-            padding: 24px 32px 60px !important;
-            background: var(--card-bg) !important;
-            backdrop-filter: blur(6px) !important;
-            -webkit-backdrop-filter: blur(6px) !important;
-            border-radius: var(--radius) !important;
-            box-shadow: var(--shadow) !important;
-            border: 1px solid var(--border-color) !important;
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 18px;
         }
 
-        /* ----- 标题 ----- */
-        .markdown-section h1 {
-            font-size: 2rem !important;
-            font-weight: 700 !important;
-            border-bottom: 3px solid var(--red) !important;
-            padding-bottom: 12px !important;
-            color: var(--text-color) !important;
-        }
-        .markdown-section h2 {
-            font-weight: 600 !important;
-            border-left: 4px solid var(--red) !important;
-            padding-left: 16px !important;
-            margin-top: 40px !important;
-            color: var(--text-color) !important;
-        }
-        .markdown-section h3, .markdown-section h4 {
-            font-weight: 600 !important;
-            color: var(--text-color) !important;
+        .sidebar-brand img {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            background: var(--red);
         }
 
-        /* ----- 链接 ----- */
-        a, .markdown-section a {
-            color: var(--red) !important;
-            text-decoration: none !important;
-            border-bottom: 1.5px solid transparent !important;
-            transition: border-color 0.2s !important;
+        .sidebar-brand .brand-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red);
+            letter-spacing: -0.3px;
         }
-        a:hover, .markdown-section a:hover {
-            border-bottom-color: var(--red) !important;
-            color: var(--red-dark) !important;
-        }
-
-        /* ----- 代码 ----- */
-        .markdown-section code {
-            color: var(--red-dark) !important;
-            background: var(--red-light) !important;
-            padding: 2px 8px !important;
-            border-radius: 4px !important;
-        }
-        .markdown-section pre {
-            background: #1a1a2e !important;
-            border-radius: var(--radius-sm) !important;
-            padding: 16px 20px !important;
-            border: 1px solid rgba(255,255,255,0.06) !important;
-        }
-        .markdown-section pre code {
-            background: transparent !important;
-            color: #e0e0e8 !important;
-            padding: 0 !important;
+        .sidebar-brand .brand-text span {
+            color: var(--text);
+            font-weight: 400;
         }
 
-        /* ----- 表格 ----- */
-        .markdown-section table thead {
-            background: var(--red) !important;
-            color: #fff !important;
+        /* 侧边栏导航 */
+        .sidebar-nav {
+            list-style: none;
         }
-        .markdown-section table tbody tr:nth-child(even) {
-            background: rgba(0,0,0,0.02) !important;
+        .sidebar-nav li {
+            margin: 1px 0;
         }
-
-        /* ----- 引用块 ----- */
-        .markdown-section blockquote {
-            border-left: 4px solid var(--red) !important;
-            background: rgba(236,65,65,0.05) !important;
-            padding: 12px 20px !important;
-            border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
-            color: var(--text-muted) !important;
+        .sidebar-nav a {
+            display: block;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition);
+            border-left: 3px solid transparent;
         }
-
-        /* ----- 顶部导航 ----- */
-        .app-nav {
-            background: rgba(255,255,255,0.6) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-            border-bottom: 1px solid var(--border-color) !important;
-            padding: 10px 20px !important;
+        .sidebar-nav a:hover {
+            background: var(--red-light);
+            color: var(--red);
         }
-        .app-nav a {
-            color: var(--text-color) !important;
-            font-weight: 500 !important;
+        .sidebar-nav a.active {
+            background: var(--red);
+            color: #fff;
+            border-left-color: var(--red-dark);
+            box-shadow: 0 2px 12px var(--red-glow);
         }
-        .app-nav a:hover {
-            color: var(--red) !important;
+        .sidebar-nav .sub {
+            padding-left: 20px;
         }
-        .app-nav a::before {
-            background: var(--red) !important;
-        }
-
-        /* ----- 分页 ----- */
-        .docsify-pagination-container {
-            border-top: 1px solid var(--border-color) !important;
-            padding-top: 20px !important;
-            margin-top: 32px !important;
-        }
-        .pagination-item:hover {
-            background: var(--red-light) !important;
+        .sidebar-nav .sub a {
+            font-weight: 400;
+            font-size: 13px;
+            padding: 4px 12px;
         }
 
-        /* ----- 搜索框 ----- */
-        .search .input-wrap input:focus {
-            border-color: var(--red) !important;
-            box-shadow: 0 0 0 2px var(--red-glow) !important;
+        /* 移动端侧边栏开关 */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 101;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 12px var(--red-glow);
+            transition: transform var(--transition);
+        }
+        .sidebar-toggle:hover {
+            transform: scale(1.04);
         }
 
-        /* ----- 深色模式 ----- */
-        body.dark {
-            --bg-body: #12121e;
-            --card-bg: rgba(28,28,44,0.82);
-            --text-color: #e8e8f0;
-            --text-muted: #8888aa;
-            --border-color: rgba(255,255,255,0.06);
-            --shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-        body.dark .sidebar {
-            background: rgba(18,18,30,0.92) !important;
-            border-right-color: var(--border-color) !important;
-        }
-        body.dark .sidebar-nav ul li a {
-            color: #c8c8d8 !important;
-        }
-        body.dark .sidebar-nav ul li a:hover {
-            background: rgba(236,65,65,0.15) !important;
-            color: var(--red) !important;
-        }
-        body.dark .sidebar-nav ul li a.active {
-            background: var(--red) !important;
-            color: #fff !important;
-        }
-        body.dark .markdown-section code {
-            background: rgba(236,65,65,0.15) !important;
-            color: #f0a0a0 !important;
-        }
-        body.dark .markdown-section pre {
-            background: #0a0a14 !important;
-        }
-        body.dark .markdown-section blockquote {
-            background: rgba(236,65,65,0.08) !important;
-        }
-        body.dark .markdown-section table tbody tr:nth-child(even) {
-            background: rgba(255,255,255,0.02) !important;
-        }
-        body.dark .app-nav {
-            background: rgba(18,18,30,0.7) !important;
-            border-bottom-color: var(--border-color) !important;
-        }
-        body.dark .app-nav a {
-            color: #c8c8d8 !important;
-        }
-        body.dark .app-nav a:hover {
-            color: var(--red) !important;
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            z-index: 99;
+            backdrop-filter: blur(2px);
         }
 
-        /* ----- 移动端 ----- */
-        @media (max-width: 768px) {
-            .markdown-section {
-                padding: 16px 18px 40px !important;
-                border-radius: 12px !important;
-                margin: 0 10px !important;
-            }
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                width: 280px;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,0.3);
-                z-index: 99;
-                backdrop-filter: blur(2px);
-            }
-            .sidebar-overlay.open {
-                display: block;
-            }
-            .sidebar-toggle {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                position: fixed;
-                top: 14px;
-                left: 14px;
-                z-index: 101;
-                background: var(--red);
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                width: 42px;
-                height: 42px;
-                font-size: 22px;
-                cursor: pointer;
-                box-shadow: 0 2px 12px var(--red-glow);
-            }
-            .content {
-                padding-top: 16px !important;
-            }
-        }
-        @media (min-width: 769px) {
-            .sidebar-toggle, .sidebar-overlay {
-                display: none !important;
-            }
+        /* ===== 主内容 ===== */
+        .main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 32px 40px 60px;
+            min-height: 100vh;
         }
 
-        /* ----- 主题切换按钮 ----- */
+        /* ===== 顶部导航栏 ===== */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .top-nav .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-nav .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition);
+        }
+
+        .top-nav .nav-links a:hover {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        .top-nav .nav-links a.active-link {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        .top-nav .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .top-nav .nav-right .version-badge {
+            font-size: 12px;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 2px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        /* ===== 内容卡片 ===== */
+        .content-card {
+            max-width: 920px;
+            margin: 0 auto;
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 32px 40px 48px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: box-shadow var(--transition);
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* ===== 文章排版 ===== */
+        .markdown-body h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            border-bottom: 3px solid var(--red);
+            padding-bottom: 14px;
+            margin-bottom: 28px;
+            color: var(--text);
+        }
+
+        .markdown-body h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-left: 4px solid var(--red);
+            padding-left: 16px;
+            margin-top: 40px;
+            margin-bottom: 14px;
+            color: var(--text);
+        }
+
+        .markdown-body h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 28px;
+            color: var(--text);
+        }
+
+        .markdown-body h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            color: var(--text);
+        }
+
+        .markdown-body p {
+            margin: 12px 0;
+            color: var(--text-secondary);
+        }
+
+        .markdown-body a {
+            color: var(--red);
+            text-decoration: none;
+            border-bottom: 1.5px solid transparent;
+            transition: border-color var(--transition);
+        }
+
+        .markdown-body a:hover {
+            border-bottom-color: var(--red);
+            color: var(--red-dark);
+        }
+
+        .markdown-body ul,
+        .markdown-body ol {
+            padding-left: 24px;
+            margin: 12px 0;
+        }
+
+        .markdown-body li {
+            margin: 4px 0;
+            color: var(--text-secondary);
+        }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--red);
+            background: var(--red-light);
+            padding: 12px 20px;
+            margin: 16px 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            color: var(--text-secondary);
+        }
+
+        .markdown-body blockquote p {
+            margin: 0;
+            color: inherit;
+        }
+
+        /* 代码 */
+        .markdown-body code {
+            font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85em;
+            background: var(--red-light);
+            color: var(--red-dark);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .markdown-body pre {
+            background: #1a1a2a;
+            border-radius: var(--radius-sm);
+            padding: 18px 22px;
+            overflow-x: auto;
+            margin: 16px 0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .markdown-body pre code {
+            background: transparent;
+            color: #d4d4e0;
+            padding: 0;
+            font-size: 0.82rem;
+            line-height: 1.8;
+        }
+
+        /* 表格 */
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        .markdown-body table thead {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .markdown-body table th,
+        .markdown-body table td {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .markdown-body table tbody tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .markdown-body img {
+            max-width: 100%;
+            border-radius: var(--radius-sm);
+        }
+
+        .markdown-body hr {
+            border: none;
+            border-top: 2px solid var(--border);
+            margin: 32px 0;
+        }
+
+        /* ===== 分页 ===== */
+        .pagination-wrap {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding-top: 20px;
+            margin-top: 32px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .pagination-wrap a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 6px 18px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 14px;
+            transition: all var(--transition);
+        }
+
+        .pagination-wrap a:hover {
+            background: var(--red-light);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        /* ===== 主题切换按钮 ===== */
         .theme-toggle {
             position: fixed;
             bottom: 24px;
             right: 24px;
             z-index: 200;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             border: none;
-            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            background: var(--red);
             color: #fff;
-            font-size: 22px;
+            font-size: 20px;
             cursor: pointer;
             box-shadow: 0 4px 20px var(--red-glow);
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             outline: none;
-            user-select: none;
-        }
-        .theme-toggle:hover {
-            transform: scale(1.1) rotate(6deg);
-            box-shadow: 0 6px 32px var(--red-glow);
-        }
-        .theme-toggle:active {
-            transform: scale(0.92);
-        }
-        .theme-toggle.light-mode {
-            background: rgba(255,255,255,0.9);
-            color: var(--text-color);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
-        /* ----- 滚动条 ----- */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-body); }
-        ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--red-dark); }
+        .theme-toggle:hover {
+            transform: scale(1.08) rotate(6deg);
+            box-shadow: 0 6px 28px var(--red-glow);
+        }
+
+        .theme-toggle.light-mode {
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--text);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ===== 深色模式 ===== */
+        body.dark {
+            --bg: #12121e;
+            --card: #1c1c2e;
+            --text: #e8e8f0;
+            --text-secondary: #b0b0c8;
+            --text-light: #6a6a88;
+            --border: #2a2a3e;
+            --shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --red-light: rgba(236, 65, 65, 0.15);
+        }
+
+        body.dark .sidebar {
+            background: #18182a;
+            border-right-color: var(--border);
+        }
+
+        body.dark .sidebar-nav a {
+            color: #b0b0c8;
+        }
+
+        body.dark .sidebar-nav a:hover {
+            background: rgba(236, 65, 65, 0.15);
+            color: var(--red);
+        }
+
+        body.dark .sidebar-nav a.active {
+            background: var(--red);
+            color: #fff;
+        }
+
+        body.dark .top-nav .nav-links a {
+            color: #b0b0c8;
+        }
+
+        body.dark .top-nav .nav-links a:hover,
+        body.dark .top-nav .nav-links a.active-link {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        body.dark .markdown-body code {
+            background: rgba(236, 65, 65, 0.18);
+            color: #f0a0a0;
+        }
+
+        body.dark .markdown-body pre {
+            background: #0c0c18;
+        }
+
+        body.dark .markdown-body blockquote {
+            background: rgba(236, 65, 65, 0.08);
+        }
+
+        body.dark .markdown-body table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        body.dark .pagination-wrap a {
+            color: #b0b0c8;
+            border-color: var(--border);
+        }
+
+        body.dark .pagination-wrap a:hover {
+            background: rgba(236, 65, 65, 0.12);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        body.dark .top-nav .version-badge {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-light);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                padding: 20px 16px 24px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.open {
+                display: block;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 16px 12px 40px;
+            }
+
+            .content-card {
+                padding: 18px 16px 32px;
+                border-radius: 12px;
+            }
+
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding-top: 4px;
+            }
+
+            .top-nav .nav-links {
+                gap: 16px;
+            }
+
+            .top-nav .nav-links a {
+                font-size: 13px;
+            }
+
+            .markdown-body h1 {
+                font-size: 1.6rem;
+            }
+
+            .markdown-body h2 {
+                font-size: 1.2rem;
+            }
+
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 17px;
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-card {
+                padding: 14px 12px 24px;
+                border-radius: 10px;
+            }
+
+            .top-nav .nav-links {
+                gap: 12px;
+            }
+
+            .top-nav .nav-links a {
+                font-size: 12px;
+            }
+        }
+
+        /* ===== 加载状态 ===== */
+        .loading-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40vh;
+            color: var(--text-light);
+            font-size: 14px;
+            gap: 12px;
+        }
+
+        .loading-placeholder::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--red);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div id="app"></div>
+    <!-- ===== 侧边栏 ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="netease.png" alt="网易云音乐" />
+            <div class="brand-text">网易云<span>API</span></div>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <!-- 由 JS 生成 -->
+            <div style="padding:12px 0;color:var(--text-light);font-size:13px;">加载中...</div>
+        </nav>
+    </aside>
 
-    <!-- 移动端侧边栏 -->
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="切换侧边栏">☰</button>
+    <!-- ===== 移动端遮罩 ===== -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
 
-    <!-- 主题切换 -->
-    <button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
+    <!-- ===== 主内容 ===== -->
+    <main class="main" id="mainContent">
+        <div class="top-nav" id="topNav">
+            <div class="nav-links" id="navLinks">
+                <a href="/">首页</a>
+                <a href="/home">文档</a>
+                <a href="https://github.com/neteasecloudmusicapienhanced/api-enhanced" target="_blank">GitHub</a>
+            </div>
+            <div class="nav-right">
+                <span class="version-badge" id="versionBadge">v4.x</span>
+            </div>
+        </div>
 
+        <div class="content-card" id="contentCard">
+            <div id="docsify-content">
+                <div class="loading-placeholder">加载文档中</div>
+            </div>
+        </div>
+
+        <!-- 分页（由 Docsify 渲染） -->
+        <div class="pagination-wrap" id="paginationWrap"></div>
+    </main>
+
+    <!-- ===== 主题切换 ===== -->
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+
+    <!-- ============================================================
+    Docsify 配置
+    ============================================================ -->
     <script>
         window.$docsify = {
             name: '网易云音乐 API Enhanced',
             repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
-            coverpage: false,          // 关掉封面页，直接显示文档
+            coverpage: false,
             homepage: 'home.md',
             loadSidebar: false,
             subMaxLevel: 4,
             auto2top: true,
             nameLink: '/',
+            relativePath: true,
             search: {
                 maxAge: 86400000,
                 paths: 'auto',
@@ -362,21 +698,203 @@
                 buttonText: '复制',
                 successText: '已复制 ✓'
             },
-            nav: [
-                { title: '首页', path: '/' },
-                { title: '文档', path: '/home' },
-                { title: 'GitHub', path: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced' }
-            ]
+            // 侧边栏由我们自定义，不需要 Docsify 生成
+            sidebar: false,
+            // 渲染完成后处理
+            done: function() {
+                // 移除加载占位
+                var loading = document.querySelector('#docsify-content .loading-placeholder');
+                if (loading) loading.remove();
+
+                // 生成侧边栏
+                generateSidebar();
+
+                // 更新激活状态
+                updateActiveNav();
+
+                // 处理版本号
+                fetchVersion();
+            },
+            afterEach: function(html) {
+                setTimeout(function() {
+                    updateActiveNav();
+                    // 重新生成侧边栏（当页面切换时更新）
+                    generateSidebar();
+                }, 50);
+                return html;
+            }
         };
-    </script>
 
-    <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js"></script>
-    <script src="https://unpkg.com/docsify-plugin-search@2.0.0/dist/search.min.js"></script>
-    <script src="https://unpkg.com/docsify-copy-code@2.1.1/dist/docsify-copy-code.min.js"></script>
-    <script src="https://unpkg.com/docsify-plugin-flexible-alerts@1.1.0/docsify-plugin-flexible-alerts.min.js"></script>
+        // ===== 生成侧边栏 =====
+        function generateSidebar() {
+            var container = document.getElementById('sidebarNav');
+            if (!container) return;
 
-    <!-- 主题切换 -->
-    <script>
+            // 从当前页面提取标题生成侧边栏
+            var headings = document.querySelectorAll('.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4');
+            if (headings.length === 0) {
+                container.innerHTML = '<div style="padding:12px 0;color:var(--text-light);font-size:13px;">暂无目录</div>';
+                return;
+            }
+
+            var html = '<ul>';
+            var currentH2 = '';
+            var currentH3 = '';
+            var h2Count = 0;
+            var h3Count = 0;
+
+            headings.forEach(function(h) {
+                var level = parseInt(h.tagName.charAt(1));
+                var text = h.textContent.trim();
+                // 生成 id
+                var id = text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, '-').replace(/^-|-$/g, '');
+                if (!id) id = 'section-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+                h.id = id;
+
+                if (level === 1) {
+                    // h1 作为顶层
+                    html += '<li><a href="#' + id + '" class="active">' + text + '</a></li>';
+                    currentH2 = '';
+                    currentH3 = '';
+                    h2Count = 0;
+                    h3Count = 0;
+                } else if (level === 2) {
+                    // h2
+                    if (h2Count > 0) {
+                        // 如果前面有 h2，先关闭
+                        if (h3Count > 0) {
+                            html += '</ul></li>';
+                            h3Count = 0;
+                        }
+                        html += '</ul></li>';
+                    }
+                    html += '<li><a href="#' + id + '">' + text + '</a><ul>';
+                    currentH2 = id;
+                    h2Count++;
+                    h3Count = 0;
+                } else if (level === 3) {
+                    // h3
+                    if (h2Count === 0) {
+                        // 如果没有 h2，直接作为子项
+                        html += '<li><a href="#' + id + '">' + text + '</a></li>';
+                    } else {
+                        if (h3Count === 0) {
+                            // 第一个 h3
+                            html += '<li><a href="#' + id + '">' + text + '</a>';
+                        } else {
+                            html += '<li><a href="#' + id + '">' + text + '</a></li>';
+                        }
+                        h3Count++;
+                    }
+                } else if (level === 4) {
+                    // h4 — 简单处理
+                    html += '<li style="padding-left:16px;"><a href="#' + id + '" style="font-size:12px;color:var(--text-light);">' + text + '</a></li>';
+                }
+            });
+
+            // 关闭未闭合的标签
+            if (h3Count > 0) {
+                html += '</ul></li>';
+            }
+            if (h2Count > 0) {
+                html += '</ul></li>';
+            }
+            html += '</ul>';
+
+            container.innerHTML = html;
+
+            // 绑定点击事件：移动端自动关闭侧边栏
+            container.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        closeSidebar();
+                    }
+                    // 更新激活状态
+                    updateActiveNav();
+                });
+            });
+
+            // 更新激活状态
+            updateActiveNav();
+        }
+
+        // ===== 更新导航激活状态 =====
+        function updateActiveNav() {
+            var hash = window.location.hash || '';
+            var links = document.querySelectorAll('.sidebar-nav a, .top-nav .nav-links a');
+            links.forEach(function(link) {
+                link.classList.remove('active');
+                var href = link.getAttribute('href');
+                if (href === hash) {
+                    link.classList.add('active');
+                }
+                if (href === window.location.pathname || (href === '/' && window.location.pathname === '/index.html')) {
+                    link.classList.add('active');
+                }
+            });
+
+            // 顶部导航激活
+            var navLinks = document.querySelectorAll('.top-nav .nav-links a');
+            var currentPath = window.location.pathname;
+            navLinks.forEach(function(link) {
+                link.classList.remove('active-link');
+                var href = link.getAttribute('href');
+                if (href === currentPath || (href === '/' && currentPath === '/index.html')) {
+                    link.classList.add('active-link');
+                }
+                if (href === '/home' && currentPath === '/') {
+                    // 如果当前是首页，但 home 链接指向 /home，不激活
+                }
+            });
+        }
+
+        // ===== 获取版本号 =====
+        function fetchVersion() {
+            fetch('/inner/version', { method: 'POST' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var v = data && data.data && data.data.version;
+                    var badge = document.getElementById('versionBadge');
+                    if (v) badge.textContent = 'v' + v;
+                })
+                .catch(function() {});
+        }
+
+        // ===== 移动端侧边栏控制 =====
+        function openSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleBtn = document.getElementById('sidebarToggle');
+            var overlay = document.getElementById('sidebarOverlay');
+
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var sidebar = document.getElementById('sidebar');
+                sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+            });
+
+            overlay.addEventListener('click', closeSidebar);
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) closeSidebar();
+            });
+        });
+
+        // ===== 主题切换 =====
         (function() {
             var STORAGE_KEY = 'docsify-theme';
             var btn = document.getElementById('themeToggle');
@@ -386,7 +904,7 @@
                 document.body.classList.toggle('dark', isDark);
                 btn.textContent = isDark ? '☀️' : '🌙';
                 btn.className = 'theme-toggle' + (isDark ? '' : ' light-mode');
-                try { localStorage.setItem(STORAGE_KEY, theme); } catch(e) {}
+                try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) {}
             }
 
             function toggleTheme() {
@@ -409,62 +927,37 @@
                         setTheme(e.matches ? 'dark' : 'light');
                     }
                 });
-            } catch(e) {}
+            } catch (e) {}
         })();
     </script>
 
-    <!-- 移动端侧边栏控制 -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var toggleBtn = document.getElementById('sidebarToggle');
-            var overlay = document.getElementById('sidebarOverlay');
-
-            function openSidebar() {
-                document.querySelector('.sidebar').classList.add('open');
-                overlay.classList.add('open');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeSidebar() {
-                document.querySelector('.sidebar').classList.remove('open');
-                overlay.classList.remove('open');
-                document.body.style.overflow = '';
-            }
-
-            toggleBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                var sidebar = document.querySelector('.sidebar');
-                sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-            });
-
-            overlay.addEventListener('click', closeSidebar);
-
-            document.querySelectorAll('.sidebar-nav a').forEach(function(link) {
-                link.addEventListener('click', function() {
-                    if (window.innerWidth <= 768) closeSidebar();
-                });
-            });
-
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 768) closeSidebar();
-            });
-        });
+    <!-- 加载 Docsify -->
+    <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js">
+    </script>
+    <script src="https://unpkg.com/docsify-plugin-search@2.0.0/dist/search.min.js">
+    </script>
+    <script src="https://unpkg.com/docsify-copy-code@2.1.1/dist/docsify-copy-code.min.js">
+    </script>
+    <script src="https://unpkg.com/docsify-plugin-flexible-alerts@1.1.0/docsify-plugin-flexible-alerts.min.js">
     </script>
 
-    <!-- PWA -->
+    <!-- Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(function() {});
         }
     </script>
 
-    <!-- GA -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG"></script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG">
+    </script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){ dataLayer.push(arguments); }
+
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-BPRGR23JEG');
     </script>
+
 </body>
 </html>
