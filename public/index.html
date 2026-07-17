@@ -1,126 +1,788 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="icon" href="docs/netease.png">
-  <title>网易云音乐 API Enhanced</title>
-  <style>
-    :root {
-      --fg: #333;
-      --muted: #666;
-      --border: #ddd;
-      --bg: #f5f5f5;
-      --panel: #ffffff;
-      --accent: #333;
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--fg); background: var(--bg); line-height: 1.6; }
-    .container { max-width: 960px; margin: 40px auto; padding: 0 20px; }
-    @media (max-width: 480px) {
-      .container { margin: 20px auto; padding: 0 16px; }
-      header.site-header h1 { font-size: 22px; }
-      .block { padding: 16px; }
-    }
-    header.site-header { margin-bottom: 24px; }
-    header.site-header h1 { font-size: 28px; font-weight: 600; margin: 0; }
-    .badge { display: inline-block; margin-left: 8px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 12px; font-size: 12px; color: var(--muted); }
-    .sub { margin-top: 8px; color: var(--muted); font-size: 14px; }
-    .block { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
-    .block h2 { margin: 0 0 12px; font-size: 18px; font-weight: 600; }
-    .kvs { display: grid; grid-template-columns: 100px 1fr; gap: 8px 12px; align-items: start; }
-    .kvs div:first-child { color: var(--muted); flex-shrink: 0; }
-    .kvs div:last-child { word-break: break-all; overflow-wrap: anywhere; min-width: 0; overflow: hidden; }
-    @media (max-width: 480px) {
-      .kvs { grid-template-columns: 1fr; gap: 4px 12px; }
-      .kvs div:first-child { font-weight: 500; }
-    }
-    ul.links { list-style: none; padding: 0; margin: 0; }
-    ul.links li { margin: 8px 0; }
-    ul.links a { color: var(--fg); text-decoration: none; border-bottom: 1px dotted var(--border); transition: all 0.2s ease; }
-    ul.links a:hover { color: var(--accent); border-bottom-color: var(--accent); }
-    pre { margin: 0; background: #f9f9f9; border: 1px solid var(--border); border-radius: 6px; padding: 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
-    code { font-family: 'Courier New', monospace; font-size: 13px; }
-    @media (max-width: 480px) {
-      code { font-size: 12px; }
-    }
-    footer.site-footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border); color: var(--muted); text-align: center; }
-    footer.site-footer a { color: var(--fg); text-decoration: none; transition: color 0.2s ease; }
-    footer.site-footer a:hover { color: var(--accent); }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="icon" href="docs/netease.png" />
+    <title>网易云音乐 API Enhanced</title>
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --red: #ec4141;
+            --red-dark: #c23333;
+            --red-light: #fce8e8;
+            --red-glow: rgba(236, 65, 65, 0.25);
+
+            --bg: #f4f6fa;
+            --panel: #ffffff;
+            --panel-border: rgba(0, 0, 0, 0.06);
+
+            --fg: #1a1a2e;
+            --fg-muted: #5a5a7a;
+            --fg-light: #8a8aa8;
+
+            --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 16px 56px rgba(0, 0, 0, 0.10);
+            --shadow-hover: 0 12px 40px rgba(236, 65, 65, 0.12);
+
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* ===== Reset & Base ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== Layout ===== */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 24px 32px;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px 16px 20px;
+            }
+        }
+
+        /* ===== Header ===== */
+        .site-header {
+            margin-bottom: 32px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px 16px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-left .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--red);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 22px;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px var(--red-glow);
+        }
+
+        .site-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .site-header h1 .highlight {
+            color: var(--red);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--red-light);
+            color: var(--red-dark);
+            border: 1px solid rgba(236, 65, 65, 0.15);
+            white-space: nowrap;
+            margin-left: 6px;
+            letter-spacing: 0.2px;
+        }
+
+        .badge::before {
+            content: "●";
+            margin-right: 6px;
+            font-size: 10px;
+            color: var(--red);
+        }
+
+        .header-right {
+            font-size: 14px;
+            color: var(--fg-muted);
+            background: var(--panel);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--panel-border);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-right .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4caf50;
+            display: inline-block;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(0.85);
+            }
+        }
+
+        .sub {
+            width: 100%;
+            margin-top: 6px;
+            color: var(--fg-muted);
+            font-size: 14px;
+            padding-left: 56px;
+        }
+
+        @media (max-width: 640px) {
+            .site-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-left .logo-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
+            }
+            .site-header h1 {
+                font-size: 20px;
+            }
+            .badge {
+                font-size: 11px;
+                padding: 2px 10px;
+            }
+            .sub {
+                padding-left: 0;
+                font-size: 13px;
+            }
+            .header-right {
+                font-size: 12px;
+                padding: 4px 12px;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* ===== Cards ===== */
+        .block {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow var(--transition), transform var(--transition);
+        }
+
+        .block:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .block-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .block-header .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--red-light);
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .block h2 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+        }
+
+        .block h2 .count {
+            font-weight: 400;
+            font-size: 13px;
+            color: var(--fg-light);
+            margin-left: 8px;
+        }
+
+        /* ===== KVS ===== */
+        .kvs {
+            display: grid;
+            grid-template-columns: 110px 1fr;
+            gap: 6px 16px;
+            align-items: start;
+            font-size: 14px;
+        }
+
+        .kvs .k {
+            color: var(--fg-muted);
+            font-weight: 500;
+            padding: 4px 0;
+        }
+
+        .kvs .v {
+            padding: 4px 0;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 13px;
+            background: var(--bg);
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--panel-border);
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .kvs .v code {
+            background: transparent;
+            padding: 0;
+            border: none;
+            font-size: 13px;
+        }
+
+        @media (max-width: 480px) {
+            .kvs {
+                grid-template-columns: 1fr;
+                gap: 2px 0;
+            }
+            .kvs .k {
+                font-weight: 600;
+                font-size: 13px;
+                padding-bottom: 0;
+            }
+            .kvs .v {
+                font-size: 12px;
+                padding: 3px 10px;
+            }
+        }
+
+        /* ===== Links ===== */
+        ul.links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 24px;
+        }
+
+        ul.links li {
+            margin: 0;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        ul.links li:last-child {
+            border-bottom: none;
+        }
+
+        ul.links li .link-marker {
+            color: var(--red);
+            font-size: 12px;
+            opacity: 0.6;
+            flex-shrink: 0;
+        }
+
+        ul.links a {
+            color: var(--fg);
+            text-decoration: none;
+            transition: color var(--transition), border-color var(--transition);
+            border-bottom: 1.5px solid transparent;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        ul.links a:hover {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        ul.links a code {
+            background: var(--bg);
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--fg-muted);
+            border: 1px solid var(--panel-border);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        @media (max-width: 640px) {
+            ul.links {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            ul.links li {
+                padding: 8px 0;
+            }
+        }
+
+        /* ===== Debug ===== */
+        .debug-block pre {
+            margin: 0;
+            background: #f8f9fc;
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 13px;
+            line-height: 1.7;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            position: relative;
+        }
+
+        .debug-block pre .copy-hint {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 11px;
+            color: var(--fg-light);
+            background: var(--panel);
+            padding: 2px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--panel-border);
+            opacity: 0;
+            transition: opacity var(--transition);
+            cursor: pointer;
+        }
+
+        .debug-block pre:hover .copy-hint {
+            opacity: 1;
+        }
+
+        .debug-block pre code {
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--fg);
+        }
+
+        .debug-block .debug-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--panel-border);
+        }
+
+        .debug-block .debug-actions a {
+            color: var(--fg-muted);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color var(--transition), background var(--transition);
+            padding: 4px 12px;
+            border-radius: 6px;
+            background: var(--bg);
+            border: 1px solid var(--panel-border);
+        }
+
+        .debug-block .debug-actions a:hover {
+            color: var(--red);
+            background: var(--red-light);
+            border-color: var(--red);
+        }
+
+        .debug-block .debug-actions .sep {
+            color: var(--panel-border);
+            user-select: none;
+        }
+
+        @media (max-width: 480px) {
+            .debug-block pre {
+                font-size: 12px;
+                padding: 12px 14px;
+            }
+            .debug-block pre code {
+                font-size: 12px;
+            }
+            .debug-block .debug-actions a {
+                font-size: 12px;
+                padding: 2px 10px;
+            }
+        }
+
+        /* ===== Footer ===== */
+        .site-footer {
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            color: var(--fg-light);
+            font-size: 13px;
+        }
+
+        .site-footer .footer-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .site-footer a {
+            color: var(--fg-muted);
+            text-decoration: none;
+            transition: color var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .site-footer a:hover {
+            color: var(--red);
+        }
+
+        .site-footer .footer-heart {
+            color: var(--red);
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .site-footer {
+                flex-direction: column;
+                text-align: center;
+                font-size: 12px;
+            }
+            .site-footer .footer-links {
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d0d0da;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b0b0c0;
+        }
+
+        /* ===== Utilities ===== */
+        .text-muted {
+            color: var(--fg-muted);
+        }
+        .text-small {
+            font-size: 13px;
+        }
+
+        /* ===== Responsive card padding ===== */
+        @media (max-width: 640px) {
+            .block {
+                padding: 18px 16px;
+                border-radius: 12px;
+            }
+            .block-header .icon {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
+            .block h2 {
+                font-size: 15px;
+            }
+        }
+
+        /* ===== Shimmer load ===== */
+        .shimmer {
+            background: linear-gradient(90deg, var(--panel) 25%, var(--bg) 50%, var(--panel) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.8s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <main class="container">
-    <header class="site-header">
-      <h1>网易云音乐 API Enhanced <span id="api-version" class="badge"></span></h1>
-      <p class="sub">🔍 A revival project for NeteaseCloudMusicApi Node.js Api Services || 网易云音乐 API 备份 + 增强 || 本项目自原版v4.28.0版本后开始自行维护</p>
-    </header>
 
-    <section class="block">
-      <h2>状态</h2>
-      <div class="kvs">
-        <div>Base URL</div><div id="base-url">—</div>
-        <div>当前页</div><div id="current-url">—</div>
-      </div>
-    </section>
+    <main class="container">
 
-    <section class="block">
-      <h2>文档</h2>
-      <p><a href="/docs" target="_blank">查看在线文档</a></p>
-    </section>
+        <!-- ===== HEADER ===== -->
+        <header class="site-header">
+            <div class="header-left">
+                <div class="logo-icon">♫</div>
+                <h1>
+                    网易云音乐 <span class="highlight">API</span> Enhanced
+                    <span id="api-version" class="badge">v·加载中</span>
+                </h1>
+            </div>
+            <div class="header-right">
+                <span class="dot"></span>
+                <span id="status-text">服务正常</span>
+            </div>
+            <p class="sub">
+                🔍 自 v4.28.0 起独立维护 · 备份增强 · 持续迭代
+            </p>
+        </header>
 
-    <section class="block">
-      <h2>常用接口</h2>
-      <ul class="links">
-        <li><a href="/search?keywords=妖精小姐的魔法邀约">搜索音乐: <code>GET /search</code></a></li>
-        <li><a href="/song/detail?ids=2756058128">获取音乐详情: <code>GET /song/detail</code></a></li>
-        <li><a href="/comment/music?id=2756058128&limit=1">获取音乐评论: <code>GET /comment/music</code></a></li>
-        <li><a href="/song/url/v1?id=2756058128&level=exhigh">获取音乐播放链接: <code>GET /song/url/v1</code></a></li>
-      </ul>
-    </section>
+        <!-- ===== STATUS ===== -->
+        <section class="block">
+            <div class="block-header">
+                <span class="icon">📡</span>
+                <h2>服务状态</h2>
+            </div>
+            <div class="kvs">
+                <span class="k">Base URL</span>
+                <span class="v" id="base-url">—</span>
+                <span class="k">当前页面</span>
+                <span class="v" id="current-url">—</span>
+                <span class="k">反馈</span>
+                <span class="v" style="background:var(--red-light);border-color:var(--red);color:var(--red-dark);font-weight:500;">
+                    📧 QQ: 3179711976
+                </span>
+            </div>
+        </section>
 
-    <section class="block">
-      <h2>调试部分</h2>
-      <pre><code>curl -s {origin}/inner/version
-curl -s {origin}/search?keywords=网易云</code></pre>
-      <div style="margin-top:10px; line-height:2;">
-        <a href="/api.html">交互式调试</a> ·
-        <a href="/qrlogin.html">二维码登录示例</a> ·
-        <a href="/unblock_test.html">解灰测试</a> ·
-        <a href="/audio_match_demo/index.html">听歌识曲 Demo</a> ·
-        <a href="/cloud.html">云盘上传</a> ·
-        <a href="/playlist_import.html">歌单导入</a> ·
-        <a href="/api_decrypt.html">API 解密</a> ·
-        <a href="/listen_together_host.html">一起听示例</a> ·
-        <a href="/playlist_cover_update.html">更新歌单封面示例</a> ·
-        <a href="/avatar_update.html">头像更新示例</a> ·
-        <a href="/scrobble.html">听歌打卡示例</a>
-      </div>
-    </section>
+        <!-- ===== DOCS ===== -->
+        <section class="block">
+            <div class="block-header">
+                <span class="icon">📖</span>
+                <h2>在线文档</h2>
+            </div>
+            <p style="margin: 0;">
+                <a href="/docs" target="_blank" style="color:var(--red); font-weight:500; text-decoration:none; border-bottom:1.5px solid var(--red);">
+                    → 查看完整 API 文档
+                </a>
+            </p>
+        </section>
 
-    <footer class="site-footer">
-      <a href="https://github.com/neteasecloudmusicapienhanced/api-enhanced" target="_blank">GitHub</a>
-    </footer>
-  </main>
+        <!-- ===== COMMON APIs ===== -->
+        <section class="block">
+            <div class="block-header">
+                <span class="icon">⚡</span>
+                <h2>常用接口 <span class="count">快速体验</span></h2>
+            </div>
+            <ul class="links">
+                <li>
+                    <span class="link-marker">▸</span>
+                    <a href="/search?keywords=妖精小姐的魔法邀约">
+                        搜索音乐 <code>GET /search</code>
+                    </a>
+                </li>
+                <li>
+                    <span class="link-marker">▸</span>
+                    <a href="/song/detail?ids=2756058128">
+                        音乐详情 <code>GET /song/detail</code>
+                    </a>
+                </li>
+                <li>
+                    <span class="link-marker">▸</span>
+                    <a href="/comment/music?id=2756058128&limit=1">
+                        音乐评论 <code>GET /comment/music</code>
+                    </a>
+                </li>
+                <li>
+                    <span class="link-marker">▸</span>
+                    <a href="/song/url/v1?id=2756058128&level=exhigh">
+                        播放链接 <code>GET /song/url/v1</code>
+                    </a>
+                </li>
+            </ul>
+        </section>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var origin = window.location.origin;
-      document.getElementById('base-url').textContent = origin;
-      document.getElementById('current-url').textContent = window.location.href;
+        <!-- ===== DEBUG ===== -->
+        <section class="block debug-block">
+            <div class="block-header">
+                <span class="icon">🛠️</span>
+                <h2>调试 &amp; 工具 <span class="count">命令行 / 示例</span></h2>
+            </div>
 
-      fetch('/inner/version', { method: 'POST' })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          var v = data && data.data && data.data.version;
-          if (v) document.getElementById('api-version').textContent = 'v' + v;
-          var pre = document.querySelector('pre code');
-          if (pre) pre.textContent = pre.textContent.replace(/\{origin\}/g, origin);
-        })
-        .catch(function () {});
-    });
-  </script>
+            <pre id="debug-pre"><code>curl -s {origin}/inner/version
+curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="copy-hint">复制</span></pre>
+
+            <div class="debug-actions">
+                <a href="/api.html">交互式调试</a>
+                <span class="sep">·</span>
+                <a href="/qrlogin.html">二维码登录</a>
+                <span class="sep">·</span>
+                <a href="/unblock_test.html">解灰测试</a>
+                <span class="sep">·</span>
+                <a href="/audio_match_demo/index.html">听歌识曲</a>
+                <span class="sep">·</span>
+                <a href="/cloud.html">云盘上传</a>
+                <span class="sep">·</span>
+                <a href="/playlist_import.html">歌单导入</a>
+                <span class="sep">·</span>
+                <a href="/api_decrypt.html">API 解密</a>
+                <span class="sep">·</span>
+                <a href="/listen_together_host.html">一起听</a>
+                <span class="sep">·</span>
+                <a href="/playlist_cover_update.html">歌单封面</a>
+                <span class="sep">·</span>
+                <a href="/avatar_update.html">头像更新</a>
+                <span class="sep">·</span>
+                <a href="/scrobble.html">听歌打卡</a>
+            </div>
+        </section>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="site-footer">
+            <span>
+                <span class="footer-heart">♥</span> 开放 · 自由 · 音乐
+                <span style="margin-left:12px;color:var(--fg-light);font-size:12px;">
+                    反馈 QQ: 3179711976
+                </span>
+            </span>
+            <div class="footer-links">
+                <a href="https://github.com/neteasecloudmusicapienhanced/api-enhanced" target="_blank">
+                    <span style="font-size:16px;">⌨</span> GitHub
+                </a>
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+                    ↑ 回到顶部
+                </a>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const origin = window.location.origin;
+
+            // ---- 状态 ----
+            document.getElementById('base-url').textContent = origin;
+            document.getElementById('current-url').textContent = window.location.href;
+
+            // ---- 版本 ----
+            fetch('/inner/version', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    const v = data && data.data && data.data.version;
+                    const badge = document.getElementById('api-version');
+                    if (v) badge.textContent = 'v' + v;
+                    else badge.textContent = 'v·';
+
+                    // 替换 pre 中的 {origin}
+                    const pre = document.querySelector('#debug-pre code');
+                    if (pre) {
+                        pre.textContent = pre.textContent.replace(/\{origin\}/g, origin);
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('api-version').textContent = 'v·—';
+                });
+
+            // ---- 复制功能 ----
+            const copyHint = document.getElementById('copy-hint');
+            if (copyHint) {
+                copyHint.addEventListener('click', function() {
+                    const codeEl = document.querySelector('#debug-pre code');
+                    if (!codeEl) return;
+                    const text = codeEl.textContent;
+                    navigator.clipboard.writeText(text).then(() => {
+                        const orig = copyHint.textContent;
+                        copyHint.textContent = '✓ 已复制';
+                        setTimeout(() => { copyHint.textContent = orig; }, 1800);
+                    }).catch(() => {
+                        // fallback
+                        const range = document.createRange();
+                        range.selectNode(codeEl);
+                        window.getSelection().removeAllRanges();
+                        window.getSelection().addRange(range);
+                        document.execCommand('copy');
+                        window.getSelection().removeAllRanges();
+                        const orig = copyHint.textContent;
+                        copyHint.textContent = '✓ 已复制';
+                        setTimeout(() => { copyHint.textContent = orig; }, 1800);
+                    });
+                });
+            }
+
+            // ---- 状态指示器动画 ----
+            const statusText = document.getElementById('status-text');
+            const dot = document.querySelector('.dot');
+            fetch('/inner/version', { method: 'POST' })
+                .then(r => {
+                    if (r.ok) {
+                        statusText.textContent = '服务正常';
+                        dot.style.background = '#4caf50';
+                    } else {
+                        statusText.textContent = '服务异常';
+                        dot.style.background = '#ff9800';
+                    }
+                })
+                .catch(() => {
+                    statusText.textContent = '连接失败';
+                    dot.style.background = '#f44336';
+                });
+
+        });
+    </script>
+
 </body>
 </html>
