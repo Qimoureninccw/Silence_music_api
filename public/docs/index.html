@@ -1,513 +1,585 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js">
-  <meta name="description" content="网易云音乐 NodeJS API Enhanced">
-  <title>网易云音乐 NodeJS API Enhanced</title>
-  <link rel="icon" href="netease.png">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta name="referrer" content="never">
-  <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css">
+    <meta charset="UTF-8" />
+    <meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js" />
+    <meta name="description" content="网易云音乐 NodeJS API Enhanced" />
+    <title>网易云音乐 NodeJS API Enhanced</title>
+    <link rel="icon" href="netease.png" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta name="referrer" content="never" />
 
-  <style>
-    /* ===== 品牌色彩 ===== */
-    :root {
-      --brand-red: #ec4141;
-      --brand-red-dark: #c23333;
-      --brand-red-light: #fce8e8;
-      --brand-shadow: rgba(236, 65, 65, 0.35);
-      --radius-lg: 20px;
-      --radius-sm: 10px;
-    }
+    <!-- 加载 Docsify 默认主题（但我们会用自定义样式彻底覆盖所有绿色） -->
+    <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css" />
 
-    /* ============================================================
-       彻底覆盖 Docsify 默认绿色 (#42b983) → 全部改为红色
-       ============================================================ */
+    <style>
+        /* ================================================================
+               完全重写 — 彻底清除所有绿色 (#42b983 等)，统一为网易红
+               ================================================================ */
 
-    /* ----- 1. 全局链接 & 文字 ----- */
-    a,
-    .markdown-section a,
-    .sidebar-nav ul li a,
-    .app-name-link,
-    .pagination-item .pagination-label,
-    .pagination-item .pagination-title,
-    .search .clear-button,
-    .search .input-wrap input::placeholder {
-      color: var(--brand-red) !important;
-    }
-    a:hover,
-    .markdown-section a:hover,
-    .sidebar-nav ul li a:hover,
-    .app-name-link:hover {
-      color: var(--brand-red-dark) !important;
-    }
+        /* ----- 品牌色 ----- */
+        :root {
+            --red: #ec4141;
+            --red-dark: #b83030;
+            --red-light: #fce8e8;
+            --red-glow: rgba(236, 65, 65, 0.3);
+            --bg-body: #f4f6fa;
+            --text-dark: #1a1a2e;
+            --text-muted: #5a5a7a;
+            --card-bg: rgba(255, 255, 255, 0.78);
+            --shadow: 0 8px 40px rgba(0, 0, 0, 0.06);
+        }
 
-    /* 侧边栏文字 — 用户要求黑色，这里用深灰 */
-    .sidebar-nav ul li a {
-      color: #1a1a2e !important;
-    }
-    .sidebar-nav ul li a:hover {
-      color: var(--brand-red) !important;
-    }
-    .sidebar-nav ul li a.active {
-      background: var(--brand-red) !important;
-      color: #fff !important;
-      box-shadow: 0 2px 12px var(--brand-shadow) !important;
-    }
+        /* ----- 全局重置 ----- */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: var(--bg-body);
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
 
-    /* ----- 2. 标题边框 / 下划线 ----- */
-    .markdown-section h1,
-    .markdown-section h2 {
-      border-color: var(--brand-red) !important;
-    }
-    .markdown-section h2 {
-      border-left-color: var(--brand-red) !important;
-    }
+        /* ================================================================
+           1. 侧边栏 — 文字黑色，激活红色
+           ================================================================ */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.88) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.04) !important;
+        }
+        /* 项目名称 */
+        .app-name-link {
+            color: var(--red) !important;
+            font-weight: 700 !important;
+        }
+        /* 侧边栏链接 — 黑色 */
+        .sidebar-nav ul li a {
+            color: var(--text-dark) !important;
+            font-weight: 500 !important;
+            border-radius: 6px !important;
+            padding: 5px 12px !important;
+            margin: 2px 0 !important;
+            transition: all 0.2s !important;
+        }
+        .sidebar-nav ul li a:hover {
+            background: var(--red-light) !important;
+            color: var(--red) !important;
+        }
+        .sidebar-nav ul li a.active {
+            background: var(--red) !important;
+            color: #fff !important;
+            box-shadow: 0 2px 12px var(--red-glow) !important;
+        }
 
-    /* ----- 3. 引用块 ----- */
-    .markdown-section blockquote {
-      border-left-color: var(--brand-red) !important;
-    }
+        /* ================================================================
+           2. 内容区 — 毛玻璃卡片
+           ================================================================ */
+        .content {
+            padding-top: 30px !important;
+            background: transparent !important;
+        }
+        .markdown-section {
+            max-width: 900px !important;
+            margin: 0 auto !important;
+            padding: 24px 32px 60px !important;
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(6px) !important;
+            -webkit-backdrop-filter: blur(6px) !important;
+            border-radius: 20px !important;
+            box-shadow: var(--shadow) !important;
+            transition: background 0.3s !important;
+        }
 
-    /* ----- 4. 表格表头 ----- */
-    .markdown-section table thead {
-      background: var(--brand-red) !important;
-      color: #fff !important;
-    }
+        /* ================================================================
+           3. 标题 — 红色边框 / 下划线
+           ================================================================ */
+        .markdown-section h1 {
+            font-size: 2.2rem !important;
+            font-weight: 700 !important;
+            border-bottom: 3px solid var(--red) !important;
+            padding-bottom: 12px !important;
+            color: var(--text-dark) !important;
+        }
+        .markdown-section h2 {
+            font-weight: 600 !important;
+            border-left: 4px solid var(--red) !important;
+            padding-left: 16px !important;
+            margin-top: 40px !important;
+            color: var(--text-dark) !important;
+        }
+        .markdown-section h3,
+        .markdown-section h4 {
+            font-weight: 600 !important;
+            color: var(--text-dark) !important;
+        }
 
-    /* ----- 5. 行内代码 ----- */
-    .markdown-section code {
-      color: var(--brand-red-dark) !important;
-      background: var(--brand-red-light) !important;
-    }
+        /* ================================================================
+           4. 链接 — 红色
+           ================================================================ */
+        a,
+        .markdown-section a,
+        .pagination-item .pagination-label,
+        .pagination-item .pagination-title {
+            color: var(--red) !important;
+            text-decoration: none !important;
+            border-bottom: 1.5px solid transparent !important;
+            transition: border-color 0.2s !important;
+        }
+        a:hover,
+        .markdown-section a:hover {
+            color: var(--red-dark) !important;
+            border-bottom-color: var(--red) !important;
+        }
 
-    /* ----- 6. 搜索框 ----- */
-    .search .input-wrap input:focus {
-      border-color: var(--brand-red) !important;
-      box-shadow: 0 0 0 2px var(--brand-shadow) !important;
-    }
+        /* ================================================================
+           5. 代码
+           ================================================================ */
+        .markdown-section code {
+            color: var(--red-dark) !important;
+            background: var(--red-light) !important;
+            padding: 2px 8px !important;
+            border-radius: 4px !important;
+            font-size: 0.9em !important;
+        }
+        .markdown-section pre {
+            background: #1e1e2e !important;
+            border-radius: 10px !important;
+            padding: 16px 20px !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+        .markdown-section pre code {
+            background: transparent !important;
+            color: #e0e0e0 !important;
+            padding: 0 !important;
+        }
 
-    /* ----- 7. 分页控件 ----- */
-    .pagination-item:hover {
-      background: var(--brand-red-light) !important;
-    }
+        /* ================================================================
+           6. 表格 — 表头红色
+           ================================================================ */
+        .markdown-section table thead {
+            background: var(--red) !important;
+            color: #fff !important;
+        }
+        .markdown-section table th,
+        .markdown-section table td {
+            padding: 10px 16px !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+        }
+        .markdown-section table tbody tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.02) !important;
+        }
 
-    /* ----- 8. 顶部导航激活指示条 ----- */
-    .app-nav a::before {
-      background: var(--brand-red) !important;
-    }
+        /* ================================================================
+           7. 引用块 — 红色左边框
+           ================================================================ */
+        .markdown-section blockquote {
+            border-left: 4px solid var(--red) !important;
+            background: rgba(236, 65, 65, 0.05) !important;
+            padding: 12px 20px !important;
+            border-radius: 0 10px 10px 0 !important;
+            color: var(--text-muted) !important;
+        }
 
-    /* ----- 9. 滚动条 ----- */
-    ::-webkit-scrollbar-thumb {
-      background: var(--brand-red) !important;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--brand-red-dark) !important;
-    }
+        /* ================================================================
+           8. 顶部导航
+           ================================================================ */
+        .app-nav {
+            background: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+            padding: 10px 20px !important;
+        }
+        .app-nav a {
+            color: var(--text-dark) !important;
+            font-weight: 500 !important;
+        }
+        .app-nav a:hover {
+            color: var(--red) !important;
+        }
+        .app-nav a::before {
+            background: var(--red) !important;
+        }
 
-    /* ----- 10. 封面页 (coverpage) 彻底改红 ----- */
-    /* 封面背景 — 用渐变红替代默认绿色 */
-    section.cover {
-      background: linear-gradient(145deg, #1a0a0a 0%, #2d1515 40%, #3d1a1a 100%) !important;
-      /* 也可以用纯色: background: #1a0a0a !important; */
-    }
-    /* 封面标题 */
-    section.cover h1 {
-      color: #fff !important;
-    }
-    section.cover h1 .anchor span {
-      color: #fff !important;
-    }
-    /* 封面描述文字 */
-    section.cover .cover-main p:not(.lead) {
-      color: rgba(255, 255, 255, 0.75) !important;
-    }
-    /* 封面按钮 — 主要按钮 */
-    section.cover .cover-main .buttons .button-primary,
-    section.cover .cover-main .buttons a:first-child {
-      background: var(--brand-red) !important;
-      border-color: var(--brand-red) !important;
-      color: #fff !important;
-    }
-    section.cover .cover-main .buttons .button-primary:hover,
-    section.cover .cover-main .buttons a:first-child:hover {
-      background: var(--brand-red-dark) !important;
-      border-color: var(--brand-red-dark) !important;
-    }
-    /* 封面次要按钮 */
-    section.cover .cover-main .buttons a:not(:first-child) {
-      background: transparent !important;
-      border-color: rgba(255, 255, 255, 0.4) !important;
-      color: rgba(255, 255, 255, 0.85) !important;
-    }
-    section.cover .cover-main .buttons a:not(:first-child):hover {
-      border-color: var(--brand-red) !important;
-      color: #fff !important;
-    }
-    /* 封面徽标/图标 */
-    section.cover .cover-main .mask-gradient {
-      background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.6)) !important;
-    }
+        /* ================================================================
+           9. 搜索框 — 红色聚焦边框
+           ================================================================ */
+        .search .input-wrap input:focus {
+            border-color: var(--red) !important;
+            box-shadow: 0 0 0 2px var(--red-glow) !important;
+        }
 
-    /* ----- 11. 按钮（通用） ----- */
-    .markdown-section .btn,
-    .markdown-section button,
-    button,
-    .btn {
-      background: var(--brand-red) !important;
-      border-color: var(--brand-red) !important;
-      color: #fff !important;
-    }
-    .markdown-section .btn:hover,
-    .markdown-section button:hover,
-    button:hover,
-    .btn:hover {
-      background: var(--brand-red-dark) !important;
-      border-color: var(--brand-red-dark) !important;
-    }
+        /* ================================================================
+           10. 分页控件
+           ================================================================ */
+        .docsify-pagination-container {
+            border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+            padding-top: 20px !important;
+            margin-top: 40px !important;
+        }
+        .pagination-item:hover {
+            background: var(--red-light) !important;
+        }
 
-    /* ============================================================
-       保留之前的美化样式
-       ============================================================ */
+        /* ================================================================
+           11. 滚动条 — 红色
+           ================================================================ */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-body);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--red) !important;
+            border-radius: 6px !important;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--red-dark) !important;
+        }
 
-    .sidebar {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-right: 1px solid rgba(0, 0, 0, 0.04);
-      box-shadow: 2px 0 24px rgba(0, 0, 0, 0.04);
-    }
+        /* ================================================================
+           12. 封面页 (coverpage) — 彻底重写
+           ================================================================ */
+        section.cover {
+            background: linear-gradient(145deg, #120808 0%, #2a1212 40%, #3d1a1a 100%) !important;
+        }
+        section.cover .cover-main {
+            color: #fff !important;
+        }
+        section.cover .cover-main h1 {
+            color: #fff !important;
+            font-weight: 700 !important;
+        }
+        section.cover .cover-main p {
+            color: rgba(255, 255, 255, 0.78) !important;
+        }
+        /* 封面主按钮 — 红色 */
+        section.cover .cover-main .buttons a:first-child,
+        section.cover .cover-main .button-primary {
+            background: var(--red) !important;
+            border: 2px solid var(--red) !important;
+            color: #fff !important;
+            border-radius: 30px !important;
+            padding: 12px 32px !important;
+            font-weight: 600 !important;
+            transition: all 0.25s !important;
+            box-shadow: 0 4px 20px var(--red-glow) !important;
+        }
+        section.cover .cover-main .buttons a:first-child:hover,
+        section.cover .cover-main .button-primary:hover {
+            background: var(--red-dark) !important;
+            border-color: var(--red-dark) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 32px var(--red-glow) !important;
+        }
+        /* 封面次要按钮 — 透明边框 */
+        section.cover .cover-main .buttons a:not(:first-child) {
+            background: transparent !important;
+            border: 2px solid rgba(255, 255, 255, 0.35) !important;
+            color: rgba(255, 255, 255, 0.85) !important;
+            border-radius: 30px !important;
+            padding: 12px 32px !important;
+            font-weight: 600 !important;
+            transition: all 0.25s !important;
+        }
+        section.cover .cover-main .buttons a:not(:first-child):hover {
+            border-color: var(--red) !important;
+            color: #fff !important;
+            transform: translateY(-2px) !important;
+        }
+        /* 封面遮罩 */
+        section.cover .mask-gradient {
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.6)) !important;
+        }
 
-    .sidebar-nav ul li a {
-      border-radius: 6px;
-      padding: 5px 12px;
-      margin: 2px 0;
-      transition: all 0.2s;
-      font-weight: 500;
-      font-size: 14px;
-    }
-    .sidebar-nav ul li a:hover {
-      background: var(--brand-red-light) !important;
-    }
+        /* ================================================================
+           13. 通用按钮
+           ================================================================ */
+        .btn,
+        button,
+        .markdown-section .btn {
+            background: var(--red) !important;
+            border: 2px solid var(--red) !important;
+            color: #fff !important;
+            border-radius: 30px !important;
+            padding: 8px 24px !important;
+            font-weight: 600 !important;
+            transition: all 0.25s !important;
+            cursor: pointer !important;
+        }
+        .btn:hover,
+        button:hover,
+        .markdown-section .btn:hover {
+            background: var(--red-dark) !important;
+            border-color: var(--red-dark) !important;
+        }
 
-    .app-name-link {
-      font-weight: 700 !important;
-      letter-spacing: -0.3px;
-      color: var(--brand-red) !important;
-    }
-    .app-name-link img {
-      border-radius: 8px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
+        /* ================================================================
+           14. 暗色模式覆盖
+           ================================================================ */
+        body.dark .sidebar {
+            background: rgba(18, 18, 30, 0.92) !important;
+            border-right-color: rgba(255, 255, 255, 0.04) !important;
+        }
+        body.dark .sidebar-nav ul li a {
+            color: #c8c8d8 !important;
+        }
+        body.dark .sidebar-nav ul li a:hover {
+            background: rgba(236, 65, 65, 0.15) !important;
+            color: #fff !important;
+        }
+        body.dark .sidebar-nav ul li a.active {
+            background: var(--red) !important;
+            color: #fff !important;
+        }
+        body.dark .markdown-section {
+            background: rgba(28, 28, 44, 0.78) !important;
+        }
+        body.dark .markdown-section h1,
+        body.dark .markdown-section h2,
+        body.dark .markdown-section h3,
+        body.dark .markdown-section h4 {
+            color: #ececf0 !important;
+        }
+        body.dark .markdown-section p,
+        body.dark .markdown-section li {
+            color: #c8c8d8 !important;
+        }
+        body.dark .markdown-section code {
+            background: rgba(236, 65, 65, 0.18) !important;
+            color: #f0a0a0 !important;
+        }
+        body.dark .markdown-section pre {
+            background: #0e0e1a !important;
+        }
+        body.dark .app-nav {
+            background: rgba(18, 18, 30, 0.7) !important;
+            border-bottom-color: rgba(255, 255, 255, 0.04) !important;
+        }
+        body.dark .app-nav a {
+            color: #c8c8d8 !important;
+        }
+        body.dark .app-nav a:hover {
+            color: var(--red) !important;
+        }
+        body.dark section.cover {
+            background: linear-gradient(145deg, #0a0505 0%, #1a0e0e 40%, #2a1212 100%) !important;
+        }
+        body.dark .pagination-item:hover {
+            background: rgba(236, 65, 65, 0.12) !important;
+        }
+        body.dark .docsify-pagination-container {
+            border-top-color: rgba(255, 255, 255, 0.06) !important;
+        }
+        body.dark .search .input-wrap input:focus {
+            border-color: var(--red) !important;
+            box-shadow: 0 0 0 2px rgba(236, 65, 65, 0.25) !important;
+        }
 
-    .content { padding-top: 30px; background: transparent; }
-    .markdown-section {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px 30px 60px;
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border-radius: var(--radius-lg);
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.04);
-    }
+        /* ================================================================
+           15. 响应式
+           ================================================================ */
+        @media (max-width: 768px) {
+            .markdown-section {
+                padding: 16px 18px 40px !important;
+                border-radius: 16px !important;
+                margin: 0 10px !important;
+            }
+            .sidebar {
+                background: rgba(255, 255, 255, 0.94) !important;
+                backdrop-filter: blur(18px) !important;
+                -webkit-backdrop-filter: blur(18px) !important;
+            }
+            section.cover .cover-main .buttons a {
+                display: inline-block !important;
+                margin: 6px 4px !important;
+                padding: 10px 22px !important;
+                font-size: 14px !important;
+            }
+        }
 
-    body.dark .markdown-section {
-      background: rgba(30, 30, 46, 0.75);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
-    }
+        /* ================================================================
+           16. 主题切换按钮 — 红色浮动
+           ================================================================ */
+        .theme-toggle {
+            position: fixed !important;
+            bottom: 28px !important;
+            right: 28px !important;
+            z-index: 999 !important;
+            width: 52px !important;
+            height: 52px !important;
+            border-radius: 50% !important;
+            border: none !important;
+            background: linear-gradient(135deg, var(--red), var(--red-dark)) !important;
+            color: #fff !important;
+            font-size: 24px !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 20px var(--red-glow) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            outline: none !important;
+            padding: 0 !important;
+            user-select: none !important;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.12) rotate(8deg) !important;
+            box-shadow: 0 6px 32px var(--red-glow) !important;
+        }
+        .theme-toggle:active {
+            transform: scale(0.92) !important;
+        }
+        .theme-toggle.light {
+            background: rgba(255, 255, 255, 0.9) !important;
+            color: var(--text-dark) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+        .theme-toggle.light:hover {
+            box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14) !important;
+        }
 
-    .markdown-section h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      border-bottom: 3px solid var(--brand-red);
-      padding-bottom: 12px;
-      margin-bottom: 28px;
-      color: var(--heading-color, #1a1a2e);
-    }
-    .markdown-section h2 {
-      font-weight: 600;
-      border-left: 4px solid var(--brand-red);
-      padding-left: 16px;
-      margin-top: 40px;
-      color: var(--heading-color, #1a1a2e);
-    }
-    .markdown-section h3,
-    .markdown-section h4 {
-      font-weight: 600;
-      color: var(--heading-color, #2a2a4a);
-    }
-    .markdown-section p,
-    .markdown-section li {
-      line-height: 1.8;
-      color: var(--text-color, #333);
-    }
-    .markdown-section a {
-      border-bottom: 1.5px solid transparent;
-      transition: border-color 0.2s;
-    }
-    .markdown-section a:hover {
-      border-bottom-color: var(--brand-red);
-    }
+        /* ================================================================
+           17. 其他杂项
+           ================================================================ */
+        .markdown-section img {
+            border-radius: 10px !important;
+        }
+        .markdown-section .emoji {
+            font-style: normal !important;
+        }
+        /* 确保所有 #42b983 都被覆盖 */
+        [class*="42b983"],
+        [style*="#42b983"] {
+            color: var(--red) !important;
+            border-color: var(--red) !important;
+            background-color: var(--red-light) !important;
+        }
+        /* 强制覆盖 Docsify 默认绿色变量 */
+        .vue,
+        .vue .app-name-link,
+        .vue .sidebar-nav ul li a.active,
+        .vue .search .input-wrap input:focus {
+            --theme-color: var(--red) !important;
+            --theme-color-light: var(--red-light) !important;
+        }
+    </style>
 
-    .markdown-section pre {
-      border-radius: var(--radius-sm);
-      background: #1e1e2e !important;
-      padding: 16px 20px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    }
-    .markdown-section pre code {
-      background: transparent !important;
-      color: #e0e0e0 !important;
-      padding: 0;
-    }
-
-    .markdown-section table {
-      border-collapse: collapse;
-      width: 100%;
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    }
-    .markdown-section table th,
-    .markdown-section table td {
-      padding: 10px 16px;
-      border: 1px solid rgba(0,0,0,0.06);
-    }
-    .markdown-section table tbody tr:nth-child(even) {
-      background: rgba(0, 0, 0, 0.02);
-    }
-
-    .markdown-section blockquote {
-      background: rgba(236, 65, 65, 0.05);
-      padding: 12px 20px;
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      color: var(--text-muted, #555);
-    }
-
-    .app-nav {
-      padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-    }
-    .app-nav a {
-      font-weight: 500;
-      color: #1a1a2e !important;
-    }
-    .app-nav a:hover {
-      color: var(--brand-red) !important;
-    }
-
-    /* 主题切换按钮 */
-    .theme-toggle {
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      z-index: 999;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      border: none;
-      background: linear-gradient(135deg, var(--brand-red), var(--brand-red-dark));
-      color: #fff;
-      font-size: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 20px var(--brand-shadow);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      outline: none;
-      padding: 0;
-      user-select: none;
-    }
-    .theme-toggle:hover {
-      transform: scale(1.12) rotate(8deg);
-      box-shadow: 0 6px 32px var(--brand-shadow);
-    }
-    .theme-toggle:active { transform: scale(0.92); }
-    .theme-toggle.light {
-      background: rgba(255, 255, 255, 0.85);
-      color: #333;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
-    }
-
-    .docsify-pagination-container {
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-      padding-top: 20px;
-      margin-top: 40px;
-    }
-
-    /* ===== 暗色模式 ===== */
-    body.dark .sidebar {
-      background: rgba(20, 20, 32, 0.88);
-      border-right-color: rgba(255,255,255,0.04);
-    }
-    body.dark .sidebar-nav ul li a {
-      color: #c0c0d0 !important;
-    }
-    body.dark .sidebar-nav ul li a:hover {
-      background: rgba(236, 65, 65, 0.15) !important;
-      color: #fff !important;
-    }
-    body.dark .sidebar-nav ul li a.active {
-      background: var(--brand-red) !important;
-      color: #fff !important;
-    }
-    body.dark .markdown-section h1,
-    body.dark .markdown-section h2,
-    body.dark .markdown-section h3,
-    body.dark .markdown-section h4 {
-      color: #e8e8f0;
-    }
-    body.dark .markdown-section p,
-    body.dark .markdown-section li {
-      color: #c8c8d8;
-    }
-    body.dark .markdown-section code {
-      background: rgba(236, 65, 65, 0.15) !important;
-      color: #f0a0a0 !important;
-    }
-    body.dark .markdown-section pre {
-      background: #0e0e1a !important;
-    }
-    body.dark .app-nav {
-      background: rgba(20, 20, 32, 0.7);
-      border-bottom-color: rgba(255,255,255,0.04);
-    }
-    body.dark .app-nav a {
-      color: #c8c8d8 !important;
-    }
-    body.dark .app-nav a:hover {
-      color: var(--brand-red) !important;
-    }
-
-    /* ===== 响应式 ===== */
-    @media (max-width: 768px) {
-      .markdown-section {
-        padding: 16px 18px 40px;
-        border-radius: 16px;
-        margin: 0 10px;
-        background: rgba(255, 255, 255, 0.8);
-      }
-      .sidebar {
-        background: rgba(255, 255, 255, 0.92);
-        backdrop-filter: blur(16px);
-      }
-      .theme-toggle {
-        width: 44px;
-        height: 44px;
-        font-size: 20px;
-        bottom: 20px;
-        right: 20px;
-      }
-    }
-  </style>
-
-  <!-- Google AdSense -->
-  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-5159844745975514",
-      enable_page_level_ads: true
-    });
-  </script>
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js">
+    </script>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-5159844745975514",
+            enable_page_level_ads: true
+        });
+    </script>
 </head>
 <body>
-  <div id="app"></div>
-  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    <div id="app"></div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
 
-  <!-- ===== 主题切换逻辑 ===== -->
-  <script>
-    (function() {
-      var STORAGE_KEY = 'docsify-theme';
-      var link = document.getElementById('theme-css');
-      var btn = document.getElementById('themeToggle');
-      var LIGHT_URL = '//unpkg.com/docsify/lib/themes/vue.css';
-      var DARK_URL = '//unpkg.com/docsify/lib/themes/dark.css';
+    <!-- ===== 主题切换 ===== -->
+    <script>
+        (function() {
+            var STORAGE_KEY = 'docsify-theme';
+            var link = document.getElementById('theme-css');
+            var btn = document.getElementById('themeToggle');
+            var LIGHT_URL = '//unpkg.com/docsify/lib/themes/vue.css';
+            var DARK_URL = '//unpkg.com/docsify/lib/themes/dark.css';
 
-      function setTheme(theme) {
-        link.href = theme === 'dark' ? DARK_URL : LIGHT_URL;
-        btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-        btn.className = 'theme-toggle' + (theme === 'dark' ? '' : ' light');
-        document.body.classList.toggle('dark', theme === 'dark');
-        localStorage.setItem(STORAGE_KEY, theme);
-      }
+            function setTheme(theme) {
+                link.href = theme === 'dark' ? DARK_URL : LIGHT_URL;
+                btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+                btn.className = 'theme-toggle' + (theme === 'dark' ? '' : ' light');
+                document.body.classList.toggle('dark', theme === 'dark');
+                localStorage.setItem(STORAGE_KEY, theme);
+            }
 
-      function toggleTheme() {
-        var isDark = link.href.includes('dark');
-        setTheme(isDark ? 'light' : 'dark');
-      }
+            function toggleTheme() {
+                var isDark = link.href.includes('dark');
+                setTheme(isDark ? 'light' : 'dark');
+            }
 
-      var saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setTheme(saved);
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setTheme('dark');
-      }
+            var saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                setTheme(saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme('dark');
+            }
 
-      btn.addEventListener('click', toggleTheme);
+            btn.addEventListener('click', toggleTheme);
 
-      try {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-          if (!localStorage.getItem(STORAGE_KEY)) {
-            setTheme(e.matches ? 'dark' : 'light');
-          }
-        });
-      } catch(e) {}
-    })();
-  </script>
+            try {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                    if (!localStorage.getItem(STORAGE_KEY)) {
+                        setTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
+            } catch (e) {}
+        })();
+    </script>
 
-  <!-- ===== Docsify 配置 ===== -->
-  <script>
-    window.$docsify = {
-      name: '网易云音乐 API Enhanced',
-      repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
-      coverpage: true,
-      homepage: 'home.md',
-      loadSidebar: false,
-      subMaxLevel: 4,
-      auto2top: true,
-      nameLink: '/',
-      search: {
-        maxAge: 86400000,
-        paths: 'auto',
-        placeholder: '搜索文档...'
-      },
-      copyCode: {
-        buttonText: '复制',
-        successText: '已复制!'
-      },
-      nav: [
-        { title: '🏠 首页', path: '/' },
-        { title: '📖 文档', path: '/home' },
-        { title: 'GitHub', path: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced' }
-      ]
-    };
-  </script>
+    <!-- ===== Docsify 配置 ===== -->
+    <script>
+        window.$docsify = {
+            name: '网易云音乐 API Enhanced',
+            repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
+            coverpage: true,
+            homepage: 'home.md',
+            loadSidebar: false,
+            subMaxLevel: 4,
+            auto2top: true,
+            nameLink: '/',
+            search: {
+                maxAge: 86400000,
+                paths: 'auto',
+                placeholder: '搜索文档...'
+            },
+            copyCode: {
+                buttonText: '复制',
+                successText: '已复制!'
+            },
+            nav: [
+                { title: '🏠 首页', path: '/' },
+                { title: '📖 文档', path: '/home' },
+                { title: 'GitHub', path: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced' }
+            ]
+        };
+    </script>
 
-  <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js"></script>
-  <script src="https://unpkg.com/docsify-plugin-search@2.0.0/dist/search.min.js"></script>
-  <script src="https://unpkg.com/docsify-copy-code@2.1.1/dist/docsify-copy-code.min.js"></script>
-  <script src="https://unpkg.com/docsify-plugin-flexible-alerts@1.1.0/docsify-plugin-flexible-alerts.min.js"></script>
+    <!-- Docsify 核心 -->
+    <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js">
+    </script>
+    <!-- 插件 -->
+    <script src="https://unpkg.com/docsify-plugin-search@2.0.0/dist/search.min.js">
+    </script>
+    <script src="https://unpkg.com/docsify-copy-code@2.1.1/dist/docsify-copy-code.min.js">
+    </script>
+    <script src="https://unpkg.com/docsify-plugin-flexible-alerts@1.1.0/docsify-plugin-flexible-alerts.min.js">
+    </script>
 
-  <script>
-    if (typeof navigator.serviceWorker !== 'undefined') {
-      navigator.serviceWorker.register('sw.js')
-    }
-  </script>
+    <!-- Service Worker -->
+    <script>
+        if (typeof navigator.serviceWorker !== 'undefined') {
+            navigator.serviceWorker.register('sw.js')
+        }
+    </script>
 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-BPRGR23JEG');
-  </script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG">
+    </script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-BPRGR23JEG');
+    </script>
 </body>
 </html>
