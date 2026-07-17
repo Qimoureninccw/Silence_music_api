@@ -11,21 +11,17 @@
         :root {
             --red: #ec4141;
             --red-dark: #c23333;
-            --red-light: #fce8e8;
+            --red-light: rgba(236, 65, 65, 0.18);
             --red-glow: rgba(236, 65, 65, 0.25);
 
-            --bg: #f4f6fa;
-            --panel: #ffffff;
-            --panel-border: rgba(0, 0, 0, 0.06);
+            /* 毛玻璃背景色 — 低透明 */
+            --glass-bg: rgba(255, 255, 255, 0.38);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
 
             --fg: #1a1a2e;
-            --fg-muted: #5a5a7a;
-            --fg-light: #8a8aa8;
-
-            --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.07);
-            --shadow-lg: 0 16px 56px rgba(0, 0, 0, 0.10);
-            --shadow-hover: 0 12px 40px rgba(236, 65, 65, 0.12);
+            --fg-muted: #4a4a6a;
+            --fg-light: #7a7a9a;
 
             --radius: 16px;
             --radius-sm: 10px;
@@ -46,18 +42,30 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: var(--bg);
             color: var(--fg);
             line-height: 1.65;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+
+            /* ===== 背景图片 ===== */
+            background-image: url('https://haowallpaper.com/link//common/file/previewFileImg/15063062493105472');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
         }
 
-        /* ===== Layout ===== */
+        /* ===== 毛玻璃容器 ===== */
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 40px 24px 32px;
+            min-height: 100vh;
+
+            /* 整体叠加一层极淡的玻璃效果，让背景更融合 */
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
         }
 
         @media (max-width: 640px) {
@@ -90,7 +98,7 @@
             object-fit: cover;
             flex-shrink: 0;
             box-shadow: 0 4px 16px var(--red-glow);
-            background: #fff; /* 防止透明背景显示异常 */
+            background: rgba(255, 255, 255, 0.6);
         }
 
         .site-header h1 {
@@ -99,6 +107,8 @@
             letter-spacing: -0.3px;
             margin: 0;
             line-height: 1.2;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
         }
 
         .site-header h1 .highlight {
@@ -114,10 +124,12 @@
             font-weight: 500;
             background: var(--red-light);
             color: var(--red-dark);
-            border: 1px solid rgba(236, 65, 65, 0.15);
+            border: 1px solid rgba(236, 65, 65, 0.25);
             white-space: nowrap;
             margin-left: 6px;
             letter-spacing: 0.2px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
         .badge::before {
@@ -129,12 +141,14 @@
 
         .header-right {
             font-size: 14px;
-            color: var(--fg-muted);
-            background: var(--panel);
+            color: rgba(255, 255, 255, 0.85);
+            background: var(--glass-bg);
             padding: 6px 16px;
             border-radius: 20px;
-            border: 1px solid var(--panel-border);
-            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -164,9 +178,10 @@
         .sub {
             width: 100%;
             margin-top: 6px;
-            color: var(--fg-muted);
+            color: rgba(255, 255, 255, 0.8);
             font-size: 14px;
             padding-left: 56px;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
         }
 
         @media (max-width: 640px) {
@@ -197,19 +212,25 @@
             }
         }
 
-        /* ===== Cards ===== */
+        /* ===== 毛玻璃卡片 ===== */
         .block {
-            background: var(--panel);
-            border: 1px solid var(--panel-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
             border-radius: var(--radius);
             padding: 24px 28px;
             margin-bottom: 20px;
-            box-shadow: var(--shadow-sm);
-            transition: box-shadow var(--transition), transform var(--transition);
+            box-shadow: var(--glass-shadow);
+            transition: box-shadow var(--transition), transform var(--transition), background var(--transition);
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.10);
         }
 
         .block:hover {
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
+            background: rgba(255, 255, 255, 0.48);
+            transform: translateY(-2px);
         }
 
         .block-header {
@@ -230,6 +251,8 @@
             justify-content: center;
             font-size: 16px;
             flex-shrink: 0;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
         .block h2 {
@@ -237,12 +260,13 @@
             font-size: 17px;
             font-weight: 600;
             letter-spacing: -0.2px;
+            color: #fff;
         }
 
         .block h2 .count {
             font-weight: 400;
             font-size: 13px;
-            color: var(--fg-light);
+            color: rgba(255, 255, 255, 0.6);
             margin-left: 8px;
         }
 
@@ -256,7 +280,7 @@
         }
 
         .kvs .k {
-            color: var(--fg-muted);
+            color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
             padding: 4px 0;
         }
@@ -267,12 +291,13 @@
             overflow-wrap: anywhere;
             font-family: 'SF Mono', 'Courier New', monospace;
             font-size: 13px;
-            background: var(--bg);
+            background: rgba(255, 255, 255, 0.12);
             padding: 4px 12px;
             border-radius: 6px;
-            border: 1px solid var(--panel-border);
+            border: 1px solid rgba(255, 255, 255, 0.10);
             min-width: 0;
             overflow: hidden;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .kvs .v code {
@@ -280,6 +305,7 @@
             padding: 0;
             border: none;
             font-size: 13px;
+            color: inherit;
         }
 
         @media (max-width: 480px) {
@@ -311,7 +337,7 @@
         ul.links li {
             margin: 0;
             padding: 6px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
             gap: 6px;
@@ -324,12 +350,12 @@
         ul.links li .link-marker {
             color: var(--red);
             font-size: 12px;
-            opacity: 0.6;
+            opacity: 0.8;
             flex-shrink: 0;
         }
 
         ul.links a {
-            color: var(--fg);
+            color: rgba(255, 255, 255, 0.9);
             text-decoration: none;
             transition: color var(--transition), border-color var(--transition);
             border-bottom: 1.5px solid transparent;
@@ -341,17 +367,17 @@
         }
 
         ul.links a:hover {
-            color: var(--red);
+            color: #fff;
             border-bottom-color: var(--red);
         }
 
         ul.links a code {
-            background: var(--bg);
+            background: rgba(255, 255, 255, 0.10);
             padding: 1px 8px;
             border-radius: 4px;
             font-size: 11px;
-            color: var(--fg-muted);
-            border: 1px solid var(--panel-border);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             font-weight: 500;
             letter-spacing: 0.2px;
         }
@@ -369,8 +395,8 @@
         /* ===== Debug ===== */
         .debug-block pre {
             margin: 0;
-            background: #f8f9fc;
-            border: 1px solid var(--panel-border);
+            background: rgba(0, 0, 0, 0.20);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: var(--radius-sm);
             padding: 14px 18px;
             overflow-x: auto;
@@ -380,6 +406,7 @@
             line-height: 1.7;
             font-family: 'SF Mono', 'Courier New', monospace;
             position: relative;
+            color: rgba(255, 255, 255, 0.85);
         }
 
         .debug-block pre .copy-hint {
@@ -387,11 +414,11 @@
             top: 8px;
             right: 12px;
             font-size: 11px;
-            color: var(--fg-light);
-            background: var(--panel);
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
             padding: 2px 10px;
             border-radius: 4px;
-            border: 1px solid var(--panel-border);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             opacity: 0;
             transition: opacity var(--transition);
             cursor: pointer;
@@ -404,7 +431,7 @@
         .debug-block pre code {
             font-family: inherit;
             font-size: 13px;
-            color: var(--fg);
+            color: inherit;
         }
 
         .debug-block .debug-actions {
@@ -413,28 +440,28 @@
             gap: 8px 16px;
             margin-top: 14px;
             padding-top: 14px;
-            border-top: 1px solid var(--panel-border);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .debug-block .debug-actions a {
-            color: var(--fg-muted);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             font-size: 13px;
             transition: color var(--transition), background var(--transition);
             padding: 4px 12px;
             border-radius: 6px;
-            background: var(--bg);
-            border: 1px solid var(--panel-border);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .debug-block .debug-actions a:hover {
-            color: var(--red);
-            background: var(--red-light);
+            color: #fff;
+            background: rgba(236, 65, 65, 0.25);
             border-color: var(--red);
         }
 
         .debug-block .debug-actions .sep {
-            color: var(--panel-border);
+            color: rgba(255, 255, 255, 0.15);
             user-select: none;
         }
 
@@ -452,17 +479,26 @@
             }
         }
 
+        /* ===== 在线文档链接特殊处理 ===== */
+        .block p a {
+            color: #fff !important;
+            border-bottom-color: rgba(255, 255, 255, 0.3) !important;
+        }
+        .block p a:hover {
+            border-bottom-color: #fff !important;
+        }
+
         /* ===== Footer ===== */
         .site-footer {
             margin-top: 32px;
             padding-top: 20px;
-            border-top: 1px solid var(--panel-border);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 8px 16px;
-            color: var(--fg-light);
+            color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
         }
 
@@ -473,7 +509,7 @@
         }
 
         .site-footer a {
-            color: var(--fg-muted);
+            color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
             transition: color var(--transition);
             display: inline-flex;
@@ -482,7 +518,7 @@
         }
 
         .site-footer a:hover {
-            color: var(--red);
+            color: #fff;
         }
 
         .site-footer .footer-heart {
@@ -509,19 +545,19 @@
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: var(--bg);
+            background: rgba(0, 0, 0, 0.10);
         }
         ::-webkit-scrollbar-thumb {
-            background: #d0d0da;
+            background: rgba(255, 255, 255, 0.25);
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #b0b0c0;
+            background: rgba(255, 255, 255, 0.40);
         }
 
         /* ===== Utilities ===== */
         .text-muted {
-            color: var(--fg-muted);
+            color: rgba(255, 255, 255, 0.6);
         }
         .text-small {
             font-size: 13px;
@@ -542,23 +578,6 @@
                 font-size: 15px;
             }
         }
-
-        /* ===== Shimmer load ===== */
-        .shimmer {
-            background: linear-gradient(90deg, var(--panel) 25%, var(--bg) 50%, var(--panel) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.8s infinite;
-            border-radius: 4px;
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
-        }
     </style>
 </head>
 <body>
@@ -568,7 +587,6 @@
         <!-- ===== HEADER ===== -->
         <header class="site-header">
             <div class="header-left">
-                <!-- 使用提供的 Logo 图片 -->
                 <img src="https://silence-music-api.cc.cd/docs/netease.png" alt="网易云音乐" class="logo-img" />
                 <h1>
                     网易云音乐 <span class="highlight">API</span> Enhanced
@@ -596,7 +614,7 @@
                 <span class="k">当前页面</span>
                 <span class="v" id="current-url">—</span>
                 <span class="k">反馈</span>
-                <span class="v" style="background:var(--red-light);border-color:var(--red);color:var(--red-dark);font-weight:500;">
+                <span class="v" style="background:rgba(236,65,65,0.20);border-color:rgba(236,65,65,0.30);color:#fff;font-weight:500;">
                     📧 QQ: 3179711976
                 </span>
             </div>
@@ -609,7 +627,7 @@
                 <h2>在线文档</h2>
             </div>
             <p style="margin: 0;">
-                <a href="/docs" target="_blank" style="color:var(--red); font-weight:500; text-decoration:none; border-bottom:1.5px solid var(--red);">
+                <a href="/docs" target="_blank" style="color:#fff; font-weight:500; text-decoration:none; border-bottom:1.5px solid rgba(255,255,255,0.3);">
                     → 查看完整 API 文档
                 </a>
             </p>
@@ -688,7 +706,7 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
         <footer class="site-footer">
             <span>
                 <span class="footer-heart">♥</span> 开放 · 自由 · 音乐
-                <span style="margin-left:12px;color:var(--fg-light);font-size:12px;">
+                <span style="margin-left:12px;color:rgba(255,255,255,0.4);font-size:12px;">
                     反馈 QQ: 3179711976
                 </span>
             </span>
@@ -722,7 +740,6 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
                     if (v) badge.textContent = 'v' + v;
                     else badge.textContent = 'v·';
 
-                    // 替换 pre 中的 {origin}
                     const pre = document.querySelector('#debug-pre code');
                     if (pre) {
                         pre.textContent = pre.textContent.replace(/\{origin\}/g, origin);
@@ -744,7 +761,6 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
                         copyHint.textContent = '✓ 已复制';
                         setTimeout(() => { copyHint.textContent = orig; }, 1800);
                     }).catch(() => {
-                        // fallback
                         const range = document.createRange();
                         range.selectNode(codeEl);
                         window.getSelection().removeAllRanges();
@@ -758,7 +774,7 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
                 });
             }
 
-            // ---- 状态指示器动画 ----
+            // ---- 状态指示器 ----
             const statusText = document.getElementById('status-text');
             const dot = document.querySelector('.dot');
             fetch('/inner/version', { method: 'POST' })
