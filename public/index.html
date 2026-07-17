@@ -12,9 +12,10 @@
             --red-dark: #c23333;
             --red-light: rgba(236, 65, 65, 0.18);
             --red-glow: rgba(236, 65, 65, 0.25);
-            --glass-bg: rgba(255, 255, 255, 0.35);
-            --glass-border: rgba(255, 255, 255, 0.25);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+            /* ===== 透明度调高，文字更清晰 ===== */
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.30);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
             --radius: 16px;
             --radius-sm: 10px;
             --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -33,13 +34,12 @@
             background-attachment: fixed;
             background-repeat: no-repeat;
         }
-
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 40px 24px 32px;
             min-height: 100vh;
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
         }
@@ -64,7 +64,7 @@
         .site-header h1 {
             font-size: 26px; font-weight: 700; letter-spacing: -0.3px;
             margin: 0; line-height: 1.2;
-            color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+            color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.30);
         }
         .site-header h1 .highlight { color: var(--red); }
         .badge {
@@ -80,7 +80,7 @@
         }
         .badge::before { content: "●"; margin-right: 6px; font-size: 10px; color: var(--red); }
         .header-right {
-            font-size: 14px; color: rgba(255,255,255,0.85);
+            font-size: 14px; color: rgba(255,255,255,0.9);
             background: var(--glass-bg); padding: 6px 16px;
             border-radius: 20px; border: 1px solid var(--glass-border);
             box-shadow: var(--glass-shadow);
@@ -99,8 +99,8 @@
         }
         .sub {
             width: 100%; margin-top: 6px;
-            color: rgba(255,255,255,0.8); font-size: 14px;
-            padding-left: 56px; text-shadow: 0 1px 8px rgba(0,0,0,0.2);
+            color: rgba(255,255,255,0.85); font-size: 14px;
+            padding-left: 56px; text-shadow: 0 1px 8px rgba(0,0,0,0.25);
         }
         @media (max-width: 640px) {
             .site-header { flex-direction: column; align-items: flex-start; }
@@ -111,7 +111,7 @@
             .header-right { font-size: 12px; padding: 4px 12px; width: 100%; justify-content: center; }
         }
 
-        /* ----- 毛玻璃卡片 ----- */
+        /* ===== 毛玻璃卡片 — 透明度已调高，文字更清晰 ===== */
         .block {
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
@@ -122,12 +122,12 @@
             margin-bottom: 20px;
             box-shadow: var(--glass-shadow);
             transition: box-shadow var(--transition), transform var(--transition), background var(--transition);
-            color: #fff;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.10);
+            color: #1a1a2e;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.3);
         }
         .block:hover {
-            box-shadow: 0 12px 48px rgba(0,0,0,0.18);
-            background: rgba(255,255,255,0.45);
+            box-shadow: 0 12px 48px rgba(0,0,0,0.16);
+            background: rgba(255, 255, 255, 0.70);
             transform: translateY(-2px);
         }
         .block-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
@@ -139,8 +139,14 @@
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
         }
-        .block h2 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.2px; color: #fff; }
-        .block h2 .count { font-weight: 400; font-size: 13px; color: rgba(255,255,255,0.6); margin-left: 8px; }
+        .block h2 {
+            margin: 0; font-size: 17px; font-weight: 600;
+            letter-spacing: -0.2px; color: #1a1a2e;
+        }
+        .block h2 .count {
+            font-weight: 400; font-size: 13px;
+            color: rgba(26,26,46,0.5); margin-left: 8px;
+        }
 
         /* ----- KVS ----- */
         .kvs {
@@ -150,14 +156,14 @@
             align-items: start;
             font-size: 14px;
         }
-        .kvs .k { color: rgba(255,255,255,0.7); font-weight: 500; padding: 4px 0; }
+        .kvs .k { color: rgba(26,26,46,0.6); font-weight: 500; padding: 4px 0; }
         .kvs .v {
             padding: 4px 0; word-break: break-all; overflow-wrap: anywhere;
             font-family: 'SF Mono', 'Courier New', monospace; font-size: 13px;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.25);
             padding: 4px 12px; border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.10);
-            color: rgba(255,255,255,0.9);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #1a1a2e;
         }
         .kvs .v code { background: transparent; padding: 0; border: none; font-size: 13px; color: inherit; }
         @media (max-width: 480px) {
@@ -173,41 +179,49 @@
         }
         ul.links li {
             margin: 0; padding: 6px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
             display: flex; align-items: center; gap: 6px;
         }
         ul.links li:last-child { border-bottom: none; }
-        ul.links li .link-marker { color: var(--red); font-size: 12px; opacity: 0.8; flex-shrink: 0; }
+        ul.links li .link-marker { color: var(--red); font-size: 12px; opacity: 0.7; flex-shrink: 0; }
         ul.links a {
-            color: rgba(255,255,255,0.9); text-decoration: none;
+            color: #1a1a2e; text-decoration: none;
             transition: color var(--transition), border-color var(--transition);
             border-bottom: 1.5px solid transparent;
             font-size: 14px; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;
         }
-        ul.links a:hover { color: #fff; border-bottom-color: var(--red); }
+        ul.links a:hover { color: var(--red); border-bottom-color: var(--red); }
         ul.links a code {
-            background: rgba(255,255,255,0.10); padding: 1px 8px; border-radius: 4px;
-            font-size: 11px; color: rgba(255,255,255,0.7);
-            border: 1px solid rgba(255,255,255,0.06); font-weight: 500; letter-spacing: 0.2px;
+            background: rgba(0,0,0,0.06); padding: 1px 8px; border-radius: 4px;
+            font-size: 11px; color: rgba(26,26,46,0.6);
+            border: 1px solid rgba(0,0,0,0.06); font-weight: 500; letter-spacing: 0.2px;
         }
         @media (max-width: 640px) { ul.links { grid-template-columns: 1fr; gap: 0; } ul.links li { padding: 8px 0; } }
 
+        /* 在线文档链接 */
+        .block p a {
+            color: var(--red) !important;
+            font-weight: 500;
+            border-bottom: 1.5px solid var(--red) !important;
+        }
+        .block p a:hover { opacity: 0.7; }
+
         /* ----- Debug ----- */
         .debug-block pre {
-            margin: 0; background: rgba(0,0,0,0.20);
-            border: 1px solid rgba(255,255,255,0.08);
+            margin: 0; background: rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.06);
             border-radius: var(--radius-sm);
             padding: 14px 18px; overflow-x: auto;
             white-space: pre-wrap; word-break: break-all;
             font-size: 13px; line-height: 1.7;
             font-family: 'SF Mono', 'Courier New', monospace;
-            position: relative; color: rgba(255,255,255,0.85);
+            position: relative; color: #1a1a2e;
         }
         .debug-block pre .copy-hint {
             position: absolute; top: 8px; right: 12px;
-            font-size: 11px; color: rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.08); padding: 2px 10px;
-            border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);
+            font-size: 11px; color: rgba(26,26,46,0.4);
+            background: rgba(255,255,255,0.5); padding: 2px 10px;
+            border-radius: 4px; border: 1px solid rgba(0,0,0,0.06);
             opacity: 0; transition: opacity var(--transition); cursor: pointer;
         }
         .debug-block pre:hover .copy-hint { opacity: 1; }
@@ -215,17 +229,17 @@
         .debug-block .debug-actions {
             display: flex; flex-wrap: wrap; gap: 8px 16px;
             margin-top: 14px; padding-top: 14px;
-            border-top: 1px solid rgba(255,255,255,0.06);
+            border-top: 1px solid rgba(0,0,0,0.06);
         }
         .debug-block .debug-actions a {
-            color: rgba(255,255,255,0.7); text-decoration: none; font-size: 13px;
+            color: rgba(26,26,46,0.6); text-decoration: none; font-size: 13px;
             transition: color var(--transition), background var(--transition);
             padding: 4px 12px; border-radius: 6px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.3);
+            border: 1px solid rgba(0,0,0,0.06);
         }
-        .debug-block .debug-actions a:hover { color: #fff; background: rgba(236,65,65,0.25); border-color: var(--red); }
-        .debug-block .debug-actions .sep { color: rgba(255,255,255,0.15); user-select: none; }
+        .debug-block .debug-actions a:hover { color: var(--red); background: var(--red-light); border-color: var(--red); }
+        .debug-block .debug-actions .sep { color: rgba(0,0,0,0.10); user-select: none; }
         @media (max-width: 480px) {
             .debug-block pre { font-size: 12px; padding: 12px 14px; }
             .debug-block pre code { font-size: 12px; }
@@ -235,14 +249,14 @@
         /* ----- Footer ----- */
         .site-footer {
             margin-top: 32px; padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.08);
+            border-top: 1px solid rgba(0,0,0,0.06);
             display: flex; justify-content: space-between; align-items: center;
             flex-wrap: wrap; gap: 8px 16px;
-            color: rgba(255,255,255,0.5); font-size: 13px;
+            color: rgba(26,26,46,0.4); font-size: 13px;
         }
         .site-footer .footer-links { display: flex; gap: 20px; align-items: center; }
-        .site-footer a { color: rgba(255,255,255,0.6); text-decoration: none; transition: color var(--transition); display: inline-flex; align-items: center; gap: 4px; }
-        .site-footer a:hover { color: #fff; }
+        .site-footer a { color: rgba(26,26,46,0.5); text-decoration: none; transition: color var(--transition); display: inline-flex; align-items: center; gap: 4px; }
+        .site-footer a:hover { color: var(--red); }
         .site-footer .footer-heart { color: var(--red); font-size: 14px; }
         @media (max-width: 480px) {
             .site-footer { flex-direction: column; text-align: center; font-size: 12px; }
@@ -250,9 +264,9 @@
         }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.10); }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.40); }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.06); }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
 
         @media (max-width: 640px) {
             .block { padding: 18px 16px; border-radius: 12px; }
@@ -278,13 +292,13 @@
                 <span class="k">Base URL</span><span class="v" id="base-url">—</span>
                 <span class="k">当前页面</span><span class="v" id="current-url">—</span>
                 <span class="k">反馈</span>
-                <span class="v" style="background:rgba(236,65,65,0.20);border-color:rgba(236,65,65,0.30);color:#fff;font-weight:500;">📧 QQ: 3179711976</span>
+                <span class="v" style="background:rgba(236,65,65,0.15);border-color:rgba(236,65,65,0.20);color:var(--red-dark);font-weight:500;">📧 QQ: 3179711976</span>
             </div>
         </section>
 
         <section class="block">
             <div class="block-header"><span class="icon">📖</span><h2>在线文档</h2></div>
-            <p style="margin:0;"><a href="/docs" target="_blank" style="color:#fff;font-weight:500;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,0.3);">→ 查看完整 API 文档</a></p>
+            <p style="margin:0;"><a href="/docs" target="_blank">→ 查看完整 API 文档</a></p>
         </section>
 
         <section class="block">
@@ -316,7 +330,7 @@
         </section>
 
         <footer class="site-footer">
-            <span><span class="footer-heart">♥</span> 开放 · 自由 · 音乐 <span style="margin-left:12px;color:rgba(255,255,255,0.4);font-size:12px;">反馈 QQ: 3179711976</span></span>
+            <span><span class="footer-heart">♥</span> 开放 · 自由 · 音乐 <span style="margin-left:12px;color:rgba(26,26,46,0.4);font-size:12px;">反馈 QQ: 3179711976</span></span>
             <div class="footer-links">
                 <a href="https://github.com/neteasecloudmusicapienhanced/api-enhanced" target="_blank"><span style="font-size:16px;">⌨</span> GitHub</a>
                 <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑ 回到顶部</a>
