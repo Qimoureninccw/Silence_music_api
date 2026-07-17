@@ -1,58 +1,356 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="KEYWords" contect="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js">
+  <meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js">
   <meta name="description" content="网易云音乐 NodeJS API Enhanced">
   <title>网易云音乐 NodeJS API Enhanced</title>
   <link rel="icon" href="netease.png">
-  <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta name="referrer" content="never">
+  <!-- Docsify 主题（默认 light） -->
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css">
+
+  <!-- ========== 自定义美化样式 ========== -->
   <style>
-    .theme-toggle {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 999;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(30,30,46,0.75);
+    /* ----- 全局变量 & 重置 ----- */
+    :root {
+      --brand-red: #ec4141;
+      --brand-red-dark: #c23333;
+      --brand-red-light: #fce8e8;
+      --brand-shadow: rgba(236, 65, 65, 0.35);
+      --radius-lg: 20px;
+      --radius-sm: 10px;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ----- 滚动条美化 ----- */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary, #f0f0f0);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--brand-red);
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--brand-red-dark);
+    }
+
+    /* ----- 页面背景与全局字体 ----- */
+    body {
+      background: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    /* 侧边栏 (Docsify 默认 .sidebar) */
+    .sidebar {
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(0, 0, 0, 0.04);
+      box-shadow: 2px 0 24px rgba(0, 0, 0, 0.04);
+      transition: background 0.3s, backdrop-filter 0.3s;
+    }
+    .sidebar-nav {
+      padding-top: 20px;
+    }
+    /* 侧边栏链接 */
+    .sidebar-nav ul li a {
+      border-radius: 6px;
+      padding: 6px 12px;
+      margin: 2px 0;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .sidebar-nav ul li a:hover {
+      background: var(--brand-red-light);
+      color: var(--brand-red) !important;
+    }
+    .sidebar-nav ul li a.active {
+      background: var(--brand-red);
+      color: #fff !important;
+      box-shadow: 0 2px 12px var(--brand-shadow);
+    }
+    /* 侧边栏标题 */
+    .app-name-link {
+      font-weight: 700 !important;
+      color: var(--brand-red) !important;
+      letter-spacing: -0.3px;
+    }
+    .app-name-link img {
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    /* ----- 主内容区域 ----- */
+    .content {
+      padding-top: 30px;
+      background: transparent;
+    }
+    .markdown-section {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 20px 30px 60px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.04);
+      transition: background 0.3s, backdrop-filter 0.3s, box-shadow 0.3s;
+    }
+    /* 暗色模式下的内容背景 */
+    body.dark .markdown-section {
+      background: rgba(30, 30, 46, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    /* 文章标题 */
+    .markdown-section h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      border-bottom: 3px solid var(--brand-red);
+      padding-bottom: 12px;
+      margin-bottom: 28px;
+      color: var(--heading-color, #1a1a2e);
+    }
+    .markdown-section h2 {
+      font-weight: 600;
+      border-left: 4px solid var(--brand-red);
+      padding-left: 16px;
+      margin-top: 40px;
+      color: var(--heading-color, #1a1a2e);
+    }
+    .markdown-section h3 {
+      font-weight: 600;
+      color: var(--heading-color, #2a2a4a);
+    }
+    .markdown-section p, .markdown-section li {
+      line-height: 1.8;
+      color: var(--text-color, #333);
+    }
+    .markdown-section a {
+      color: var(--brand-red);
+      text-decoration: none;
+      border-bottom: 1.5px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .markdown-section a:hover {
+      border-bottom-color: var(--brand-red);
+    }
+
+    /* 代码块 */
+    .markdown-section pre {
+      border-radius: var(--radius-sm);
+      background: #1e1e2e !important;
+      padding: 16px 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      transition: box-shadow 0.3s;
+    }
+    .markdown-section pre:hover {
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+    }
+    .markdown-section code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.9em;
+      background: rgba(236, 65, 65, 0.06);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--brand-red-dark);
+    }
+    .markdown-section pre code {
+      background: transparent;
+      color: #e0e0e0;
+      padding: 0;
+    }
+
+    /* 表格美化 */
+    .markdown-section table {
+      border-collapse: collapse;
+      width: 100%;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+    .markdown-section table thead {
+      background: var(--brand-red);
       color: #fff;
-      font-size: 20px;
+    }
+    .markdown-section table th, .markdown-section table td {
+      padding: 10px 16px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .markdown-section table tbody tr:nth-child(even) {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    /* 引用块 */
+    .markdown-section blockquote {
+      border-left: 4px solid var(--brand-red);
+      background: rgba(236, 65, 65, 0.05);
+      padding: 12px 20px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: var(--text-muted, #555);
+    }
+
+    /* ----- 顶部导航栏 (docsify 的 .app-nav) ----- */
+    .app-nav {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.02);
+    }
+    .app-nav a {
+      color: var(--text-color, #333) !important;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .app-nav a:hover {
+      color: var(--brand-red) !important;
+    }
+    .app-nav a::before {
+      background: var(--brand-red) !important;
+    }
+
+    /* ----- 主题切换按钮 (右下角浮层) ----- */
+    .theme-toggle {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 999;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-red-dark));
+      color: #fff;
+      font-size: 24px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 4px 20px var(--brand-shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       outline: none;
       padding: 0;
       line-height: 1;
       user-select: none;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
     .theme-toggle:hover {
-      transform: scale(1.12) rotate(12deg);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      transform: scale(1.12) rotate(8deg);
+      box-shadow: 0 6px 32px var(--brand-shadow);
     }
     .theme-toggle:active {
       transform: scale(0.92);
     }
+    /* 暗色模式时按钮变为浅色风格 */
     .theme-toggle.light {
-      background: rgba(255,255,255,0.85);
+      background: rgba(255, 255, 255, 0.85);
       color: #333;
-      border-color: rgba(0,0,0,0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
     }
-    html, body, .sidebar, .content, .markdown-section,
-    .sidebar-nav, .search, .docsify-pagination-container {
-      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    .theme-toggle.light:hover {
+      box-shadow: 0 6px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    /* ----- 底部的翻页 (pagination) ----- */
+    .docsify-pagination-container {
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      padding-top: 20px;
+      margin-top: 40px;
+    }
+    .docsify-pagination-container .pagination-item {
+      border-radius: var(--radius-sm);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .docsify-pagination-container .pagination-item:hover {
+      background: var(--brand-red-light);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+
+    /* ----- 响应式优化 ----- */
+    @media (max-width: 768px) {
+      .markdown-section {
+        padding: 16px 18px 40px;
+        border-radius: 16px;
+        margin: 0 10px;
+        background: rgba(255, 255, 255, 0.8);
+      }
+      .sidebar {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+      .theme-toggle {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+        bottom: 20px;
+        right: 20px;
+      }
+    }
+
+    /* ----- 暗色模式专用覆盖 (docsify 暗色主题会加 class="dark") ----- */
+    body.dark .sidebar {
+      background: rgba(20, 20, 32, 0.85);
+      border-right-color: rgba(255,255,255,0.04);
+    }
+    body.dark .markdown-section h1,
+    body.dark .markdown-section h2,
+    body.dark .markdown-section h3 {
+      color: #e8e8f0;
+    }
+    body.dark .markdown-section p,
+    body.dark .markdown-section li {
+      color: #c8c8d8;
+    }
+    body.dark .markdown-section blockquote {
+      background: rgba(236, 65, 65, 0.10);
+    }
+    body.dark .markdown-section code {
+      background: rgba(236, 65, 65, 0.15);
+      color: #f0a0a0;
+    }
+    body.dark .markdown-section pre {
+      background: #0e0e1a !important;
+    }
+    body.dark .app-nav {
+      background: rgba(20, 20, 32, 0.7);
+      border-bottom-color: rgba(255,255,255,0.04);
+    }
+    body.dark .app-nav a {
+      color: #c8c8d8 !important;
+    }
+    body.dark .app-nav a:hover {
+      color: var(--brand-red) !important;
+    }
+    body.dark .docsify-pagination-container {
+      border-top-color: rgba(255,255,255,0.06);
+    }
+    body.dark .sidebar-nav ul li a {
+      color: #b0b0c8;
+    }
+    body.dark .sidebar-nav ul li a:hover {
+      background: rgba(236, 65, 65, 0.15);
+      color: #fff !important;
+    }
+    body.dark .sidebar-nav ul li a.active {
+      background: var(--brand-red);
+      color: #fff !important;
     }
   </style>
+
+  <!-- Google AdSense (保留) -->
   <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
   <script>
     (adsbygoogle = window.adsbygoogle || []).push({
@@ -64,66 +362,87 @@
 <body>
   <div id="app"></div>
   <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+
+  <!-- ========== 主题切换逻辑 ========== -->
+  <script>
+    (function() {
+      var STORAGE_KEY = 'docsify-theme';
+      var link = document.getElementById('theme-css');
+      var btn = document.getElementById('themeToggle');
+      var LIGHT_URL = '//unpkg.com/docsify/lib/themes/vue.css';
+      var DARK_URL = '//unpkg.com/docsify/lib/themes/dark.css';
+
+      function setTheme(theme) {
+        link.href = theme === 'dark' ? DARK_URL : LIGHT_URL;
+        btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        btn.className = 'theme-toggle' + (theme === 'dark' ? '' : ' light');
+        document.body.classList.toggle('dark', theme === 'dark');
+        localStorage.setItem(STORAGE_KEY, theme);
+      }
+
+      function toggleTheme() {
+        var isDark = link.href.includes('dark');
+        setTheme(isDark ? 'light' : 'dark');
+      }
+
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setTheme(saved);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setTheme('dark');
+      }
+
+      btn.addEventListener('click', toggleTheme);
+
+      try {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+          if (!localStorage.getItem(STORAGE_KEY)) {
+            setTheme(e.matches ? 'dark' : 'light');
+          }
+        });
+      } catch(e) {}
+    })();
+  </script>
+
+  <!-- ========== Docsify 配置 ========== -->
+  <script>
+    window.$docsify = {
+      name: '网易云音乐 API Enhanced',
+      repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
+      coverpage: true,
+      homepage: 'home.md',
+      // 增加侧边栏加载进度条风格
+      loadSidebar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      // 自定义顶部导航
+      nav: [
+        { title: '首页', path: '/' },
+        { title: '指南', path: '/guide' },
+        { title: 'GitHub', path: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced' }
+      ]
+    };
+  </script>
+  <!-- Docsify 核心库 -->
+  <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js"></script>
+  <!-- 可选插件：搜索、复制代码等（按需加载） -->
+  <script src="https://unpkg.com/docsify-copy-code@2.1.1/dist/docsify-copy-code.min.js"></script>
+  <script src="https://unpkg.com/docsify-plugin-flexible-alerts@1.1.0/docsify-plugin-flexible-alerts.min.js"></script>
+
+  <!-- Service Worker (保留) -->
+  <script>
+    if (typeof navigator.serviceWorker !== 'undefined') {
+      navigator.serviceWorker.register('sw.js')
+    }
+  </script>
+
+  <!-- Google Analytics (保留) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-BPRGR23JEG');
+  </script>
 </body>
-<script>
-  (function() {
-    var STORAGE_KEY = 'docsify-theme';
-    var link = document.getElementById('theme-css');
-    var btn = document.getElementById('themeToggle');
-    var LIGHT_URL = '//unpkg.com/docsify/lib/themes/vue.css';
-    var DARK_URL = '//unpkg.com/docsify/lib/themes/dark.css';
-
-    function setTheme(theme) {
-      link.href = theme === 'dark' ? DARK_URL : LIGHT_URL;
-      btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-      btn.className = 'theme-toggle' + (theme === 'dark' ? '' : ' light');
-      localStorage.setItem(STORAGE_KEY, theme);
-    }
-
-    function toggleTheme() {
-      var isDark = link.href.includes('dark');
-      setTheme(isDark ? 'light' : 'dark');
-    }
-
-    var saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setTheme(saved);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    }
-
-    btn.addEventListener('click', toggleTheme);
-
-    try {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-        if (!localStorage.getItem(STORAGE_KEY)) {
-          setTheme(e.matches ? 'dark' : 'light');
-        }
-      });
-    } catch(e) {}
-  })();
-</script>
-<script>
-  window.$docsify = {
-    name: '网易云音乐 API Enhanced',
-    repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
-    coverpage: true,
-    homepage: 'home.md',
-  }
-</script>
-<script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js"></script>
-<script>
-  if (typeof navigator.serviceWorker !== 'undefined') {
-    navigator.serviceWorker.register('sw.js')
-  }
-</script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag() { dataLayer.push(arguments); }
-  gtag('js', new Date());
-
-  gtag('config', 'G-BPRGR23JEG');
-</script>
 </html>
