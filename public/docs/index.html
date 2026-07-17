@@ -21,67 +21,84 @@
       --radius-sm: 10px;
     }
 
-    /* ===== 彻底覆盖 Docsify 默认绿色 ===== */
-    /* 全局链接 */
-    a, .markdown-section a, .sidebar-nav ul li a, .app-name-link,
-    .pagination-item .pagination-label, .pagination-item .pagination-title {
+    /* ============================================================
+       彻底覆盖 Docsify 默认绿色 (#42b983) → 全部改为红色
+       ============================================================ */
+
+    /* ----- 1. 全局链接 & 文字 ----- */
+    a,
+    .markdown-section a,
+    .sidebar-nav ul li a,
+    .app-name-link,
+    .pagination-item .pagination-label,
+    .pagination-item .pagination-title,
+    .search .clear-button,
+    .search .input-wrap input::placeholder {
       color: var(--brand-red) !important;
     }
-    a:hover, .markdown-section a:hover, .sidebar-nav ul li a:hover {
+    a:hover,
+    .markdown-section a:hover,
+    .sidebar-nav ul li a:hover,
+    .app-name-link:hover {
       color: var(--brand-red-dark) !important;
     }
 
-    /* 侧边栏激活项 */
+    /* 侧边栏文字 — 用户要求黑色，这里用深灰 */
+    .sidebar-nav ul li a {
+      color: #1a1a2e !important;
+    }
+    .sidebar-nav ul li a:hover {
+      color: var(--brand-red) !important;
+    }
     .sidebar-nav ul li a.active {
       background: var(--brand-red) !important;
       color: #fff !important;
       box-shadow: 0 2px 12px var(--brand-shadow) !important;
     }
-    .sidebar-nav ul li a.active:hover {
-      background: var(--brand-red-dark) !important;
-    }
 
-    /* 标题边框 / 下划线 */
-    .markdown-section h1, .markdown-section h2 {
+    /* ----- 2. 标题边框 / 下划线 ----- */
+    .markdown-section h1,
+    .markdown-section h2 {
       border-color: var(--brand-red) !important;
     }
     .markdown-section h2 {
       border-left-color: var(--brand-red) !important;
     }
 
-    /* 引用块 */
+    /* ----- 3. 引用块 ----- */
     .markdown-section blockquote {
       border-left-color: var(--brand-red) !important;
     }
 
-    /* 表格表头 */
+    /* ----- 4. 表格表头 ----- */
     .markdown-section table thead {
       background: var(--brand-red) !important;
       color: #fff !important;
     }
 
-    /* 代码内联 */
+    /* ----- 5. 行内代码 ----- */
     .markdown-section code {
       color: var(--brand-red-dark) !important;
       background: var(--brand-red-light) !important;
     }
 
-    /* 搜索框聚焦 */
+    /* ----- 6. 搜索框 ----- */
     .search .input-wrap input:focus {
       border-color: var(--brand-red) !important;
+      box-shadow: 0 0 0 2px var(--brand-shadow) !important;
     }
 
-    /* 分页按钮 hover */
+    /* ----- 7. 分页控件 ----- */
     .pagination-item:hover {
       background: var(--brand-red-light) !important;
     }
 
-    /* 顶部导航激活 */
+    /* ----- 8. 顶部导航激活指示条 ----- */
     .app-nav a::before {
       background: var(--brand-red) !important;
     }
 
-    /* 滚动条 */
+    /* ----- 9. 滚动条 ----- */
     ::-webkit-scrollbar-thumb {
       background: var(--brand-red) !important;
     }
@@ -89,7 +106,71 @@
       background: var(--brand-red-dark) !important;
     }
 
-    /* ===== 额外美化（保留之前的设计） ===== */
+    /* ----- 10. 封面页 (coverpage) 彻底改红 ----- */
+    /* 封面背景 — 用渐变红替代默认绿色 */
+    section.cover {
+      background: linear-gradient(145deg, #1a0a0a 0%, #2d1515 40%, #3d1a1a 100%) !important;
+      /* 也可以用纯色: background: #1a0a0a !important; */
+    }
+    /* 封面标题 */
+    section.cover h1 {
+      color: #fff !important;
+    }
+    section.cover h1 .anchor span {
+      color: #fff !important;
+    }
+    /* 封面描述文字 */
+    section.cover .cover-main p:not(.lead) {
+      color: rgba(255, 255, 255, 0.75) !important;
+    }
+    /* 封面按钮 — 主要按钮 */
+    section.cover .cover-main .buttons .button-primary,
+    section.cover .cover-main .buttons a:first-child {
+      background: var(--brand-red) !important;
+      border-color: var(--brand-red) !important;
+      color: #fff !important;
+    }
+    section.cover .cover-main .buttons .button-primary:hover,
+    section.cover .cover-main .buttons a:first-child:hover {
+      background: var(--brand-red-dark) !important;
+      border-color: var(--brand-red-dark) !important;
+    }
+    /* 封面次要按钮 */
+    section.cover .cover-main .buttons a:not(:first-child) {
+      background: transparent !important;
+      border-color: rgba(255, 255, 255, 0.4) !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+    }
+    section.cover .cover-main .buttons a:not(:first-child):hover {
+      border-color: var(--brand-red) !important;
+      color: #fff !important;
+    }
+    /* 封面徽标/图标 */
+    section.cover .cover-main .mask-gradient {
+      background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.6)) !important;
+    }
+
+    /* ----- 11. 按钮（通用） ----- */
+    .markdown-section .btn,
+    .markdown-section button,
+    button,
+    .btn {
+      background: var(--brand-red) !important;
+      border-color: var(--brand-red) !important;
+      color: #fff !important;
+    }
+    .markdown-section .btn:hover,
+    .markdown-section button:hover,
+    button:hover,
+    .btn:hover {
+      background: var(--brand-red-dark) !important;
+      border-color: var(--brand-red-dark) !important;
+    }
+
+    /* ============================================================
+       保留之前的美化样式
+       ============================================================ */
+
     .sidebar {
       background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(12px);
@@ -108,12 +189,12 @@
     }
     .sidebar-nav ul li a:hover {
       background: var(--brand-red-light) !important;
-      color: var(--brand-red) !important;
     }
 
     .app-name-link {
       font-weight: 700 !important;
       letter-spacing: -0.3px;
+      color: var(--brand-red) !important;
     }
     .app-name-link img {
       border-radius: 8px;
@@ -154,11 +235,13 @@
       margin-top: 40px;
       color: var(--heading-color, #1a1a2e);
     }
-    .markdown-section h3, .markdown-section h4 {
+    .markdown-section h3,
+    .markdown-section h4 {
       font-weight: 600;
       color: var(--heading-color, #2a2a4a);
     }
-    .markdown-section p, .markdown-section li {
+    .markdown-section p,
+    .markdown-section li {
       line-height: 1.8;
       color: var(--text-color, #333);
     }
@@ -181,12 +264,6 @@
       color: #e0e0e0 !important;
       padding: 0;
     }
-    .markdown-section code {
-      font-family: 'JetBrains Mono', 'Fira Code', monospace;
-      font-size: 0.9em;
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
 
     .markdown-section table {
       border-collapse: collapse;
@@ -195,7 +272,8 @@
       overflow: hidden;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
     }
-    .markdown-section table th, .markdown-section table td {
+    .markdown-section table th,
+    .markdown-section table td {
       padding: 10px 16px;
       border: 1px solid rgba(0,0,0,0.06);
     }
@@ -219,8 +297,13 @@
     }
     .app-nav a {
       font-weight: 500;
+      color: #1a1a2e !important;
+    }
+    .app-nav a:hover {
+      color: var(--brand-red) !important;
     }
 
+    /* 主题切换按钮 */
     .theme-toggle {
       position: fixed;
       bottom: 28px;
@@ -260,10 +343,21 @@
       margin-top: 40px;
     }
 
-    /* 暗色模式 */
+    /* ===== 暗色模式 ===== */
     body.dark .sidebar {
       background: rgba(20, 20, 32, 0.88);
       border-right-color: rgba(255,255,255,0.04);
+    }
+    body.dark .sidebar-nav ul li a {
+      color: #c0c0d0 !important;
+    }
+    body.dark .sidebar-nav ul li a:hover {
+      background: rgba(236, 65, 65, 0.15) !important;
+      color: #fff !important;
+    }
+    body.dark .sidebar-nav ul li a.active {
+      background: var(--brand-red) !important;
+      color: #fff !important;
     }
     body.dark .markdown-section h1,
     body.dark .markdown-section h2,
@@ -292,18 +386,8 @@
     body.dark .app-nav a:hover {
       color: var(--brand-red) !important;
     }
-    body.dark .sidebar-nav ul li a {
-      color: #b0b0c8 !important;
-    }
-    body.dark .sidebar-nav ul li a:hover {
-      background: rgba(236, 65, 65, 0.15) !important;
-      color: #fff !important;
-    }
-    body.dark .sidebar-nav ul li a.active {
-      background: var(--brand-red) !important;
-      color: #fff !important;
-    }
 
+    /* ===== 响应式 ===== */
     @media (max-width: 768px) {
       .markdown-section {
         padding: 16px 18px 40px;
@@ -386,8 +470,8 @@
       repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
       coverpage: true,
       homepage: 'home.md',
-      loadSidebar: false,       // 自动生成侧边栏
-      subMaxLevel: 4,           // 显示到 h4
+      loadSidebar: false,
+      subMaxLevel: 4,
       auto2top: true,
       nameLink: '/',
       search: {
