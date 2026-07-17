@@ -3,560 +3,835 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js" />
-    <meta name="description" content="网易云音乐 NodeJS API Enhanced" />
-    <title>网易云音乐 NodeJS API Enhanced</title>
+    <meta name="description" content="网易云音乐 NodeJS API Enhanced — 全网最全的网易云音乐 API 接口文档" />
+    <title>网易云音乐 API Enhanced</title>
     <link rel="icon" href="netease.png" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="referrer" content="never" />
 
-    <!-- 加载 Docsify 默认主题（但我们会用自定义样式彻底覆盖所有绿色） -->
-    <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css" />
-
     <style>
-        /* ================================================================
-               完全重写 — 彻底清除所有绿色 (#42b983 等)，统一为网易红
-               ================================================================ */
+        /* ============================================================
+                   零基样式 — 不依赖任何外部主题，全自包含
+                   ============================================================ */
 
-        /* ----- 品牌色 ----- */
+        /* ----- 变量 ----- */
         :root {
             --red: #ec4141;
             --red-dark: #b83030;
             --red-light: #fce8e8;
             --red-glow: rgba(236, 65, 65, 0.3);
-            --bg-body: #f4f6fa;
-            --text-dark: #1a1a2e;
+            --bg: #f0f2f6;
+            --card: rgba(255, 255, 255, 0.82);
+            --text: #1a1a2e;
             --text-muted: #5a5a7a;
-            --card-bg: rgba(255, 255, 255, 0.78);
-            --shadow: 0 8px 40px rgba(0, 0, 0, 0.06);
+            --border: rgba(0, 0, 0, 0.06);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --transition: 0.25s ease;
         }
 
-        /* ----- 全局重置 ----- */
-        * {
+        /* ----- 重置 ----- */
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-behavior: smooth;
         }
         body {
-            background: var(--bg-body);
-            color: var(--text-dark);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ================================================================
-           1. 侧边栏 — 文字黑色，激活红色
-           ================================================================ */
-        .sidebar {
-            background: rgba(255, 255, 255, 0.88) !important;
-            backdrop-filter: blur(14px) !important;
-            -webkit-backdrop-filter: blur(14px) !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.04) !important;
-        }
-        /* 项目名称 */
-        .app-name-link {
-            color: var(--red) !important;
-            font-weight: 700 !important;
-        }
-        /* 侧边栏链接 — 黑色 */
-        .sidebar-nav ul li a {
-            color: var(--text-dark) !important;
-            font-weight: 500 !important;
-            border-radius: 6px !important;
-            padding: 5px 12px !important;
-            margin: 2px 0 !important;
-            transition: all 0.2s !important;
-        }
-        .sidebar-nav ul li a:hover {
-            background: var(--red-light) !important;
-            color: var(--red) !important;
-        }
-        .sidebar-nav ul li a.active {
-            background: var(--red) !important;
-            color: #fff !important;
-            box-shadow: 0 2px 12px var(--red-glow) !important;
-        }
-
-        /* ================================================================
-           2. 内容区 — 毛玻璃卡片
-           ================================================================ */
-        .content {
-            padding-top: 30px !important;
-            background: transparent !important;
-        }
-        .markdown-section {
-            max-width: 900px !important;
-            margin: 0 auto !important;
-            padding: 24px 32px 60px !important;
-            background: var(--card-bg) !important;
-            backdrop-filter: blur(6px) !important;
-            -webkit-backdrop-filter: blur(6px) !important;
-            border-radius: 20px !important;
-            box-shadow: var(--shadow) !important;
-            transition: background 0.3s !important;
-        }
-
-        /* ================================================================
-           3. 标题 — 红色边框 / 下划线
-           ================================================================ */
-        .markdown-section h1 {
-            font-size: 2.2rem !important;
-            font-weight: 700 !important;
-            border-bottom: 3px solid var(--red) !important;
-            padding-bottom: 12px !important;
-            color: var(--text-dark) !important;
-        }
-        .markdown-section h2 {
-            font-weight: 600 !important;
-            border-left: 4px solid var(--red) !important;
-            padding-left: 16px !important;
-            margin-top: 40px !important;
-            color: var(--text-dark) !important;
-        }
-        .markdown-section h3,
-        .markdown-section h4 {
-            font-weight: 600 !important;
-            color: var(--text-dark) !important;
-        }
-
-        /* ================================================================
-           4. 链接 — 红色
-           ================================================================ */
-        a,
-        .markdown-section a,
-        .pagination-item .pagination-label,
-        .pagination-item .pagination-title {
-            color: var(--red) !important;
-            text-decoration: none !important;
-            border-bottom: 1.5px solid transparent !important;
-            transition: border-color 0.2s !important;
-        }
-        a:hover,
-        .markdown-section a:hover {
-            color: var(--red-dark) !important;
-            border-bottom-color: var(--red) !important;
-        }
-
-        /* ================================================================
-           5. 代码
-           ================================================================ */
-        .markdown-section code {
-            color: var(--red-dark) !important;
-            background: var(--red-light) !important;
-            padding: 2px 8px !important;
-            border-radius: 4px !important;
-            font-size: 0.9em !important;
-        }
-        .markdown-section pre {
-            background: #1e1e2e !important;
-            border-radius: 10px !important;
-            padding: 16px 20px !important;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
-        }
-        .markdown-section pre code {
-            background: transparent !important;
-            color: #e0e0e0 !important;
-            padding: 0 !important;
-        }
-
-        /* ================================================================
-           6. 表格 — 表头红色
-           ================================================================ */
-        .markdown-section table thead {
-            background: var(--red) !important;
-            color: #fff !important;
-        }
-        .markdown-section table th,
-        .markdown-section table td {
-            padding: 10px 16px !important;
-            border: 1px solid rgba(0, 0, 0, 0.06) !important;
-        }
-        .markdown-section table tbody tr:nth-child(even) {
-            background: rgba(0, 0, 0, 0.02) !important;
-        }
-
-        /* ================================================================
-           7. 引用块 — 红色左边框
-           ================================================================ */
-        .markdown-section blockquote {
-            border-left: 4px solid var(--red) !important;
-            background: rgba(236, 65, 65, 0.05) !important;
-            padding: 12px 20px !important;
-            border-radius: 0 10px 10px 0 !important;
-            color: var(--text-muted) !important;
-        }
-
-        /* ================================================================
-           8. 顶部导航
-           ================================================================ */
-        .app-nav {
-            background: rgba(255, 255, 255, 0.6) !important;
-            backdrop-filter: blur(14px) !important;
-            -webkit-backdrop-filter: blur(14px) !important;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
-            padding: 10px 20px !important;
-        }
-        .app-nav a {
-            color: var(--text-dark) !important;
-            font-weight: 500 !important;
-        }
-        .app-nav a:hover {
-            color: var(--red) !important;
-        }
-        .app-nav a::before {
-            background: var(--red) !important;
-        }
-
-        /* ================================================================
-           9. 搜索框 — 红色聚焦边框
-           ================================================================ */
-        .search .input-wrap input:focus {
-            border-color: var(--red) !important;
-            box-shadow: 0 0 0 2px var(--red-glow) !important;
-        }
-
-        /* ================================================================
-           10. 分页控件
-           ================================================================ */
-        .docsify-pagination-container {
-            border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
-            padding-top: 20px !important;
-            margin-top: 40px !important;
-        }
-        .pagination-item:hover {
-            background: var(--red-light) !important;
-        }
-
-        /* ================================================================
-           11. 滚动条 — 红色
-           ================================================================ */
+        /* ----- 滚动条 ----- */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: var(--bg-body);
+            background: var(--bg);
         }
         ::-webkit-scrollbar-thumb {
-            background: var(--red) !important;
-            border-radius: 6px !important;
+            background: var(--red);
+            border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--red-dark) !important;
+            background: var(--red-dark);
         }
 
-        /* ================================================================
-           12. 封面页 (coverpage) — 彻底重写
-           ================================================================ */
-        section.cover {
-            background: linear-gradient(145deg, #120808 0%, #2a1212 40%, #3d1a1a 100%) !important;
-        }
-        section.cover .cover-main {
-            color: #fff !important;
-        }
-        section.cover .cover-main h1 {
-            color: #fff !important;
-            font-weight: 700 !important;
-        }
-        section.cover .cover-main p {
-            color: rgba(255, 255, 255, 0.78) !important;
-        }
-        /* 封面主按钮 — 红色 */
-        section.cover .cover-main .buttons a:first-child,
-        section.cover .cover-main .button-primary {
-            background: var(--red) !important;
-            border: 2px solid var(--red) !important;
-            color: #fff !important;
-            border-radius: 30px !important;
-            padding: 12px 32px !important;
-            font-weight: 600 !important;
-            transition: all 0.25s !important;
-            box-shadow: 0 4px 20px var(--red-glow) !important;
-        }
-        section.cover .cover-main .buttons a:first-child:hover,
-        section.cover .cover-main .button-primary:hover {
-            background: var(--red-dark) !important;
-            border-color: var(--red-dark) !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 8px 32px var(--red-glow) !important;
-        }
-        /* 封面次要按钮 — 透明边框 */
-        section.cover .cover-main .buttons a:not(:first-child) {
-            background: transparent !important;
-            border: 2px solid rgba(255, 255, 255, 0.35) !important;
-            color: rgba(255, 255, 255, 0.85) !important;
-            border-radius: 30px !important;
-            padding: 12px 32px !important;
-            font-weight: 600 !important;
-            transition: all 0.25s !important;
-        }
-        section.cover .cover-main .buttons a:not(:first-child):hover {
-            border-color: var(--red) !important;
-            color: #fff !important;
-            transform: translateY(-2px) !important;
-        }
-        /* 封面遮罩 */
-        section.cover .mask-gradient {
-            background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.6)) !important;
+        /* ============================================================
+                   布局容器
+                   ============================================================ */
+        .app {
+            display: flex;
+            min-height: 100vh;
         }
 
-        /* ================================================================
-           13. 通用按钮
-           ================================================================ */
-        .btn,
-        button,
-        .markdown-section .btn {
-            background: var(--red) !important;
-            border: 2px solid var(--red) !important;
-            color: #fff !important;
-            border-radius: 30px !important;
-            padding: 8px 24px !important;
-            font-weight: 600 !important;
-            transition: all 0.25s !important;
-            cursor: pointer !important;
+        /* ============================================================
+                   侧边栏
+                   ============================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 20px 16px 40px;
+            z-index: 100;
+            transition: transform 0.3s ease;
         }
-        .btn:hover,
-        button:hover,
-        .markdown-section .btn:hover {
-            background: var(--red-dark) !important;
-            border-color: var(--red-dark) !important;
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        .sidebar-brand img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        .sidebar-brand .brand-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--red);
+            letter-spacing: -0.3px;
+        }
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-nav ul li {
+            margin: 0;
+        }
+        .sidebar-nav ul li a {
+            display: block;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all var(--transition);
+            border-left: 3px solid transparent;
+        }
+        .sidebar-nav ul li a:hover {
+            background: var(--red-light);
+            color: var(--red);
+        }
+        .sidebar-nav ul li a.active {
+            background: var(--red);
+            color: #fff !important;
+            border-left-color: var(--red-dark);
+            box-shadow: 0 2px 12px var(--red-glow);
+        }
+        /* 侧边栏子层级缩进 */
+        .sidebar-nav ul ul {
+            padding-left: 16px;
+        }
+        .sidebar-nav ul ul li a {
+            font-size: 13px;
+            font-weight: 400;
+            padding: 4px 12px;
         }
 
-        /* ================================================================
-           14. 暗色模式覆盖
-           ================================================================ */
-        body.dark .sidebar {
-            background: rgba(18, 18, 30, 0.92) !important;
-            border-right-color: rgba(255, 255, 255, 0.04) !important;
+        /* 移动端侧边栏切换 */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 101;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            width: 42px;
+            height: 42px;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 2px 12px var(--red-glow);
+            transition: all var(--transition);
         }
-        body.dark .sidebar-nav ul li a {
-            color: #c8c8d8 !important;
+        .sidebar-toggle:hover {
+            transform: scale(1.05);
         }
-        body.dark .sidebar-nav ul li a:hover {
-            background: rgba(236, 65, 65, 0.15) !important;
-            color: #fff !important;
-        }
-        body.dark .sidebar-nav ul li a.active {
-            background: var(--red) !important;
-            color: #fff !important;
-        }
-        body.dark .markdown-section {
-            background: rgba(28, 28, 44, 0.78) !important;
-        }
-        body.dark .markdown-section h1,
-        body.dark .markdown-section h2,
-        body.dark .markdown-section h3,
-        body.dark .markdown-section h4 {
-            color: #ececf0 !important;
-        }
-        body.dark .markdown-section p,
-        body.dark .markdown-section li {
-            color: #c8c8d8 !important;
-        }
-        body.dark .markdown-section code {
-            background: rgba(236, 65, 65, 0.18) !important;
-            color: #f0a0a0 !important;
-        }
-        body.dark .markdown-section pre {
-            background: #0e0e1a !important;
-        }
-        body.dark .app-nav {
-            background: rgba(18, 18, 30, 0.7) !important;
-            border-bottom-color: rgba(255, 255, 255, 0.04) !important;
-        }
-        body.dark .app-nav a {
-            color: #c8c8d8 !important;
-        }
-        body.dark .app-nav a:hover {
-            color: var(--red) !important;
-        }
-        body.dark section.cover {
-            background: linear-gradient(145deg, #0a0505 0%, #1a0e0e 40%, #2a1212 100%) !important;
-        }
-        body.dark .pagination-item:hover {
-            background: rgba(236, 65, 65, 0.12) !important;
-        }
-        body.dark .docsify-pagination-container {
-            border-top-color: rgba(255, 255, 255, 0.06) !important;
-        }
-        body.dark .search .input-wrap input:focus {
-            border-color: var(--red) !important;
-            box-shadow: 0 0 0 2px rgba(236, 65, 65, 0.25) !important;
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 99;
+            backdrop-filter: blur(2px);
         }
 
-        /* ================================================================
-           15. 响应式
-           ================================================================ */
-        @media (max-width: 768px) {
-            .markdown-section {
-                padding: 16px 18px 40px !important;
-                border-radius: 16px !important;
-                margin: 0 10px !important;
-            }
-            .sidebar {
-                background: rgba(255, 255, 255, 0.94) !important;
-                backdrop-filter: blur(18px) !important;
-                -webkit-backdrop-filter: blur(18px) !important;
-            }
-            section.cover .cover-main .buttons a {
-                display: inline-block !important;
-                margin: 6px 4px !important;
-                padding: 10px 22px !important;
-                font-size: 14px !important;
-            }
+        /* ============================================================
+                   主内容
+                   ============================================================ */
+        .main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px 40px 60px;
+            min-height: 100vh;
         }
 
-        /* ================================================================
-           16. 主题切换按钮 — 红色浮动
-           ================================================================ */
+        /* ============================================================
+                   内容卡片
+                   ============================================================ */
+        .content-card {
+            max-width: 920px;
+            margin: 0 auto;
+            background: var(--card);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-radius: var(--radius);
+            padding: 32px 40px 50px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: background 0.3s;
+        }
+
+        /* ============================================================
+                   文章排版
+                   ============================================================ */
+        .markdown-body h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            border-bottom: 3px solid var(--red);
+            padding-bottom: 12px;
+            margin-bottom: 28px;
+            color: var(--text);
+        }
+        .markdown-body h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-left: 4px solid var(--red);
+            padding-left: 16px;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .markdown-body h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 28px;
+            color: var(--text);
+        }
+        .markdown-body h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            color: var(--text);
+        }
+        .markdown-body p {
+            margin: 12px 0;
+            color: var(--text);
+        }
+        .markdown-body a {
+            color: var(--red);
+            text-decoration: none;
+            border-bottom: 1.5px solid transparent;
+            transition: border-color var(--transition);
+        }
+        .markdown-body a:hover {
+            border-bottom-color: var(--red);
+            color: var(--red-dark);
+        }
+        .markdown-body ul,
+        .markdown-body ol {
+            padding-left: 24px;
+            margin: 12px 0;
+        }
+        .markdown-body li {
+            margin: 4px 0;
+            color: var(--text);
+        }
+        .markdown-body blockquote {
+            border-left: 4px solid var(--red);
+            background: rgba(236, 65, 65, 0.05);
+            padding: 12px 20px;
+            margin: 16px 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            color: var(--text-muted);
+        }
+        .markdown-body blockquote p {
+            margin: 0;
+            color: inherit;
+        }
+
+        /* 代码 */
+        .markdown-body code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 0.88em;
+            background: var(--red-light);
+            color: var(--red-dark);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .markdown-body pre {
+            background: #1a1a2e;
+            border-radius: var(--radius-sm);
+            padding: 18px 22px;
+            overflow-x: auto;
+            margin: 16px 0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .markdown-body pre code {
+            background: transparent;
+            color: #e0e0e8;
+            padding: 0;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .markdown-body pre .copy-btn {
+            float: right;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: #aaa;
+            padding: 2px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .markdown-body pre .copy-btn:hover {
+            background: var(--red);
+            color: #fff;
+        }
+
+        /* 表格 */
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+        .markdown-body table thead {
+            background: var(--red);
+            color: #fff;
+        }
+        .markdown-body table th,
+        .markdown-body table td {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+        .markdown-body table tbody tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        /* 图片 */
+        .markdown-body img {
+            max-width: 100%;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        /* 分割线 */
+        .markdown-body hr {
+            border: none;
+            border-top: 2px solid var(--border);
+            margin: 32px 0;
+        }
+
+        /* ============================================================
+                   顶部导航 (Docsify nav)
+                   ============================================================ */
+        .app-nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .app-nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color var(--transition);
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+        }
+        .app-nav a:hover {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+        .app-nav a.active-nav {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        /* ============================================================
+                   分页 (pagination)
+                   ============================================================ */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding-top: 20px;
+            margin-top: 32px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .pagination a {
+            color: var(--text);
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+            font-size: 14px;
+        }
+        .pagination a:hover {
+            background: var(--red-light);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        /* ============================================================
+                   封面页 (coverpage) — 独立于 Docsify 默认样式
+                   ============================================================ */
+        .cover-wrapper {
+            display: none;
+            /* 默认隐藏，由 JS 控制显示 */
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0f0707 0%, #1f0e0e 40%, #301515 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 24px;
+            flex-direction: column;
+        }
+        .cover-wrapper.show-cover {
+            display: flex;
+        }
+        .cover-wrapper .cover-content {
+            max-width: 720px;
+        }
+        .cover-wrapper .cover-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 40px var(--red-glow);
+        }
+        .cover-wrapper .cover-title {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+        }
+        .cover-wrapper .cover-title .highlight {
+            color: var(--red);
+        }
+        .cover-wrapper .cover-desc {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.75);
+            max-width: 560px;
+            margin: 0 auto 32px;
+            line-height: 1.8;
+        }
+        .cover-wrapper .cover-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .cover-wrapper .cover-buttons a {
+            display: inline-block;
+            padding: 12px 36px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition);
+            font-size: 15px;
+        }
+        .cover-wrapper .cover-buttons .btn-primary {
+            background: var(--red);
+            color: #fff;
+            box-shadow: 0 4px 24px var(--red-glow);
+        }
+        .cover-wrapper .cover-buttons .btn-primary:hover {
+            background: var(--red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--red-glow);
+        }
+        .cover-wrapper .cover-buttons .btn-secondary {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.85);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+        }
+        .cover-wrapper .cover-buttons .btn-secondary:hover {
+            border-color: var(--red);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .cover-wrapper .cover-meta {
+            margin-top: 36px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================================
+                   主题切换按钮
+                   ============================================================ */
         .theme-toggle {
-            position: fixed !important;
-            bottom: 28px !important;
-            right: 28px !important;
-            z-index: 999 !important;
-            width: 52px !important;
-            height: 52px !important;
-            border-radius: 50% !important;
-            border: none !important;
-            background: linear-gradient(135deg, var(--red), var(--red-dark)) !important;
-            color: #fff !important;
-            font-size: 24px !important;
-            cursor: pointer !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            box-shadow: 0 4px 20px var(--red-glow) !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            outline: none !important;
-            padding: 0 !important;
-            user-select: none !important;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 200;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--red-glow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+            user-select: none;
         }
         .theme-toggle:hover {
-            transform: scale(1.12) rotate(8deg) !important;
-            box-shadow: 0 6px 32px var(--red-glow) !important;
+            transform: scale(1.1) rotate(6deg);
+            box-shadow: 0 6px 32px var(--red-glow);
         }
         .theme-toggle:active {
-            transform: scale(0.92) !important;
+            transform: scale(0.92);
         }
-        .theme-toggle.light {
-            background: rgba(255, 255, 255, 0.9) !important;
-            color: var(--text-dark) !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        .theme-toggle.light-mode {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
-        .theme-toggle.light:hover {
-            box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14) !important;
+        .theme-toggle.light-mode:hover {
+            box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14);
         }
 
-        /* ================================================================
-           17. 其他杂项
-           ================================================================ */
-        .markdown-section img {
-            border-radius: 10px !important;
+        /* ============================================================
+                   深色模式
+                   ============================================================ */
+        body.dark {
+            --bg: #12121e;
+            --card: rgba(28, 28, 44, 0.82);
+            --text: #e8e8f0;
+            --text-muted: #8888aa;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
-        .markdown-section .emoji {
-            font-style: normal !important;
+        body.dark .sidebar {
+            background: rgba(18, 18, 30, 0.92);
+            border-right-color: var(--border);
         }
-        /* 确保所有 #42b983 都被覆盖 */
-        [class*="42b983"],
-        [style*="#42b983"] {
-            color: var(--red) !important;
-            border-color: var(--red) !important;
-            background-color: var(--red-light) !important;
+        body.dark .sidebar-nav ul li a {
+            color: #c8c8d8;
         }
-        /* 强制覆盖 Docsify 默认绿色变量 */
-        .vue,
-        .vue .app-name-link,
-        .vue .sidebar-nav ul li a.active,
-        .vue .search .input-wrap input:focus {
-            --theme-color: var(--red) !important;
-            --theme-color-light: var(--red-light) !important;
+        body.dark .sidebar-nav ul li a:hover {
+            background: rgba(236, 65, 65, 0.15);
+            color: var(--red);
+        }
+        body.dark .sidebar-nav ul li a.active {
+            background: var(--red);
+            color: #fff !important;
+        }
+        body.dark .markdown-body code {
+            background: rgba(236, 65, 65, 0.15);
+            color: #f0a0a0;
+        }
+        body.dark .markdown-body pre {
+            background: #0a0a14;
+        }
+        body.dark .markdown-body blockquote {
+            background: rgba(236, 65, 65, 0.08);
+        }
+        body.dark .markdown-body table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        body.dark .app-nav a {
+            color: #c8c8d8;
+        }
+        body.dark .app-nav a:hover,
+        body.dark .app-nav a.active-nav {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+        body.dark .pagination a {
+            color: #c8c8d8;
+            border-color: var(--border);
+        }
+        body.dark .pagination a:hover {
+            background: rgba(236, 65, 65, 0.12);
+            border-color: var(--red);
+            color: var(--red);
+        }
+        body.dark .cover-wrapper {
+            background: linear-gradient(145deg, #080404 0%, #140a0a 40%, #1f0e0e 100%);
+        }
+
+        /* ============================================================
+                   响应式
+                   ============================================================ */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                padding: 16px 12px 30px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay.open {
+                display: block;
+            }
+            .sidebar-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .main {
+                margin-left: 0;
+                padding: 16px 12px 40px;
+            }
+            .content-card {
+                padding: 20px 16px 32px;
+                border-radius: 12px;
+            }
+            .cover-wrapper .cover-title {
+                font-size: 2.2rem;
+            }
+            .cover-wrapper .cover-desc {
+                font-size: 0.95rem;
+            }
+            .cover-wrapper .cover-buttons a {
+                padding: 10px 24px;
+                font-size: 14px;
+            }
+            .app-nav {
+                gap: 14px;
+                font-size: 13px;
+            }
+            .theme-toggle {
+                width: 42px;
+                height: 42px;
+                font-size: 18px;
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+
+        /* ============================================================
+                   加载过渡
+                   ============================================================ */
+        .app-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+        .app-loading::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            margin-left: 12px;
+            border: 3px solid var(--border);
+            border-top-color: var(--red);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
-
-    <!-- Google AdSense -->
-    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js">
-    </script>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({
-            google_ad_client: "ca-pub-5159844745975514",
-            enable_page_level_ads: true
-        });
-    </script>
 </head>
 <body>
-    <div id="app"></div>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
 
-    <!-- ===== 主题切换 ===== -->
-    <script>
-        (function() {
-            var STORAGE_KEY = 'docsify-theme';
-            var link = document.getElementById('theme-css');
-            var btn = document.getElementById('themeToggle');
-            var LIGHT_URL = '//unpkg.com/docsify/lib/themes/vue.css';
-            var DARK_URL = '//unpkg.com/docsify/lib/themes/dark.css';
+    <!-- ===== 移动端侧边栏切换按钮 ===== -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="切换侧边栏">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-            function setTheme(theme) {
-                link.href = theme === 'dark' ? DARK_URL : LIGHT_URL;
-                btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-                btn.className = 'theme-toggle' + (theme === 'dark' ? '' : ' light');
-                document.body.classList.toggle('dark', theme === 'dark');
-                localStorage.setItem(STORAGE_KEY, theme);
-            }
+    <!-- ===== 应用容器 ===== -->
+    <div class="app" id="app">
 
-            function toggleTheme() {
-                var isDark = link.href.includes('dark');
-                setTheme(isDark ? 'light' : 'dark');
-            }
+        <!-- ===== 侧边栏 ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="netease.png" alt="网易云音乐" />
+                <span class="brand-name">网易云音乐 API</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav">
+                <!-- 由 Docsify 自动渲染，或由 JS 动态生成 -->
+                <div class="app-loading" style="min-height:auto;padding:20px 0;font-size:13px;">加载中...</div>
+            </nav>
+        </aside>
 
-            var saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                setTheme(saved);
-            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                setTheme('dark');
-            }
+        <!-- ===== 主内容 ===== -->
+        <main class="main" id="mainContent">
+            <!-- Docsify 会在此渲染内容 -->
+            <div id="docsify-content">
+                <div class="app-loading">加载文档中...</div>
+            </div>
+        </main>
+    </div>
 
-            btn.addEventListener('click', toggleTheme);
+    <!-- ===== 主题切换按钮 ===== -->
+    <button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
 
-            try {
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-                    if (!localStorage.getItem(STORAGE_KEY)) {
-                        setTheme(e.matches ? 'dark' : 'light');
-                    }
-                });
-            } catch (e) {}
-        })();
-    </script>
+    <!-- ============================================================
+    Docsify 核心 — 完全从零配置
+    ============================================================ -->
 
-    <!-- ===== Docsify 配置 ===== -->
+    <!-- 1. 先定义 Docsify 配置 -->
     <script>
         window.$docsify = {
+            // ----- 基础配置 -----
             name: '网易云音乐 API Enhanced',
             repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
             coverpage: true,
             homepage: 'home.md',
-            loadSidebar: false,
-            subMaxLevel: 4,
+            loadSidebar: false, // 让 Docsify 自动从标题生成侧边栏
+            subMaxLevel: 4, // 显示到 h4 层级
             auto2top: true,
             nameLink: '/',
+            relativePath: true,
+
+            // ----- 搜索 -----
             search: {
                 maxAge: 86400000,
                 paths: 'auto',
-                placeholder: '搜索文档...'
+                placeholder: '搜索文档...',
+                noData: '没有找到相关内容'
             },
+
+            // ----- 复制代码 -----
             copyCode: {
                 buttonText: '复制',
-                successText: '已复制!'
+                successText: '已复制 ✓'
             },
+
+            // ----- 顶部导航 -----
             nav: [
-                { title: '🏠 首页', path: '/' },
-                { title: '📖 文档', path: '/home' },
+                { title: '首页', path: '/' },
+                { title: '文档', path: '/home' },
                 { title: 'GitHub', path: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced' }
-            ]
+            ],
+
+            // ----- 钩子：渲染完成后处理侧边栏和封面 -----
+            done: function() {
+                // 让 Docsify 把侧边栏渲染到 #sidebarNav 里
+                var sidebarNav = document.getElementById('sidebarNav');
+                var docsifySidebar = document.querySelector('.sidebar-nav');
+                if (docsifySidebar && sidebarNav) {
+                    sidebarNav.innerHTML = docsifySidebar.innerHTML;
+                    // 把 Docsify 生成的侧边栏移走，避免重复
+                    docsifySidebar.style.display = 'none';
+                }
+
+                // 处理封面页显示
+                var cover = document.querySelector('.cover');
+                var mainContent = document.getElementById('docsify-content');
+                var coverWrapper = document.querySelector('.cover-wrapper');
+
+                if (cover) {
+                    // 有封面页：隐藏内容区，显示封面
+                    mainContent.style.display = 'none';
+                    if (!coverWrapper) {
+                        // 创建封面容器
+                        var wrapper = document.createElement('div');
+                        wrapper.className = 'cover-wrapper show-cover';
+                        wrapper.innerHTML = cover.innerHTML;
+                        // 美化封面内的按钮
+                        var btns = wrapper.querySelectorAll('.buttons a');
+                        btns.forEach(function(btn, i) {
+                            if (i === 0) {
+                                btn.className = 'btn-primary';
+                            } else {
+                                btn.className = 'btn-secondary';
+                            }
+                        });
+                        // 处理标题高亮
+                        var title = wrapper.querySelector('h1');
+                        if (title) {
+                            title.innerHTML = title.innerHTML.replace(
+                                /API/g,
+                                '<span class="highlight">API</span>'
+                            );
+                        }
+                        document.getElementById('mainContent').prepend(wrapper);
+                    }
+                } else {
+                    // 没有封面页：显示内容
+                    mainContent.style.display = 'block';
+                    var existing = document.querySelector('.cover-wrapper');
+                    if (existing) existing.remove();
+                }
+
+                // 处理侧边栏激活状态
+                var currentPath = window.location.pathname;
+                var links = document.querySelectorAll('.sidebar-nav ul li a');
+                links.forEach(function(link) {
+                    var href = link.getAttribute('href');
+                    if (href && currentPath.endsWith(href.replace(/^\.\//, ''))) {
+                        link.classList.add('active');
+                    }
+                });
+
+                // 移动端：点击侧边栏链接后自动关闭
+                links.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        closeSidebar();
+                    });
+                });
+            },
+
+            // ----- 页面切换后更新侧边栏激活状态 -----
+            beforeEach: function(html) {
+                // 可以在这里预处理 html
+                return html;
+            },
+            afterEach: function(html) {
+                // 可以在这里后处理
+                return html;
+            }
         };
     </script>
 
-    <!-- Docsify 核心 -->
+    <!-- 2. 加载 Docsify 及其插件 -->
     <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js">
     </script>
-    <!-- 插件 -->
     <script src="https://unpkg.com/docsify-plugin-search@2.0.0/dist/search.min.js">
     </script>
     <script src="https://unpkg.com/docsify-copy-code@2.1.1/dist/docsify-copy-code.min.js">
@@ -564,14 +839,264 @@
     <script src="https://unpkg.com/docsify-plugin-flexible-alerts@1.1.0/docsify-plugin-flexible-alerts.min.js">
     </script>
 
-    <!-- Service Worker -->
+    <!-- ============================================================
+    自定义 JS：主题切换 + 侧边栏控制 + 封面适配
+    ============================================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ---- 主题切换 ----
+            var STORAGE_KEY = 'docsify-theme';
+            var btn = document.getElementById('themeToggle');
+
+            function setTheme(theme) {
+                document.body.classList.toggle('dark', theme === 'dark');
+                btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+                btn.className = 'theme-toggle' + (theme === 'dark' ? '' : ' light-mode');
+                try {
+                    localStorage.setItem(STORAGE_KEY, theme);
+                } catch (e) {}
+            }
+
+            function toggleTheme() {
+                var isDark = document.body.classList.contains('dark');
+                setTheme(isDark ? 'light' : 'dark');
+            }
+
+            // 读取存储或系统偏好
+            var saved = null;
+            try {
+                saved = localStorage.getItem(STORAGE_KEY);
+            } catch (e) {}
+            if (saved) {
+                setTheme(saved);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme('dark');
+            }
+
+            btn.addEventListener('click', toggleTheme);
+
+            // 监听系统主题变化
+            try {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                    if (!localStorage.getItem(STORAGE_KEY)) {
+                        setTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
+            } catch (e) {}
+
+            // ---- 移动端侧边栏 ----
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            var toggleBtn = document.getElementById('sidebarToggle');
+
+            function openSidebar() {
+                sidebar.classList.add('open');
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+
+            overlay.addEventListener('click', closeSidebar);
+
+            // 窗口尺寸变化时自动关闭侧边栏
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+
+            // ---- 将 Docsify 的侧边栏内容迁移到自定义侧边栏 ----
+            // 使用 MutationObserver 监听 Docsify 渲染完成
+            var observer = new MutationObserver(function() {
+                var docsifySidebar = document.querySelector('.sidebar-nav');
+                var customNav = document.getElementById('sidebarNav');
+                if (docsifySidebar && customNav && customNav.querySelector('.app-loading')) {
+                    // 把 Docsify 生成的侧边栏复制过来
+                    customNav.innerHTML = docsifySidebar.innerHTML;
+                    // 隐藏 Docsify 自己的侧边栏
+                    docsifySidebar.style.display = 'none';
+
+                    // 给链接添加点击关闭侧边栏
+                    customNav.querySelectorAll('a').forEach(function(link) {
+                        link.addEventListener('click', closeSidebar);
+                    });
+
+                    // 移除加载提示
+                    var loading = customNav.querySelector('.app-loading');
+                    if (loading) loading.remove();
+                }
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+            // 也监听 #app 的变化
+            var appObserver = new MutationObserver(function() {
+                var docsifySidebar = document.querySelector('.sidebar-nav');
+                var customNav = document.getElementById('sidebarNav');
+                if (docsifySidebar && customNav && customNav.querySelector('.app-loading')) {
+                    customNav.innerHTML = docsifySidebar.innerHTML;
+                    docsifySidebar.style.display = 'none';
+                    customNav.querySelectorAll('a').forEach(function(link) {
+                        link.addEventListener('click', closeSidebar);
+                    });
+                    var loading = customNav.querySelector('.app-loading');
+                    if (loading) loading.remove();
+                }
+            });
+
+            appObserver.observe(document.getElementById('app'), {
+                childList: true,
+                subtree: true
+            });
+
+            // ---- 处理封面页的按钮样式 ----
+            // 用 MutationObserver 监听封面出现
+            var coverObserver = new MutationObserver(function() {
+                var cover = document.querySelector('.cover');
+                var mainContent = document.getElementById('docsify-content');
+                var existingWrapper = document.querySelector('.cover-wrapper');
+
+                if (cover && !existingWrapper) {
+                    // 隐藏内容
+                    if (mainContent) mainContent.style.display = 'none';
+
+                    // 创建封面包装
+                    var wrapper = document.createElement('div');
+                    wrapper.className = 'cover-wrapper show-cover';
+                    // 复制封面内容
+                    var clone = cover.cloneNode(true);
+                    wrapper.appendChild(clone);
+
+                    // 美化按钮
+                    var btns = wrapper.querySelectorAll('.buttons a');
+                    btns.forEach(function(btn, i) {
+                        if (i === 0) {
+                            btn.className = 'btn-primary';
+                        } else {
+                            btn.className = 'btn-secondary';
+                        }
+                    });
+
+                    // 标题高亮
+                    var title = wrapper.querySelector('h1');
+                    if (title) {
+                        var text = title.textContent;
+                        title.innerHTML = text.replace(/API/g, '<span class="highlight">API</span>');
+                    }
+
+                    // 插入到 main 中
+                    var mainEl = document.getElementById('mainContent');
+                    if (mainEl) {
+                        mainEl.prepend(wrapper);
+                    }
+
+                    // 隐藏原始 cover
+                    if (cover) cover.style.display = 'none';
+                }
+
+                // 如果封面被移除，显示内容
+                if (!document.querySelector('.cover') && document.querySelector('.cover-wrapper')) {
+                    var wrapper2 = document.querySelector('.cover-wrapper');
+                    if (wrapper2) wrapper2.remove();
+                    if (mainContent) mainContent.style.display = 'block';
+                }
+            });
+
+            coverObserver.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+            // 首次加载时检查
+            setTimeout(function() {
+                var cover = document.querySelector('.cover');
+                var mainContent = document.getElementById('docsify-content');
+                var existingWrapper = document.querySelector('.cover-wrapper');
+
+                if (cover && !existingWrapper) {
+                    if (mainContent) mainContent.style.display = 'none';
+                    var wrapper = document.createElement('div');
+                    wrapper.className = 'cover-wrapper show-cover';
+                    var clone = cover.cloneNode(true);
+                    wrapper.appendChild(clone);
+
+                    var btns = wrapper.querySelectorAll('.buttons a');
+                    btns.forEach(function(btn, i) {
+                        if (i === 0) {
+                            btn.className = 'btn-primary';
+                        } else {
+                            btn.className = 'btn-secondary';
+                        }
+                    });
+                    var title = wrapper.querySelector('h1');
+                    if (title) {
+                        var text = title.textContent;
+                        title.innerHTML = text.replace(/API/g, '<span class="highlight">API</span>');
+                    }
+                    var mainEl = document.getElementById('mainContent');
+                    if (mainEl) {
+                        mainEl.prepend(wrapper);
+                    }
+                    if (cover) cover.style.display = 'none';
+                }
+            }, 300);
+
+            // ---- 修复：Docsify 加载完成后再次检查 ----
+            // 利用 Docsify 的 $docsify.done 钩子已经在配置中定义过了
+            // 额外再监听一次 load 事件
+            window.addEventListener('load', function() {
+                // 再次尝试迁移侧边栏
+                var docsifySidebar = document.querySelector('.sidebar-nav');
+                var customNav = document.getElementById('sidebarNav');
+                if (docsifySidebar && customNav) {
+                    if (customNav.querySelector('.app-loading') || customNav.children.length === 0) {
+                        customNav.innerHTML = docsifySidebar.innerHTML;
+                        docsifySidebar.style.display = 'none';
+                        customNav.querySelectorAll('a').forEach(function(link) {
+                            link.addEventListener('click', closeSidebar);
+                        });
+                        var loading = customNav.querySelector('.app-loading');
+                        if (loading) loading.remove();
+                    }
+                }
+            });
+
+        })();
+    </script>
+
+    <!-- ============================================================
+    Service Worker (PWA 离线缓存)
+    ============================================================ -->
     <script>
         if (typeof navigator.serviceWorker !== 'undefined') {
-            navigator.serviceWorker.register('sw.js')
+            navigator.serviceWorker.register('sw.js').catch(function() {
+                // 静默失败，不影响使用
+            });
         }
     </script>
 
-    <!-- Google Analytics -->
+    <!-- ============================================================
+    Google Analytics (保留)
+    ============================================================ -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG">
     </script>
     <script>
@@ -581,5 +1106,6 @@
         gtag('js', new Date());
         gtag('config', 'G-BPRGR23JEG');
     </script>
+
 </body>
 </html>
