@@ -29,6 +29,7 @@
             --radius: 16px;
             --radius-sm: 8px;
             --transition: 0.25s ease;
+            --sidebar-width: 280px;
         }
 
         /* ----- 重置 ----- */
@@ -82,7 +83,7 @@
             top: 0;
             left: 0;
             bottom: 0;
-            width: 280px;
+            width: var(--sidebar-width);
             background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -90,7 +91,11 @@
             overflow-y: auto;
             padding: 20px 16px 40px;
             z-index: 100;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        /* 封面页隐藏侧边栏 */
+        .sidebar.hidden-on-cover {
+            display: none;
         }
         .sidebar-brand {
             display: flex;
@@ -186,9 +191,10 @@
                    ============================================================ */
         .main {
             flex: 1;
-            margin-left: 280px;
+            margin-left: var(--sidebar-width);
             padding: 30px 40px 60px;
             min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
 
         /* ============================================================
@@ -416,7 +422,6 @@
                    ============================================================ */
         .cover-wrapper {
             display: none;
-            /* 默认隐藏，由 JS 控制显示 */
             min-height: 100vh;
             background: linear-gradient(145deg, #0f0707 0%, #1f0e0e 40%, #301515 100%);
             color: #fff;
@@ -426,6 +431,9 @@
             text-align: center;
             padding: 40px 24px;
             flex-direction: column;
+            width: 100%;
+            /* 关键：覆盖整个可视区域，不被侧边栏遮挡 */
+            box-sizing: border-box;
         }
         .cover-wrapper.show-cover {
             display: flex;
@@ -606,6 +614,7 @@
                 transform: translateX(-100%);
                 width: 280px;
                 padding: 16px 12px 30px;
+                display: block !important; /* 移动端强制显示，通过transform控制 */
             }
             .sidebar.open {
                 transform: translateX(0);
@@ -619,7 +628,7 @@
                 justify-content: center;
             }
             .main {
-                margin-left: 0;
+                margin-left: 0 !important;
                 padding: 16px 12px 40px;
             }
             .content-card {
@@ -647,6 +656,20 @@
                 bottom: 16px;
                 right: 16px;
             }
+            /* 移动端封面页全屏 */
+            .cover-wrapper {
+                padding: 20px 16px;
+                min-height: 100vh;
+            }
+        }
+
+        /* 封面页显示时，隐藏侧边栏（PC端） */
+        .sidebar.hidden-on-cover {
+            display: none !important;
+        }
+        /* 封面页显示时，主内容占据全部宽度 */
+        .main.cover-active {
+            margin-left: 0 !important;
         }
 
         /* ============================================================
@@ -722,8 +745,8 @@
             repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
             coverpage: true,
             homepage: 'home.md',
-            loadSidebar: false, // 让 Docsify 自动从标题生成侧边栏
-            subMaxLevel: 4, // 显示到 h4 层级
+            loadSidebar: false,
+            subMaxLevel: 4,
             auto2top: true,
             nameLink: '/',
             relativePath: true,
@@ -756,77 +779,101 @@
                 var docsifySidebar = document.querySelector('.sidebar-nav');
                 if (docsifySidebar && sidebarNav) {
                     sidebarNav.innerHTML = docsifySidebar.innerHTML;
-                    // 把 Docsify 生成的侧边栏移走，避免重复
                     docsifySidebar.style.display = 'none';
                 }
 
-                // 处理封面页显示
-                var cover = document.querySelector('.cover');
-                var mainContent = document.getElementById('docsify-content');
-                var coverWrapper = document.querySelector('.cover-wrapper');
-
-                if (cover) {
-                    // 有封面页：隐藏内容区，显示封面
-                    mainContent.style.display = 'none';
-                    if (!coverWrapper) {
-                        // 创建封面容器
-                        var wrapper = document.createElement('div');
-                        wrapper.className = 'cover-wrapper show-cover';
-                        wrapper.innerHTML = cover.innerHTML;
-                        // 美化封面内的按钮
-                        var btns = wrapper.querySelectorAll('.buttons a');
-                        btns.forEach(function(btn, i) {
-                            if (i === 0) {
-                                btn.className = 'btn-primary';
-                            } else {
-                                btn.className = 'btn-secondary';
-                            }
-                        });
-                        // 处理标题高亮
-                        var title = wrapper.querySelector('h1');
-                        if (title) {
-                            title.innerHTML = title.innerHTML.replace(
-                                /API/g,
-                                '<span class="highlight">API</span>'
-                            );
-                        }
-                        document.getElementById('mainContent').prepend(wrapper);
-                    }
-                } else {
-                    // 没有封面页：显示内容
-                    mainContent.style.display = 'block';
-                    var existing = document.querySelector('.cover-wrapper');
-                    if (existing) existing.remove();
-                }
+                // 处理封面页显示/隐藏侧边栏
+                handleCoverVisibility();
 
                 // 处理侧边栏激活状态
-                var currentPath = window.location.pathname;
-                var links = document.querySelectorAll('.sidebar-nav ul li a');
-                links.forEach(function(link) {
-                    var href = link.getAttribute('href');
-                    if (href && currentPath.endsWith(href.replace(/^\.\//, ''))) {
-                        link.classList.add('active');
-                    }
-                });
+                updateActiveLink();
 
                 // 移动端：点击侧边栏链接后自动关闭
-                links.forEach(function(link) {
-                    link.addEventListener('click', function() {
-                        closeSidebar();
-                    });
+                document.querySelectorAll('.sidebar-nav ul li a').forEach(function(link) {
+                    link.addEventListener('click', closeSidebar);
                 });
             },
 
             // ----- 页面切换后更新侧边栏激活状态 -----
-            beforeEach: function(html) {
-                // 可以在这里预处理 html
-                return html;
-            },
             afterEach: function(html) {
-                // 可以在这里后处理
+                // 延迟执行，等待DOM更新
+                setTimeout(function() {
+                    updateActiveLink();
+                    handleCoverVisibility();
+                }, 100);
                 return html;
             }
         };
+
+        // ---- 辅助函数 ----
+        function handleCoverVisibility() {
+            var cover = document.querySelector('.cover');
+            var sidebar = document.getElementById('sidebar');
+            var main = document.getElementById('mainContent');
+
+            if (cover) {
+                // 有封面页：隐藏侧边栏，主内容全宽
+                sidebar.classList.add('hidden-on-cover');
+                main.classList.add('cover-active');
+                // 移动端也要关闭侧边栏
+                closeSidebar();
+            } else {
+                sidebar.classList.remove('hidden-on-cover');
+                main.classList.remove('cover-active');
+            }
+        }
+
+        function updateActiveLink() {
+            var currentPath = window.location.pathname;
+            document.querySelectorAll('.sidebar-nav ul li a').forEach(function(link) {
+                var href = link.getAttribute('href');
+                link.classList.remove('active');
+                if (href && currentPath.endsWith(href.replace(/^\.\//, ''))) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // ---- 移动端侧边栏控制 ----
+        function openSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // ---- 绑定事件 ----
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleBtn = document.getElementById('sidebarToggle');
+            var overlay = document.getElementById('sidebarOverlay');
+
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+
+            overlay.addEventListener('click', closeSidebar);
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+        });
     </script>
 
     <!-- 2. 加载 Docsify 及其插件 -->
@@ -840,7 +887,7 @@
     </script>
 
     <!-- ============================================================
-    自定义 JS：主题切换 + 侧边栏控制 + 封面适配
+    自定义 JS：主题切换 + 侧边栏迁移 + 封面检测
     ============================================================ -->
     <script>
         (function() {
@@ -864,7 +911,6 @@
                 setTheme(isDark ? 'light' : 'dark');
             }
 
-            // 读取存储或系统偏好
             var saved = null;
             try {
                 saved = localStorage.getItem(STORAGE_KEY);
@@ -877,7 +923,6 @@
 
             btn.addEventListener('click', toggleTheme);
 
-            // 监听系统主题变化
             try {
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
                     if (!localStorage.getItem(STORAGE_KEY)) {
@@ -886,60 +931,42 @@
                 });
             } catch (e) {}
 
-            // ---- 移动端侧边栏 ----
-            var sidebar = document.getElementById('sidebar');
-            var overlay = document.getElementById('sidebarOverlay');
-            var toggleBtn = document.getElementById('sidebarToggle');
-
-            function openSidebar() {
-                sidebar.classList.add('open');
-                overlay.classList.add('open');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeSidebar() {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('open');
-                document.body.style.overflow = '';
-            }
-
-            toggleBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (sidebar.classList.contains('open')) {
-                    closeSidebar();
-                } else {
-                    openSidebar();
-                }
-            });
-
-            overlay.addEventListener('click', closeSidebar);
-
-            // 窗口尺寸变化时自动关闭侧边栏
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 768) {
-                    closeSidebar();
-                }
-            });
-
-            // ---- 将 Docsify 的侧边栏内容迁移到自定义侧边栏 ----
-            // 使用 MutationObserver 监听 Docsify 渲染完成
-            var observer = new MutationObserver(function() {
+            // ---- 监听 Docsify 渲染，迁移侧边栏 ----
+            function migrateSidebar() {
                 var docsifySidebar = document.querySelector('.sidebar-nav');
                 var customNav = document.getElementById('sidebarNav');
-                if (docsifySidebar && customNav && customNav.querySelector('.app-loading')) {
-                    // 把 Docsify 生成的侧边栏复制过来
-                    customNav.innerHTML = docsifySidebar.innerHTML;
-                    // 隐藏 Docsify 自己的侧边栏
-                    docsifySidebar.style.display = 'none';
+                if (docsifySidebar && customNav) {
+                    // 避免重复迁移
+                    if (customNav.querySelector('.app-loading') || customNav.children.length === 0) {
+                        customNav.innerHTML = docsifySidebar.innerHTML;
+                        docsifySidebar.style.display = 'none';
+                        // 给链接添加点击关闭侧边栏
+                        customNav.querySelectorAll('a').forEach(function(link) {
+                            link.addEventListener('click', closeSidebar);
+                        });
+                        // 移除加载提示
+                        var loading = customNav.querySelector('.app-loading');
+                        if (loading) loading.remove();
+                        // 更新激活状态
+                        updateActiveLink();
+                    }
+                }
+            }
 
-                    // 给链接添加点击关闭侧边栏
-                    customNav.querySelectorAll('a').forEach(function(link) {
-                        link.addEventListener('click', closeSidebar);
-                    });
-
-                    // 移除加载提示
-                    var loading = customNav.querySelector('.app-loading');
-                    if (loading) loading.remove();
+            // 使用 MutationObserver 监听 DOM 变化
+            var observer = new MutationObserver(function() {
+                migrateSidebar();
+                // 检测封面变化
+                var cover = document.querySelector('.cover');
+                var sidebar = document.getElementById('sidebar');
+                var main = document.getElementById('mainContent');
+                if (cover) {
+                    sidebar.classList.add('hidden-on-cover');
+                    main.classList.add('cover-active');
+                    closeSidebar();
+                } else {
+                    sidebar.classList.remove('hidden-on-cover');
+                    main.classList.remove('cover-active');
                 }
             });
 
@@ -948,137 +975,18 @@
                 subtree: true
             });
 
-            // 也监听 #app 的变化
-            var appObserver = new MutationObserver(function() {
-                var docsifySidebar = document.querySelector('.sidebar-nav');
-                var customNav = document.getElementById('sidebarNav');
-                if (docsifySidebar && customNav && customNav.querySelector('.app-loading')) {
-                    customNav.innerHTML = docsifySidebar.innerHTML;
-                    docsifySidebar.style.display = 'none';
-                    customNav.querySelectorAll('a').forEach(function(link) {
-                        link.addEventListener('click', closeSidebar);
-                    });
-                    var loading = customNav.querySelector('.app-loading');
-                    if (loading) loading.remove();
-                }
-            });
-
-            appObserver.observe(document.getElementById('app'), {
-                childList: true,
-                subtree: true
-            });
-
-            // ---- 处理封面页的按钮样式 ----
-            // 用 MutationObserver 监听封面出现
-            var coverObserver = new MutationObserver(function() {
-                var cover = document.querySelector('.cover');
-                var mainContent = document.getElementById('docsify-content');
-                var existingWrapper = document.querySelector('.cover-wrapper');
-
-                if (cover && !existingWrapper) {
-                    // 隐藏内容
-                    if (mainContent) mainContent.style.display = 'none';
-
-                    // 创建封面包装
-                    var wrapper = document.createElement('div');
-                    wrapper.className = 'cover-wrapper show-cover';
-                    // 复制封面内容
-                    var clone = cover.cloneNode(true);
-                    wrapper.appendChild(clone);
-
-                    // 美化按钮
-                    var btns = wrapper.querySelectorAll('.buttons a');
-                    btns.forEach(function(btn, i) {
-                        if (i === 0) {
-                            btn.className = 'btn-primary';
-                        } else {
-                            btn.className = 'btn-secondary';
-                        }
-                    });
-
-                    // 标题高亮
-                    var title = wrapper.querySelector('h1');
-                    if (title) {
-                        var text = title.textContent;
-                        title.innerHTML = text.replace(/API/g, '<span class="highlight">API</span>');
-                    }
-
-                    // 插入到 main 中
-                    var mainEl = document.getElementById('mainContent');
-                    if (mainEl) {
-                        mainEl.prepend(wrapper);
-                    }
-
-                    // 隐藏原始 cover
-                    if (cover) cover.style.display = 'none';
-                }
-
-                // 如果封面被移除，显示内容
-                if (!document.querySelector('.cover') && document.querySelector('.cover-wrapper')) {
-                    var wrapper2 = document.querySelector('.cover-wrapper');
-                    if (wrapper2) wrapper2.remove();
-                    if (mainContent) mainContent.style.display = 'block';
-                }
-            });
-
-            coverObserver.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-
-            // 首次加载时检查
+            // 首次加载延迟执行
             setTimeout(function() {
-                var cover = document.querySelector('.cover');
-                var mainContent = document.getElementById('docsify-content');
-                var existingWrapper = document.querySelector('.cover-wrapper');
+                migrateSidebar();
+                handleCoverVisibility();
+                updateActiveLink();
+            }, 500);
 
-                if (cover && !existingWrapper) {
-                    if (mainContent) mainContent.style.display = 'none';
-                    var wrapper = document.createElement('div');
-                    wrapper.className = 'cover-wrapper show-cover';
-                    var clone = cover.cloneNode(true);
-                    wrapper.appendChild(clone);
-
-                    var btns = wrapper.querySelectorAll('.buttons a');
-                    btns.forEach(function(btn, i) {
-                        if (i === 0) {
-                            btn.className = 'btn-primary';
-                        } else {
-                            btn.className = 'btn-secondary';
-                        }
-                    });
-                    var title = wrapper.querySelector('h1');
-                    if (title) {
-                        var text = title.textContent;
-                        title.innerHTML = text.replace(/API/g, '<span class="highlight">API</span>');
-                    }
-                    var mainEl = document.getElementById('mainContent');
-                    if (mainEl) {
-                        mainEl.prepend(wrapper);
-                    }
-                    if (cover) cover.style.display = 'none';
-                }
-            }, 300);
-
-            // ---- 修复：Docsify 加载完成后再次检查 ----
-            // 利用 Docsify 的 $docsify.done 钩子已经在配置中定义过了
-            // 额外再监听一次 load 事件
-            window.addEventListener('load', function() {
-                // 再次尝试迁移侧边栏
-                var docsifySidebar = document.querySelector('.sidebar-nav');
-                var customNav = document.getElementById('sidebarNav');
-                if (docsifySidebar && customNav) {
-                    if (customNav.querySelector('.app-loading') || customNav.children.length === 0) {
-                        customNav.innerHTML = docsifySidebar.innerHTML;
-                        docsifySidebar.style.display = 'none';
-                        customNav.querySelectorAll('a').forEach(function(link) {
-                            link.addEventListener('click', closeSidebar);
-                        });
-                        var loading = customNav.querySelector('.app-loading');
-                        if (loading) loading.remove();
-                    }
-                }
-            });
+            // 暴露函数给全局
+            window.handleCoverVisibility = handleCoverVisibility;
+            window.updateActiveLink = updateActiveLink;
+            window.closeSidebar = closeSidebar;
+            window.openSidebar = openSidebar;
 
         })();
     </script>
@@ -1088,9 +996,7 @@
     ============================================================ -->
     <script>
         if (typeof navigator.serviceWorker !== 'undefined') {
-            navigator.serviceWorker.register('sw.js').catch(function() {
-                // 静默失败，不影响使用
-            });
+            navigator.serviceWorker.register('sw.js').catch(function() {});
         }
     </script>
 
