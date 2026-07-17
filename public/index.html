@@ -13,56 +13,45 @@
             --red-dark: #c23333;
             --red-light: rgba(236, 65, 65, 0.18);
             --red-glow: rgba(236, 65, 65, 0.25);
-
-            /* 毛玻璃背景色 — 低透明 */
             --glass-bg: rgba(255, 255, 255, 0.38);
             --glass-border: rgba(255, 255, 255, 0.25);
             --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
-
             --fg: #1a1a2e;
             --fg-muted: #4a4a6a;
             --fg-light: #7a7a9a;
-
             --radius: 16px;
             --radius-sm: 10px;
             --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        /* ===== Reset & Base ===== */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
         html,
         body {
             height: 100%;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
             color: var(--fg);
             line-height: 1.65;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-
-            /* ===== 本地背景图片 ===== */
-            background-image: url('bg.png');
+            /* 背景图片路径改为 /public/bg.png */
+            background-image: url('/public/bg.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
         }
 
-        /* ===== 毛玻璃容器 ===== */
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 40px 24px 32px;
             min-height: 100vh;
-
-            /* 整体叠加一层极淡的玻璃效果，让背景更融合 */
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
@@ -74,7 +63,7 @@
             }
         }
 
-        /* ===== Header ===== */
+        /* ----- Header ----- */
         .site-header {
             margin-bottom: 32px;
             display: flex;
@@ -83,14 +72,12 @@
             justify-content: space-between;
             gap: 12px 16px;
         }
-
         .header-left {
             display: flex;
             align-items: center;
             gap: 12px;
             flex-wrap: wrap;
         }
-
         .header-left .logo-img {
             width: 44px;
             height: 44px;
@@ -100,7 +87,6 @@
             box-shadow: 0 4px 16px var(--red-glow);
             background: rgba(255, 255, 255, 0.6);
         }
-
         .site-header h1 {
             font-size: 26px;
             font-weight: 700;
@@ -110,11 +96,9 @@
             color: #fff;
             text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
         }
-
         .site-header h1 .highlight {
             color: var(--red);
         }
-
         .badge {
             display: inline-flex;
             align-items: center;
@@ -131,14 +115,12 @@
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
         }
-
         .badge::before {
             content: "●";
             margin-right: 6px;
             font-size: 10px;
             color: var(--red);
         }
-
         .header-right {
             font-size: 14px;
             color: rgba(255, 255, 255, 0.85);
@@ -153,7 +135,6 @@
             align-items: center;
             gap: 8px;
         }
-
         .header-right .dot {
             width: 8px;
             height: 8px;
@@ -162,7 +143,6 @@
             display: inline-block;
             animation: pulse-dot 2s infinite;
         }
-
         @keyframes pulse-dot {
             0%,
             100% {
@@ -174,7 +154,6 @@
                 transform: scale(0.85);
             }
         }
-
         .sub {
             width: 100%;
             margin-top: 6px;
@@ -183,7 +162,6 @@
             padding-left: 56px;
             text-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
         }
-
         @media (max-width: 640px) {
             .site-header {
                 flex-direction: column;
@@ -212,7 +190,7 @@
             }
         }
 
-        /* ===== 毛玻璃卡片 ===== */
+        /* ----- 毛玻璃卡片 ----- */
         .block {
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
@@ -226,20 +204,17 @@
             color: #fff;
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.10);
         }
-
         .block:hover {
             box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
             background: rgba(255, 255, 255, 0.48);
             transform: translateY(-2px);
         }
-
         .block-header {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 16px;
         }
-
         .block-header .icon {
             width: 32px;
             height: 32px;
@@ -254,7 +229,6 @@
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
         }
-
         .block h2 {
             margin: 0;
             font-size: 17px;
@@ -262,7 +236,6 @@
             letter-spacing: -0.2px;
             color: #fff;
         }
-
         .block h2 .count {
             font-weight: 400;
             font-size: 13px;
@@ -270,7 +243,7 @@
             margin-left: 8px;
         }
 
-        /* ===== KVS ===== */
+        /* ----- KVS ----- */
         .kvs {
             display: grid;
             grid-template-columns: 110px 1fr;
@@ -278,13 +251,11 @@
             align-items: start;
             font-size: 14px;
         }
-
         .kvs .k {
             color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
             padding: 4px 0;
         }
-
         .kvs .v {
             padding: 4px 0;
             word-break: break-all;
@@ -299,7 +270,6 @@
             overflow: hidden;
             color: rgba(255, 255, 255, 0.9);
         }
-
         .kvs .v code {
             background: transparent;
             padding: 0;
@@ -307,7 +277,6 @@
             font-size: 13px;
             color: inherit;
         }
-
         @media (max-width: 480px) {
             .kvs {
                 grid-template-columns: 1fr;
@@ -324,7 +293,7 @@
             }
         }
 
-        /* ===== Links ===== */
+        /* ----- Links ----- */
         ul.links {
             list-style: none;
             padding: 0;
@@ -333,7 +302,6 @@
             grid-template-columns: 1fr 1fr;
             gap: 6px 24px;
         }
-
         ul.links li {
             margin: 0;
             padding: 6px 0;
@@ -342,18 +310,15 @@
             align-items: center;
             gap: 6px;
         }
-
         ul.links li:last-child {
             border-bottom: none;
         }
-
         ul.links li .link-marker {
             color: var(--red);
             font-size: 12px;
             opacity: 0.8;
             flex-shrink: 0;
         }
-
         ul.links a {
             color: rgba(255, 255, 255, 0.9);
             text-decoration: none;
@@ -365,12 +330,10 @@
             gap: 6px;
             flex-wrap: wrap;
         }
-
         ul.links a:hover {
             color: #fff;
             border-bottom-color: var(--red);
         }
-
         ul.links a code {
             background: rgba(255, 255, 255, 0.10);
             padding: 1px 8px;
@@ -381,7 +344,6 @@
             font-weight: 500;
             letter-spacing: 0.2px;
         }
-
         @media (max-width: 640px) {
             ul.links {
                 grid-template-columns: 1fr;
@@ -392,7 +354,7 @@
             }
         }
 
-        /* ===== Debug ===== */
+        /* ----- Debug ----- */
         .debug-block pre {
             margin: 0;
             background: rgba(0, 0, 0, 0.20);
@@ -408,7 +370,6 @@
             position: relative;
             color: rgba(255, 255, 255, 0.85);
         }
-
         .debug-block pre .copy-hint {
             position: absolute;
             top: 8px;
@@ -423,17 +384,14 @@
             transition: opacity var(--transition);
             cursor: pointer;
         }
-
         .debug-block pre:hover .copy-hint {
             opacity: 1;
         }
-
         .debug-block pre code {
             font-family: inherit;
             font-size: 13px;
             color: inherit;
         }
-
         .debug-block .debug-actions {
             display: flex;
             flex-wrap: wrap;
@@ -442,7 +400,6 @@
             padding-top: 14px;
             border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
-
         .debug-block .debug-actions a {
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
@@ -453,18 +410,15 @@
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.06);
         }
-
         .debug-block .debug-actions a:hover {
             color: #fff;
             background: rgba(236, 65, 65, 0.25);
             border-color: var(--red);
         }
-
         .debug-block .debug-actions .sep {
             color: rgba(255, 255, 255, 0.15);
             user-select: none;
         }
-
         @media (max-width: 480px) {
             .debug-block pre {
                 font-size: 12px;
@@ -479,16 +433,7 @@
             }
         }
 
-        /* ===== 在线文档链接特殊处理 ===== */
-        .block p a {
-            color: #fff !important;
-            border-bottom-color: rgba(255, 255, 255, 0.3) !important;
-        }
-        .block p a:hover {
-            border-bottom-color: #fff !important;
-        }
-
-        /* ===== Footer ===== */
+        /* ----- Footer ----- */
         .site-footer {
             margin-top: 32px;
             padding-top: 20px;
@@ -501,13 +446,11 @@
             color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
         }
-
         .site-footer .footer-links {
             display: flex;
             gap: 20px;
             align-items: center;
         }
-
         .site-footer a {
             color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
@@ -516,16 +459,13 @@
             align-items: center;
             gap: 4px;
         }
-
         .site-footer a:hover {
             color: #fff;
         }
-
         .site-footer .footer-heart {
             color: var(--red);
             font-size: 14px;
         }
-
         @media (max-width: 480px) {
             .site-footer {
                 flex-direction: column;
@@ -563,7 +503,6 @@
             font-size: 13px;
         }
 
-        /* ===== Responsive card padding ===== */
         @media (max-width: 640px) {
             .block {
                 padding: 18px 16px;
@@ -584,7 +523,6 @@
 
     <main class="container">
 
-        <!-- ===== HEADER ===== -->
         <header class="site-header">
             <div class="header-left">
                 <img src="https://silence-music-api.cc.cd/docs/netease.png" alt="网易云音乐" class="logo-img" />
@@ -602,7 +540,6 @@
             </p>
         </header>
 
-        <!-- ===== STATUS ===== -->
         <section class="block">
             <div class="block-header">
                 <span class="icon">📡</span>
@@ -620,7 +557,6 @@
             </div>
         </section>
 
-        <!-- ===== DOCS ===== -->
         <section class="block">
             <div class="block-header">
                 <span class="icon">📖</span>
@@ -633,7 +569,6 @@
             </p>
         </section>
 
-        <!-- ===== COMMON APIs ===== -->
         <section class="block">
             <div class="block-header">
                 <span class="icon">⚡</span>
@@ -667,16 +602,13 @@
             </ul>
         </section>
 
-        <!-- ===== DEBUG ===== -->
         <section class="block debug-block">
             <div class="block-header">
                 <span class="icon">🛠️</span>
                 <h2>调试 &amp; 工具 <span class="count">命令行 / 示例</span></h2>
             </div>
-
             <pre id="debug-pre"><code>curl -s {origin}/inner/version
 curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="copy-hint">复制</span></pre>
-
             <div class="debug-actions">
                 <a href="/api.html">交互式调试</a>
                 <span class="sep">·</span>
@@ -702,7 +634,6 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
             </div>
         </section>
 
-        <!-- ===== FOOTER ===== -->
         <footer class="site-footer">
             <span>
                 <span class="footer-heart">♥</span> 开放 · 自由 · 音乐
@@ -724,14 +655,10 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
             const origin = window.location.origin;
-
-            // ---- 状态 ----
             document.getElementById('base-url').textContent = origin;
             document.getElementById('current-url').textContent = window.location.href;
 
-            // ---- 版本 ----
             fetch('/inner/version', { method: 'POST' })
                 .then(r => r.json())
                 .then(data => {
@@ -739,7 +666,6 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
                     const badge = document.getElementById('api-version');
                     if (v) badge.textContent = 'v' + v;
                     else badge.textContent = 'v·';
-
                     const pre = document.querySelector('#debug-pre code');
                     if (pre) {
                         pre.textContent = pre.textContent.replace(/\{origin\}/g, origin);
@@ -749,7 +675,6 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
                     document.getElementById('api-version').textContent = 'v·—';
                 });
 
-            // ---- 复制功能 ----
             const copyHint = document.getElementById('copy-hint');
             if (copyHint) {
                 copyHint.addEventListener('click', function() {
@@ -774,7 +699,6 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
                 });
             }
 
-            // ---- 状态指示器 ----
             const statusText = document.getElementById('status-text');
             const dot = document.querySelector('.dot');
             fetch('/inner/version', { method: 'POST' })
@@ -791,7 +715,6 @@ curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="cop
                     statusText.textContent = '连接失败';
                     dot.style.background = '#f44336';
                 });
-
         });
     </script>
 
