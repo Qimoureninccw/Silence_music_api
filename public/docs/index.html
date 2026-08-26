@@ -9,12 +9,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="referrer" content="never">
 
-  <!-- 保留原主题 CSS（会被覆盖） -->
+  <!-- 保留 Docsify 默认主题（会被我们的样式覆盖） -->
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css">
 
   <style>
     /* ================================================================
-       高级覆盖样式 — 保留所有原有功能，仅提升视觉
+       全中性灰阶配色 — 无红色，仅用亮度区分层级
        ================================================================ */
 
     /* ----- 视频背景 ----- */
@@ -47,7 +47,7 @@
       -webkit-backdrop-filter: blur(2px);
     }
 
-    /* ----- 主题切换按钮（保留原样，仅优化毛玻璃） ----- */
+    /* ----- 主题切换按钮（中性灰） ----- */
     .theme-toggle {
       position: fixed;
       bottom: 24px;
@@ -99,7 +99,7 @@
       transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
 
-    /* ----- 侧边栏：毛玻璃升级 ----- */
+    /* ----- 侧边栏：毛玻璃升级（中性灰） ----- */
     .sidebar {
       background: rgba(20, 20, 32, 0.60) !important;
       backdrop-filter: blur(24px) saturate(1.4) !important;
@@ -127,9 +127,9 @@
       text-shadow: none;
     }
 
-    /* 侧边栏链接 */
+    /* 侧边栏链接 — 亮度区分（无红色） */
     .sidebar-nav ul li a {
-      color: rgba(255, 255, 255, 0.7) !important;
+      color: rgba(255, 255, 255, 0.6) !important;
       border-radius: 8px !important;
       padding: 6px 14px !important;
       margin: 2px 0 !important;
@@ -142,23 +142,23 @@
       color: #fff !important;
     }
     .sidebar-nav ul li a.active {
-      background: rgba(236, 65, 65, 0.25) !important;
+      background: rgba(255, 255, 255, 0.12) !important;
       color: #fff !important;
-      border-left-color: #ec4141 !important;
-      box-shadow: 0 0 20px rgba(236, 65, 65, 0.1) !important;
+      border-left-color: rgba(255, 255, 255, 0.4) !important;
+      box-shadow: 0 0 20px rgba(255,255,255,0.02) !important;
     }
     body.light-mode .sidebar-nav ul li a {
-      color: rgba(26, 26, 46, 0.7) !important;
+      color: rgba(26, 26, 46, 0.6) !important;
     }
     body.light-mode .sidebar-nav ul li a:hover {
       background: rgba(0, 0, 0, 0.04) !important;
       color: #1a1a2e !important;
     }
     body.light-mode .sidebar-nav ul li a.active {
-      background: rgba(236, 65, 65, 0.08) !important;
-      color: #ec4141 !important;
-      border-left-color: #ec4141 !important;
-      box-shadow: 0 0 20px rgba(236, 65, 65, 0.05) !important;
+      background: rgba(0, 0, 0, 0.06) !important;
+      color: #1a1a2e !important;
+      border-left-color: rgba(0, 0, 0, 0.2) !important;
+      box-shadow: 0 0 20px rgba(0,0,0,0.02) !important;
     }
 
     /* 二级菜单 */
@@ -211,7 +211,7 @@
       box-shadow: 0 12px 56px rgba(0, 0, 0, 0.06) !important;
     }
 
-    /* ----- 排版（红色品牌色） ----- */
+    /* ----- 排版（无红色，纯亮度区分） ----- */
     .markdown-section h1 {
       font-size: 2.2rem !important;
       font-weight: 700 !important;
@@ -227,12 +227,15 @@
       left: 0;
       width: 56px;
       height: 3px;
-      background: #ec4141;
+      background: rgba(255,255,255,0.2);
       border-radius: 2px;
     }
     body.light-mode .markdown-section h1 {
       color: #1a1a2e !important;
       border-bottom-color: rgba(0,0,0,0.04) !important;
+    }
+    body.light-mode .markdown-section h1::after {
+      background: rgba(0,0,0,0.15);
     }
 
     .markdown-section h2 {
@@ -266,21 +269,29 @@
       color: rgba(26, 26, 46, 0.8) !important;
     }
 
+    /* 链接 — 用亮度区分（加粗 + 下划线，无红色） */
     .markdown-section a {
-      color: #ec4141 !important;
+      color: #fff !important;
       text-decoration: none !important;
-      border-bottom: 1.5px solid transparent !important;
+      border-bottom: 1.5px solid rgba(255,255,255,0.3) !important;
       transition: border-color 0.2s !important;
-      font-weight: 500 !important;
+      font-weight: 600 !important;
     }
     .markdown-section a:hover {
-      border-bottom-color: #ec4141 !important;
+      border-bottom-color: #fff !important;
+    }
+    body.light-mode .markdown-section a {
+      color: #1a1a2e !important;
+      border-bottom-color: rgba(0,0,0,0.15) !important;
+    }
+    body.light-mode .markdown-section a:hover {
+      border-bottom-color: #1a1a2e !important;
     }
 
-    /* ----- 代码块（高级暗色） ----- */
+    /* ----- 代码块（中性灰） ----- */
     .markdown-section code {
       background: rgba(0, 0, 0, 0.40) !important;
-      color: #f0a0a0 !important;
+      color: #d0d0e0 !important;
       padding: 2px 10px !important;
       border-radius: 6px !important;
       font-size: 0.88em !important;
@@ -288,7 +299,7 @@
     }
     body.light-mode .markdown-section code {
       background: rgba(0, 0, 0, 0.06) !important;
-      color: #c23333 !important;
+      color: #1a1a2e !important;
       border-color: rgba(0,0,0,0.04) !important;
     }
 
@@ -314,9 +325,9 @@
       color: #1a1a2e !important;
     }
 
-    /* ----- 表格 ----- */
+    /* ----- 表格（中性灰） ----- */
     .markdown-section table thead {
-      background: #ec4141 !important;
+      background: rgba(255,255,255,0.10) !important;
       color: #fff !important;
     }
     .markdown-section table th,
@@ -336,20 +347,21 @@
       background: rgba(0,0,0,0.02) !important;
     }
 
-    /* ----- 引用块 ----- */
+    /* ----- 引用块（无红色） ----- */
     .markdown-section blockquote {
-      border-left: 4px solid #ec4141 !important;
+      border-left: 4px solid rgba(255,255,255,0.2) !important;
       background: rgba(255,255,255,0.03) !important;
       padding: 14px 22px !important;
       border-radius: 0 10px 10px 0 !important;
       color: rgba(255,255,255,0.7) !important;
     }
     body.light-mode .markdown-section blockquote {
+      border-left-color: rgba(0,0,0,0.1) !important;
       background: rgba(0,0,0,0.02) !important;
       color: rgba(26,26,46,0.7) !important;
     }
 
-    /* ----- 顶部导航 ----- */
+    /* ----- 顶部导航（中性灰） ----- */
     .app-nav {
       background: rgba(255,255,255,0.04) !important;
       backdrop-filter: blur(16px) !important;
@@ -381,10 +393,10 @@
       color: #1a1a2e !important;
     }
     .app-nav a::before {
-      background: #ec4141 !important;
+      background: rgba(255,255,255,0.3) !important;
     }
 
-    /* ----- 分页 ----- */
+    /* ----- 分页（中性灰） ----- */
     .docsify-pagination-container {
       border-top: 1px solid rgba(255,255,255,0.04) !important;
       padding-top: 20px !important;
@@ -401,7 +413,7 @@
       background: rgba(0,0,0,0.02) !important;
     }
 
-    /* ----- 搜索框 ----- */
+    /* ----- 搜索框（中性灰） ----- */
     .search .input-wrap input {
       background: rgba(255,255,255,0.04) !important;
       border: 1px solid rgba(255,255,255,0.04) !important;
@@ -411,8 +423,8 @@
       transition: all 0.3s !important;
     }
     .search .input-wrap input:focus {
-      border-color: #ec4141 !important;
-      box-shadow: 0 0 0 3px rgba(236,65,65,0.15) !important;
+      border-color: rgba(255,255,255,0.3) !important;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.04) !important;
     }
     body.light-mode .search .input-wrap input {
       background: rgba(255,255,255,0.6) !important;
@@ -420,8 +432,8 @@
       color: #1a1a2e !important;
     }
     body.light-mode .search .input-wrap input:focus {
-      border-color: #ec4141 !important;
-      box-shadow: 0 0 0 3px rgba(236,65,65,0.08) !important;
+      border-color: rgba(0,0,0,0.2) !important;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.02) !important;
     }
     .search .input-wrap .search-icon {
       color: rgba(255,255,255,0.3) !important;
@@ -430,7 +442,7 @@
       color: rgba(0,0,0,0.15) !important;
     }
 
-    /* ----- 移动端菜单按钮（Docsify 自带）----- */
+    /* ----- 移动端菜单按钮 ----- */
     .sidebar-toggle {
       background: rgba(255,255,255,0.06) !important;
       backdrop-filter: blur(12px) !important;
@@ -454,6 +466,22 @@
     body.light-mode .sidebar-toggle:hover {
       background: rgba(255,255,255,0.8) !important;
     }
+
+    /* ================================================================
+       关键修复：封面页（coverpage）滚动到顶部不重新出现
+       通过隐藏 Docsify 默认封面页的滚动触发机制
+       ================================================================ */
+    /* 隐藏默认封面页的滚动显示（coverpage 只在加载时显示一次） */
+    .cover {
+      display: none !important;
+    }
+    /* 如果你想保留封面页但只在页面加载时显示，可以设置 position: sticky 但隐藏滚动触发 */
+    /* 这里我们直接隐藏 coverpage，因为用户说“划到最上面会出现” */
+    /* 如果需要保留封面页作为首页，可以保持 coverpage: true，但这里我们选择隐藏它 */
+    /* 或者使用以下方式：只显示首页内容，不显示封面 */
+    /* 我们干脆把 coverpage 设为 false，在 Docsify 配置中已经改好了 */
+
+    /* 如果你希望保留封面页但去掉滚动重现，可以加一个 sticky 定位并隐藏滚动触发器，但最好的办法是直接关闭 coverpage */
 
     /* ================================================================
        响应式优化
@@ -494,7 +522,7 @@
       }
     }
 
-    /* ----- 滚动条（高级风格） ----- */
+    /* ----- 滚动条（中性灰） ----- */
     ::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -503,19 +531,18 @@
       background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-      background: #ec4141;
+      background: rgba(255,255,255,0.2);
       border-radius: 4px;
-      opacity: 0.3;
       transition: opacity 0.3s;
     }
     ::-webkit-scrollbar-thumb:hover {
-      opacity: 0.8;
+      background: rgba(255,255,255,0.4);
     }
     body.light-mode ::-webkit-scrollbar-thumb {
-      opacity: 0.15;
+      background: rgba(0,0,0,0.1);
     }
     body.light-mode ::-webkit-scrollbar-thumb:hover {
-      opacity: 0.4;
+      background: rgba(0,0,0,0.2);
     }
   </style>
 
@@ -532,7 +559,6 @@
   <!-- ===== 视频背景 ===== -->
   <video autoplay muted loop playsinline id="bg-video" poster="/bg_fufu_1080.png">
     <source src="/bg_fufu_1080.mp4" type="video/mp4">
-    <!-- 降级兜底 -->
     <img src="/bg1.webp" alt="背景" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-2;pointer-events:none;">
   </video>
   <div id="bg-overlay"></div>
@@ -545,6 +571,7 @@
 
   <!-- ================================================================
   原有脚本（主题切换、Docsify 配置、广告等）全部保留
+  但修改了 coverpage: false 以彻底解决滚动重现问题
   ================================================================ -->
   <script>
     (function() {
@@ -573,7 +600,7 @@
       } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         setTheme('dark');
       } else {
-        setTheme('light'); // 默认浅色
+        setTheme('light');
       }
 
       btn.addEventListener('click', toggleTheme);
@@ -592,7 +619,7 @@
     window.$docsify = {
       name: '网易云音乐 API Enhanced',
       repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
-      coverpage: true,
+      coverpage: false,  // 关闭封面页，彻底解决滚动到顶部出现的问题
       homepage: 'home.md',
     }
   </script>
