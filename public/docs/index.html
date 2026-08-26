@@ -2,16 +2,76 @@
 <html lang="zh-CN" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js">
-  <meta name="description" content="网易云音乐 NodeJS API Enhanced">
-  <title>网易云音乐 NodeJS API Enhanced</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="网易云音乐 API Enhanced - 高级文档">
+  <title>网易云音乐 API Enhanced · 文档</title>
   <link rel="icon" href="netease.png">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta name="referrer" content="never">
 
-  <!-- 不再加载外部主题 CSS，全部自定义 -->
   <style>
-    /* ===== 视频背景 ===== */
+    /* ================================================================
+       0. CSS 变量（浅色/深色由 data-theme 控制）
+       ================================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* 深色默认 */
+      --bg-body: #0a0a12;
+      --text: #f0f0f5;
+      --text-secondary: rgba(255, 255, 255, 0.8);
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --bg-glass: rgba(255, 255, 255, 0.06);
+      --bg-glass-hover: rgba(255, 255, 255, 0.10);
+      --bg-sidebar: rgba(20, 20, 32, 0.55);
+      --border-glass: rgba(255, 255, 255, 0.06);
+      --shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+      --code-bg: rgba(0, 0, 0, 0.35);
+      --scrollbar: rgba(255, 255, 255, 0.15);
+      --scrollbar-hover: rgba(255, 255, 255, 0.30);
+      --overlay: rgba(0, 0, 0, 0.45);
+    }
+
+    [data-theme="light"] {
+      --bg-body: #f0f2f6;
+      --text: #1a1a2e;
+      --text-secondary: rgba(26, 26, 46, 0.8);
+      --text-muted: rgba(26, 26, 46, 0.4);
+      --bg-glass: rgba(255, 255, 255, 0.50);
+      --bg-glass-hover: rgba(255, 255, 255, 0.65);
+      --bg-sidebar: rgba(255, 255, 255, 0.50);
+      --border-glass: rgba(0, 0, 0, 0.04);
+      --shadow: 0 8px 40px rgba(0, 0, 0, 0.04);
+      --code-bg: rgba(0, 0, 0, 0.05);
+      --scrollbar: rgba(0, 0, 0, 0.10);
+      --scrollbar-hover: rgba(0, 0, 0, 0.20);
+      --overlay: rgba(255, 255, 255, 0.30);
+    }
+
+    /* ================================================================
+       1. 全局
+       ================================================================ */
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg-body);
+      color: var(--text);
+      line-height: 1.7;
+      transition: background 0.3s, color 0.3s;
+      scroll-behavior: smooth;
+    }
+
+    /* 滚动条 */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+
+    /* ================================================================
+       2. 视频背景
+       ================================================================ */
     #bg-video {
       position: fixed;
       top: 0;
@@ -26,291 +86,387 @@
       position: fixed;
       inset: 0;
       z-index: -1;
-      background: rgba(0, 0, 0, 0.45);
+      background: var(--overlay);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
       pointer-events: none;
       transition: background 0.3s;
     }
-    [data-theme="light"] #bg-overlay {
-      background: rgba(255, 255, 255, 0.30);
+
+    /* ================================================================
+       3. 布局
+       ================================================================ */
+    .app {
+      display: flex;
+      min-height: 100vh;
     }
 
-    /* ===== 基础配色（中性灰） ===== */
-    :root {
-      --text: #f0f0f5;
-      --text-secondary: rgba(255,255,255,0.8);
-      --text-muted: rgba(255,255,255,0.5);
-      --bg-glass: rgba(255,255,255,0.06);
-      --bg-glass-hover: rgba(255,255,255,0.10);
-      --bg-sidebar: rgba(20,20,32,0.55);
-      --border-glass: rgba(255,255,255,0.06);
-      --shadow: 0 8px 40px rgba(0,0,0,0.15);
-      --code-bg: rgba(0,0,0,0.35);
+    /* ================================================================
+       4. 侧边栏（自定义，毛玻璃）
+       ================================================================ */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 270px;
+      flex-shrink: 0;
+      background: var(--bg-sidebar);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border-right: 1px solid var(--border-glass);
+      box-shadow: 4px 0 32px rgba(0,0,0,0.1);
+      padding: 24px 18px;
+      overflow-y: auto;
+      transition: background 0.3s, border-color 0.3s;
+      scrollbar-width: thin;
     }
-    [data-theme="light"] {
-      --text: #1a1a2e;
-      --text-secondary: rgba(26,26,46,0.8);
-      --text-muted: rgba(26,26,46,0.5);
-      --bg-glass: rgba(255,255,255,0.50);
-      --bg-glass-hover: rgba(255,255,255,0.65);
-      --bg-sidebar: rgba(255,255,255,0.50);
-      --border-glass: rgba(0,0,0,0.04);
-      --shadow: 0 8px 40px rgba(0,0,0,0.04);
-      --code-bg: rgba(0,0,0,0.05);
+    .sidebar-brand {
+      font-size: 18px;
+      font-weight: 700;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-glass);
+      margin-bottom: 16px;
+      letter-spacing: -0.3px;
     }
-
-    /* ===== 全局 ===== */
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { height:100%; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0a0a12;
+    .sidebar-brand img {
+      vertical-align: middle;
+      margin-right: 8px;
+      border-radius: 8px;
+    }
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-nav ul li {
+      margin: 2px 0;
+    }
+    .sidebar-nav ul li a {
+      display: block;
+      padding: 6px 14px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .sidebar-nav ul li a:hover {
+      background: var(--bg-glass);
       color: var(--text);
-      line-height: 1.7;
-      transition: background 0.3s, color 0.3s;
     }
-    [data-theme="light"] body { background: #f0f2f6; }
+    .sidebar-nav ul li a.active {
+      background: var(--bg-glass-hover);
+      color: var(--text);
+      border-left-color: var(--text-muted);
+    }
+    .sidebar-nav ul ul {
+      padding-left: 16px;
+    }
+    .sidebar-nav ul ul li a {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+    .sidebar-nav ul ul li a:hover {
+      opacity: 1;
+      color: var(--text);
+    }
 
-    /* ===== 主题切换按钮（沿用原样式，适配深色/浅色） ===== */
+    /* 移动端侧边栏 */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 100;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      color: var(--text);
+      font-size: 22px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(2px);
+    }
+
+    /* ================================================================
+       5. 主内容
+       ================================================================ */
+    .main {
+      flex: 1;
+      padding: 30px 40px 60px;
+      min-height: 100vh;
+    }
+    .main .markdown-body {
+      max-width: 920px;
+      margin: 0 auto;
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 36px 44px 50px;
+      box-shadow: var(--shadow);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .main .markdown-body:hover {
+      background: var(--bg-glass-hover);
+    }
+
+    /* ================================================================
+       6. 排版
+       ================================================================ */
+    .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+      color: var(--text);
+      border-bottom: 1px solid var(--border-glass);
+      padding-bottom: 10px;
+      margin-top: 32px;
+    }
+    .markdown-body h1 { font-size: 2.2rem; border-bottom-width: 2px; }
+    .markdown-body h2 { font-size: 1.6rem; }
+    .markdown-body h3 { font-size: 1.2rem; }
+    .markdown-body h4 { font-size: 1rem; border-bottom: none; }
+    .markdown-body p, .markdown-body li {
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+    .markdown-body a {
+      color: var(--text);
+      border-bottom: 1.5px solid var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      transition: border-color 0.2s;
+    }
+    .markdown-body a:hover {
+      border-bottom-color: var(--text);
+    }
+    .markdown-body code {
+      background: var(--code-bg);
+      color: var(--text-secondary);
+      padding: 2px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-glass);
+      font-size: 0.88em;
+    }
+    .markdown-body pre {
+      background: var(--code-bg);
+      padding: 18px 22px;
+      border-radius: 12px;
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(4px);
+      overflow-x: auto;
+    }
+    .markdown-body pre code {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding: 0;
+    }
+    .markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-glass);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .markdown-body table thead {
+      background: var(--bg-glass-hover);
+      color: var(--text);
+    }
+    .markdown-body table th, .markdown-body table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-glass);
+      color: var(--text-secondary);
+    }
+    .markdown-body table tbody tr:last-child td { border-bottom: none; }
+    .markdown-body blockquote {
+      border-left: 4px solid var(--text-muted);
+      background: var(--bg-glass);
+      padding: 12px 20px;
+      border-radius: 0 10px 10px 0;
+      color: var(--text-secondary);
+    }
+    .markdown-body img { max-width: 100%; border-radius: 10px; }
+    .markdown-body hr { border: none; border-top: 1px solid var(--border-glass); margin: 32px 0; }
+
+    /* ================================================================
+       7. 顶部导航（自定义）
+       ================================================================ */
+    .top-nav {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      padding: 12px 20px;
+      margin-bottom: 24px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      flex-wrap: wrap;
+    }
+    .top-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .top-nav a:hover {
+      color: var(--text);
+      border-bottom-color: var(--text-muted);
+    }
+
+    /* ================================================================
+       8. 分页（自定义）
+       ================================================================ */
+    .pagination-wrap {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 24px;
+      margin-top: 32px;
+      border-top: 1px solid var(--border-glass);
+    }
+    .pagination-wrap a {
+      padding: 8px 18px;
+      border: 1px solid var(--border-glass);
+      border-radius: 10px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s;
+      background: var(--bg-glass);
+      backdrop-filter: blur(4px);
+    }
+    .pagination-wrap a:hover {
+      background: var(--bg-glass-hover);
+      border-color: var(--text-muted);
+      color: var(--text);
+    }
+
+    /* ================================================================
+       9. 主题切换按钮
+       ================================================================ */
     .theme-toggle {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      z-index: 999;
-      width: 44px;
-      height: 44px;
+      z-index: 200;
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
       border: 1px solid var(--border-glass);
-      background: var(--bg-sidebar);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
       color: var(--text);
       font-size: 20px;
       cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
       outline: none;
-      padding: 0;
       user-select: none;
     }
     .theme-toggle:hover {
-      transform: scale(1.12) rotate(12deg);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-    }
-    .theme-toggle:active { transform: scale(0.92); }
-
-    /* ===== 侧边栏（毛玻璃） ===== */
-    .sidebar {
-      background: var(--bg-sidebar) !important;
-      backdrop-filter: blur(20px) saturate(1.4) !important;
-      -webkit-backdrop-filter: blur(20px) saturate(1.4) !important;
-      border-right: 1px solid var(--border-glass) !important;
-      box-shadow: 4px 0 32px rgba(0,0,0,0.1) !important;
-    }
-    .app-name-link {
-      color: var(--text) !important;
-      font-weight: 700 !important;
-    }
-    .sidebar-nav ul li a {
-      color: var(--text-muted) !important;
-      border-radius: 6px !important;
-      padding: 5px 12px !important;
-      margin: 2px 0 !important;
-      transition: all 0.2s !important;
-      border-left: 3px solid transparent !important;
-      font-weight: 500;
-    }
-    .sidebar-nav ul li a:hover {
-      background: var(--bg-glass) !important;
-      color: var(--text) !important;
-    }
-    .sidebar-nav ul li a.active {
-      background: var(--bg-glass-hover) !important;
-      color: var(--text) !important;
-      border-left-color: var(--text-muted) !important;
+      transform: scale(1.1) rotate(8deg);
+      border-color: var(--text-muted);
+      box-shadow: 0 6px 32px rgba(0,0,0,0.2);
     }
 
-    /* ===== 主内容（毛玻璃卡片） ===== */
-    .content { padding-top: 30px !important; background: transparent !important; }
-    .markdown-section {
-      max-width: 920px !important;
-      margin: 0 auto !important;
-      padding: 32px 40px 50px !important;
-      background: var(--bg-glass) !important;
-      backdrop-filter: blur(20px) saturate(1.4) !important;
-      -webkit-backdrop-filter: blur(20px) saturate(1.4) !important;
-      border-radius: 20px !important;
-      border: 1px solid var(--border-glass) !important;
-      box-shadow: var(--shadow) !important;
-      color: var(--text) !important;
-      transition: background 0.3s, box-shadow 0.3s;
-    }
-    .markdown-section:hover {
-      background: var(--bg-glass-hover) !important;
-    }
-
-    /* ===== 排版（中性灰） ===== */
-    .markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4 {
-      color: var(--text) !important;
-      border-bottom-color: var(--border-glass) !important;
-    }
-    .markdown-section h1 { border-bottom-width: 2px; padding-bottom: 12px; }
-    .markdown-section h2 { border-bottom-width: 1px; padding-bottom: 8px; margin-top: 40px; }
-    .markdown-section p, .markdown-section li {
-      color: var(--text-secondary) !important;
-    }
-    .markdown-section a {
-      color: var(--text) !important;
-      border-bottom: 1.5px solid var(--text-muted) !important;
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .markdown-section a:hover {
-      border-bottom-color: var(--text) !important;
-    }
-
-    /* ===== 代码块（半透明） ===== */
-    .markdown-section code {
-      background: var(--code-bg) !important;
-      color: var(--text-secondary) !important;
-      padding: 2px 10px !important;
-      border-radius: 6px !important;
-      border: 1px solid var(--border-glass) !important;
-    }
-    .markdown-section pre {
-      background: var(--code-bg) !important;
-      border-radius: 12px !important;
-      padding: 18px 22px !important;
-      border: 1px solid var(--border-glass) !important;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-    }
-    .markdown-section pre code {
-      background: transparent !important;
-      border: none !important;
-      color: var(--text) !important;
-      padding: 0 !important;
+    /* ================================================================
+       10. 响应式
+       ================================================================ */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        width: 280px;
+        z-index: 100;
+        transition: transform 0.3s;
+        border-radius: 0 16px 16px 0;
+        background: var(--bg-sidebar);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .sidebar-toggle {
+        display: inline-block;
+      }
+      .sidebar-overlay.open {
+        display: block;
+      }
+      .main {
+        padding: 16px 12px 40px;
+      }
+      .main .markdown-body {
+        padding: 20px 18px 32px;
+        border-radius: 16px;
+        margin: 0 4px;
+      }
+      .top-nav {
+        margin-top: 52px;
+        padding: 10px 14px;
+        gap: 16px;
+        border-radius: 14px;
+      }
+      .top-nav a {
+        font-size: 13px;
+      }
+      .markdown-body h1 { font-size: 1.6rem; }
+      .markdown-body h2 { font-size: 1.2rem; }
     }
 
-    /* ===== 表格 ===== */
-    .markdown-section table thead {
-      background: var(--bg-glass) !important;
-      color: var(--text) !important;
-    }
-    .markdown-section table th, .markdown-section table td {
-      border-color: var(--border-glass) !important;
-      color: var(--text-secondary) !important;
+    @media (max-width: 480px) {
+      .main .markdown-body { padding: 16px 12px 24px; border-radius: 14px; }
+      .markdown-body h1 { font-size: 1.3rem; }
     }
 
-    /* ===== 引用块 ===== */
-    .markdown-section blockquote {
-      border-left: 4px solid var(--text-muted) !important;
-      background: var(--bg-glass) !important;
-      padding: 12px 20px !important;
-      border-radius: 0 10px 10px 0 !important;
-      color: var(--text-secondary) !important;
-    }
-
-    /* ===== 顶部导航 ===== */
-    .app-nav {
-      background: var(--bg-glass) !important;
-      backdrop-filter: blur(16px) !important;
-      -webkit-backdrop-filter: blur(16px) !important;
-      border-bottom: 1px solid var(--border-glass) !important;
-      padding: 12px 20px !important;
-      border-radius: 16px !important;
-      margin: 12px 16px 0 !important;
-    }
-    .app-nav a {
-      color: var(--text-muted) !important;
-      font-weight: 500 !important;
-      transition: color 0.2s;
-    }
-    .app-nav a:hover { color: var(--text) !important; }
-    .app-nav a::before { background: var(--text-muted) !important; }
-
-    /* ===== 分页 ===== */
-    .docsify-pagination-container {
-      border-top: 1px solid var(--border-glass) !important;
-      padding-top: 20px !important;
-      margin-top: 32px !important;
-    }
-    .pagination-item:hover {
-      background: var(--bg-glass) !important;
-      border-radius: 8px !important;
-    }
-
-    /* ===== 搜索框 ===== */
-    .search .input-wrap input {
-      background: var(--bg-glass) !important;
-      border: 1px solid var(--border-glass) !important;
-      border-radius: 10px !important;
-      padding: 8px 16px 8px 38px !important;
-      color: var(--text) !important;
-    }
-    .search .input-wrap input:focus {
-      border-color: var(--text-muted) !important;
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.04) !important;
-    }
-    .search .input-wrap .search-icon {
-      color: var(--text-muted) !important;
-    }
-
-    /* ===== 移动端菜单 ===== */
-    .sidebar-toggle {
-      background: var(--bg-glass) !important;
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
-      border: 1px solid var(--border-glass) !important;
-      color: var(--text) !important;
-      border-radius: 10px !important;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.15) !important;
-    }
-
-    /* ===== 删除 GitHub 角标 ===== */
+    /* ================================================================
+       11. 额外隐藏（移除 github 角标等）
+       ================================================================ */
     .github-corner {
       display: none !important;
     }
-
-    /* ===== 隐藏封面页（如果存在） ===== */
     .cover {
       display: none !important;
     }
 
-    /* ===== 滚动条 ===== */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb {
-      background: var(--text-muted);
-      border-radius: 4px;
-      opacity: 0.3;
+    /* ================================================================
+       12. 加载过渡
+       ================================================================ */
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
     }
-    ::-webkit-scrollbar-thumb:hover { opacity: 0.8; }
-
-    /* ===== 响应式 ===== */
-    @media (max-width: 768px) {
-      .markdown-section { padding: 20px 18px 32px !important; border-radius: 16px !important; margin: 0 8px !important; }
-      .app-nav { margin: 8px 8px 0 !important; padding: 10px 14px !important; border-radius: 14px !important; }
-      .sidebar { background: rgba(10,10,18,0.80) !important; }
-      [data-theme="light"] .sidebar { background: rgba(255,255,255,0.75) !important; }
+    .loading::after {
+      content: '⋯';
+      animation: dots 1.2s steps(3, end) infinite;
     }
-    @media (max-width: 480px) {
-      .markdown-section { padding: 16px 12px 24px !important; border-radius: 14px !important; margin: 0 4px !important; }
+    @keyframes dots {
+      0% { content: ''; }
+      33% { content: '.'; }
+      66% { content: '..'; }
+      100% { content: '...'; }
     }
   </style>
-
-  <!-- Google AdSense -->
-  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-5159844745975514",
-      enable_page_level_ads: true
-    });
-  </script>
 </head>
 <body>
 
@@ -321,69 +477,313 @@
   </video>
   <div id="bg-overlay"></div>
 
-  <div id="app"></div>
-  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+  <!-- ===== 应用容器 ===== -->
+  <div class="app" id="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="netease.png" width="32" height="32" alt="logo" style="vertical-align:middle;"> 网易云 API
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav">
+        <div class="loading">加载目录</div>
+      </nav>
+    </aside>
 
-  <!-- ===== 主题切换脚本（使用 data-theme，不重载 CSS） ===== -->
+    <!-- 主内容 -->
+    <main class="main" id="mainContent">
+      <div class="top-nav" id="topNav">
+        <a href="/">首页</a>
+        <a href="/home">文档</a>
+        <a href="https://github.com/neteasecloudmusicapienhanced/api-enhanced" target="_blank">GitHub</a>
+        <span style="flex:1;"></span>
+        <span style="font-size:12px;color:var(--text-muted);" id="versionBadge">v·加载中</span>
+      </div>
+      <div class="markdown-body" id="markdownBody">
+        <div class="loading">加载文档中</div>
+      </div>
+      <div class="pagination-wrap" id="paginationWrap"></div>
+    </main>
+  </div>
+
+  <!-- ===== 移动端侧边栏控制 ===== -->
+  <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ===== 主题切换按钮 ===== -->
+  <button class="theme-toggle" id="themeToggle">🌙</button>
+
+  <!-- ================================================================
+  Docsify 配置 — 仅作为 markdown 渲染引擎，不加载任何主题 CSS
+  我们完全自定义侧边栏和内容区，只借用 Docsify 的 markdown 渲染能力。
+  ================================================================ -->
+  <script>
+    window.$docsify = {
+      name: '',
+      repo: '',
+      coverpage: false,
+      homepage: 'home.md',
+      loadSidebar: false,
+      auto2top: true,
+      // 禁用默认的侧边栏和导航
+      sidebar: false,
+      nav: false,
+      search: false,
+      copyCode: false,
+    };
+  </script>
+
+  <!-- 加载 Docsify 核心库（只有 markdown 渲染器，没有主题） -->
+  <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js"></script>
+
+  <!-- ================================================================
+  自定义脚本：接管侧边栏生成、主题切换、版本获取、分页等
+  ================================================================ -->
   <script>
     (function() {
-      var STORAGE_KEY = 'docsify-theme';
-      var btn = document.getElementById('themeToggle');
+      'use strict';
 
-      function setTheme(theme) {
-        var isDark = (theme === 'dark');
-        document.documentElement.setAttribute('data-theme', theme);
-        btn.textContent = isDark ? '☀️' : '🌙';
-        btn.className = 'theme-toggle' + (isDark ? '' : ' light');
-        localStorage.setItem(STORAGE_KEY, theme);
+      // ---------- 工具：获取当前页面路径 ----------
+      function getPagePath() {
+        var path = window.location.pathname;
+        if (path === '/' || path === '/index.html') return '/home';
+        return path;
       }
 
-      function toggleTheme() {
-        var current = document.documentElement.getAttribute('data-theme') || 'dark';
-        setTheme(current === 'dark' ? 'light' : 'dark');
-      }
+      // ---------- 生成侧边栏（从文档标题提取） ----------
+      function generateSidebar() {
+        var nav = document.getElementById('sidebarNav');
+        var headings = document.querySelectorAll('#markdownBody h1, #markdownBody h2, #markdownBody h3, #markdownBody h4');
+        if (!headings.length) {
+          nav.innerHTML = '<div style="color:var(--text-muted);padding:12px;">暂无目录</div>';
+          return;
+        }
 
-      var saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setTheme(saved);
-      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setTheme('dark');
-      } else {
-        setTheme('light');
-      }
+        var html = '<ul>';
+        var stack = [];
+        headings.forEach(function(h) {
+          var level = parseInt(h.tagName.charAt(1));
+          var text = h.textContent.trim();
+          // 生成 id（与 Docsify 保持一致）
+          var id = text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, '-').replace(/^-|-$/g, '');
+          if (!id) id = 'section-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+          h.id = id;
 
-      btn.addEventListener('click', toggleTheme);
+          // 闭合比当前层级大的
+          while (stack.length && stack[stack.length-1] >= level) {
+            html += '</ul></li>';
+            stack.pop();
+          }
 
-      try {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-          if (!localStorage.getItem(STORAGE_KEY)) {
-            setTheme(e.matches ? 'dark' : 'light');
+          if (stack.length === 0) {
+            // 顶层
+            html += '<li><a href="#' + id + '">' + text + '</a>';
+            if (level < 4) {
+              html += '<ul>';
+              stack.push(level);
+            }
+          } else {
+            // 子级
+            html += '<li><a href="#' + id + '">' + text + '</a>';
+            if (level < 4) {
+              html += '<ul>';
+              stack.push(level);
+            }
           }
         });
-      } catch(e) {}
+        // 关闭所有未闭合的
+        while (stack.length) {
+          html += '</ul></li>';
+          stack.pop();
+        }
+        html += '</ul>';
+        nav.innerHTML = html;
+
+        // 高亮当前激活项
+        highlightActiveLink();
+        // 绑定点击关闭侧边栏（移动端）
+        nav.querySelectorAll('a').forEach(function(a) {
+          a.addEventListener('click', function() {
+            if (window.innerWidth <= 768) closeSidebar();
+          });
+        });
+      }
+
+      // ---------- 高亮侧边栏当前项 ----------
+      function highlightActiveLink() {
+        var hash = window.location.hash;
+        var links = document.querySelectorAll('#sidebarNav a');
+        links.forEach(function(link) {
+          link.classList.remove('active');
+          if (hash && link.getAttribute('href') === hash) {
+            link.classList.add('active');
+          }
+        });
+        // 如果没有匹配，尝试根据路径匹配
+        if (!document.querySelector('#sidebarNav a.active')) {
+          var path = getPagePath();
+          links.forEach(function(link) {
+            var href = link.getAttribute('href');
+            if (href && href.startsWith('#') && path === '/home') {
+              // 默认高亮第一个
+              if (!document.querySelector('#sidebarNav a.active')) {
+                link.classList.add('active');
+              }
+            }
+          });
+        }
+      }
+
+      // ---------- 获取版本号 ----------
+      function fetchVersion() {
+        fetch('/inner/version', { method: 'POST' })
+          .then(r => r.json())
+          .then(data => {
+            var v = data?.data?.version;
+            var badge = document.getElementById('versionBadge');
+            if (v) badge.textContent = 'v' + v;
+            else badge.textContent = 'v·—';
+          })
+          .catch(() => {
+            document.getElementById('versionBadge').textContent = 'v·—';
+          });
+      }
+
+      // ---------- 监听 Docsify 渲染完成 ----------
+      function onDocsifyReady() {
+        // Docsify 渲染完成后会触发 'docsify' 事件
+        var content = document.querySelector('#markdownBody');
+        if (content) {
+          // 如果内容还在 loading，等待 MutationObserver
+          var observer = new MutationObserver(function() {
+            var heading = content.querySelector('h1, h2, h3, h4');
+            if (heading) {
+              observer.disconnect();
+              generateSidebar();
+              // 处理分页（Docsify 可能已生成）
+              // 我们自己不处理，保持简洁
+            }
+          });
+          observer.observe(content, { childList: true, subtree: true });
+          // 兜底
+          setTimeout(function() {
+            observer.disconnect();
+            generateSidebar();
+          }, 3000);
+        }
+      }
+
+      // ---------- 移动端侧边栏 ----------
+      function openSidebar() {
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('sidebarOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      // ---------- 主题切换 ----------
+      function initTheme() {
+        var STORAGE_KEY = 'docsify-theme';
+        var btn = document.getElementById('themeToggle');
+
+        function setTheme(theme) {
+          var isDark = (theme === 'dark');
+          document.documentElement.setAttribute('data-theme', theme);
+          btn.textContent = isDark ? '☀️' : '🌙';
+          btn.className = 'theme-toggle' + (isDark ? '' : ' light');
+          localStorage.setItem(STORAGE_KEY, theme);
+        }
+
+        function toggleTheme() {
+          var current = document.documentElement.getAttribute('data-theme') || 'dark';
+          setTheme(current === 'dark' ? 'light' : 'dark');
+        }
+
+        var saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          setTheme(saved);
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          setTheme('dark');
+        } else {
+          setTheme('light');
+        }
+
+        btn.addEventListener('click', toggleTheme);
+
+        try {
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            if (!localStorage.getItem(STORAGE_KEY)) {
+              setTheme(e.matches ? 'dark' : 'light');
+            }
+          });
+        } catch(e) {}
+      }
+
+      // ---------- 初始化 ----------
+      function init() {
+        initTheme();
+        fetchVersion();
+
+        // Docsify 渲染完成后会触发事件，但不知道具体时机，用 MutationObserver 监听内容变化
+        var content = document.querySelector('#markdownBody');
+        if (content) {
+          var obs = new MutationObserver(function() {
+            if (content.querySelector('h1, h2, h3, h4')) {
+              obs.disconnect();
+              generateSidebar();
+            }
+          });
+          obs.observe(content, { childList: true, subtree: true });
+          // 兜底
+          setTimeout(function() {
+            obs.disconnect();
+            generateSidebar();
+          }, 5000);
+        }
+
+        // 侧边栏按钮
+        document.getElementById('sidebarToggle').addEventListener('click', function(e) {
+          e.stopPropagation();
+          var sidebar = document.getElementById('sidebar');
+          sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+        });
+        document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
+        window.addEventListener('resize', function() {
+          if (window.innerWidth > 768) closeSidebar();
+        });
+
+        // 监听 hash 变化，更新侧边栏高亮
+        window.addEventListener('hashchange', highlightActiveLink);
+        // 也监听 Docsify 的页面切换（通过 history）
+        window.addEventListener('popstate', function() {
+          setTimeout(highlightActiveLink, 200);
+        });
+      }
+
+      // 如果 DOM 已加载，直接初始化，否则等待
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        init();
+      } else {
+        document.addEventListener('DOMContentLoaded', init);
+      }
     })();
   </script>
 
-  <!-- ===== Docsify 配置（关闭 coverpage） ===== -->
+  <!-- ================================================================
+  Service Worker (PWA)
+  ================================================================ -->
   <script>
-    window.$docsify = {
-      name: '网易云音乐 API Enhanced',
-      repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
-      coverpage: false,
-      homepage: 'home.md',
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(function() {});
     }
   </script>
 
-  <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js"></script>
-
-  <!-- Service Worker -->
-  <script>
-    if (typeof navigator.serviceWorker !== 'undefined') {
-      navigator.serviceWorker.register('sw.js')
-    }
-  </script>
-
-  <!-- Google Analytics -->
+  <!-- ================================================================
+  Google Analytics
+  ================================================================ -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
