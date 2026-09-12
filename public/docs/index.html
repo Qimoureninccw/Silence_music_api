@@ -100,8 +100,6 @@
       margin: 0 0 8px 0 !important;
       padding: 0 22px 16px !important;
       border-bottom: 1px solid var(--line);
-      font-size: 17px !important;
-      line-height: 1.3;
     }
     .sidebar .app-name-link {
       color: var(--fg) !important;
@@ -114,7 +112,6 @@
     }
     .sidebar .app-name-link::before {
       content: "";
-      display: inline-block;
       width: 8px;
       height: 8px;
       border-radius: 50%;
@@ -123,61 +120,77 @@
       flex-shrink: 0;
     }
 
-    /* 导航区 */
+    /* 导航容器 */
     .sidebar .sidebar-nav {
-      padding: 8px 12px 20px !important;
+      padding: 8px 12px 24px !important;
     }
     .sidebar .sidebar-nav ul {
       margin: 0 !important;
       padding: 0 !important;
       list-style: none;
     }
-    .sidebar .sidebar-nav ul ul {
-      padding-left: 10px !important;
-      margin: 2px 0 6px !important;
-    }
-
     .sidebar .sidebar-nav li {
       margin: 1px 0 !important;
       list-style: none;
     }
 
-    /* 链接 */
-    .sidebar .sidebar-nav a {
+    /* ---------- level 2：## 分组标题 ---------- */
+    .sidebar .sidebar-nav > ul > li > p,
+    .sidebar .sidebar-nav > ul > li > a {
+      font-weight: 700 !important;
+      font-size: 13px !important;
+      letter-spacing: 0.3px;
+      color: var(--fg) !important;
+      padding: 14px 12px 6px !important;
+      margin: 0 !important;
+      border-radius: var(--radius-sm) !important;
+      display: block;
+      text-decoration: none !important;
+    }
+    .sidebar .sidebar-nav > ul > li > a:hover {
+      color: var(--red) !important;
+      background: transparent !important;
+      transform: none;
+    }
+
+    /* level 2 的下级列表缩进 + 左边竖线 */
+    .sidebar .sidebar-nav > ul > li > ul {
+      padding-left: 8px !important;
+      margin: 2px 0 8px 14px !important;
+      border-left: 1px solid var(--line);
+    }
+
+    /* ---------- level 3：### 具体条目 ---------- */
+    .sidebar .sidebar-nav ul ul a {
       color: var(--fg-muted) !important;
-      font-size: 14px !important;
+      font-size: 13.5px !important;
       font-weight: 500 !important;
-      padding: 7px 12px !important;
+      padding: 6px 12px !important;
       border-radius: var(--radius-sm) !important;
       transition: all 0.18s var(--ease) !important;
       display: block;
-      border: none !important;
       text-decoration: none !important;
+      border: none !important;
       line-height: 1.5;
     }
-    .sidebar .sidebar-nav a:hover {
+    .sidebar .sidebar-nav ul ul a:hover {
       color: var(--fg) !important;
       background: var(--glass-hover) !important;
       transform: translateX(2px);
     }
 
-    /* 激活项 */
-    .sidebar .sidebar-nav li.active > a,
-    .sidebar .sidebar-nav li.active > a:hover {
+    /* ---------- 激活态 ---------- */
+    .sidebar .sidebar-nav li.active > a {
       color: #fff !important;
       background: var(--red) !important;
       box-shadow: 0 4px 16px rgba(236, 65, 65, 0.4);
       transform: none;
     }
-
-    /* 分组标题（_sidebar.md 里的 ## 标题） */
-    .sidebar .sidebar-nav li > p {
-      font-weight: 600 !important;
-      font-size: 12px !important;
-      color: var(--fg-dim) !important;
-      letter-spacing: 0.6px;
-      padding: 12px 12px 6px !important;
-      margin: 0 !important;
+    /* ## 分组本身激活时不铺红底，只标红字 */
+    .sidebar .sidebar-nav > ul > li.active > a {
+      background: transparent !important;
+      color: var(--red) !important;
+      box-shadow: none !important;
     }
 
     /* ============ 主内容区 ============ */
@@ -477,21 +490,27 @@
       repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
       homepage: 'home.md',
 
-      /* 关键：加载侧边栏 */
+      /* 侧边栏 */
       loadSidebar: true,
-      /* 显示到二级标题（## 会作为分组） */
-      subMaxLevel: 2,
-      /* 侧边栏随页面滚动高亮 */
+
+      /* ★ 显示到 ### 一级：## 作为分组，### 作为条目 */
+      subMaxLevel: 3,
+
+      /* 路由切换后滚回顶部 */
       auto2top: true,
-      /* 侧边栏点击后自动折叠（移动端） */
+
+      /* 移动端侧边栏点击后自动收起 */
       mergeNavbar: true,
 
+      /* 搜索 */
       search: {
         placeholder: '搜索文档…',
         noData: '没有找到结果',
         paths: 'auto',
         depth: 3,
       },
+
+      /* 代码块复制按钮 */
       copyCode: {
         buttonText: '复制',
         errorText: '复制失败',
