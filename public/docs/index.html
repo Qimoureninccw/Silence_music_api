@@ -8,10 +8,8 @@
   <meta name="referrer" content="never">
   <title>SilenceMusicAPI</title>
 
-  <!-- 静态资源 baseURL：改这里即可（CDN / 子路径都行） -->
-  <base href="/">
-
-  <link rel="icon" href="netease.png">
+  <!-- 静态资源在站点根 /，用绝对路径 -->
+  <link rel="icon" href="/netease.png">
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css">
 
   <style>
@@ -427,10 +425,10 @@
 </head>
 <body class="theme-dark">
 
-  <!-- ===== 背景视频 ===== -->
-  <video autoplay muted loop playsinline id="bg-video" poster="bg_fufu_1080.png">
-    <source src="bg_fufu_1080.mp4" type="video/mp4">
-    <img src="bg1.webp" alt="背景" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-2;pointer-events:none;">
+  <!-- ===== 背景视频（静态资源在站点根 /） ===== -->
+  <video autoplay muted loop playsinline id="bg-video" poster="/bg_fufu_1080.png">
+    <source src="/bg_fufu_1080.mp4" type="video/mp4">
+    <img src="/bg1.webp" alt="背景" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-2;pointer-events:none;">
   </video>
   <div id="bg-overlay"></div>
 
@@ -526,8 +524,9 @@
   <script src="https://unpkg.com/docsify-copy-code"></script>
 
   <script>
+    /* Service Worker 相对于当前目录注册 */
     if (typeof navigator.serviceWorker !== 'undefined') {
-      navigator.serviceWorker.register('sw.js');
+      navigator.serviceWorker.register('sw.js').catch(function () {});
     }
   </script>
 
