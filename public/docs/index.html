@@ -1,18 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="KEYWords" contect="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js">
-  <meta name="description" content="网易云音乐 NodeJS API Enhanced">
-  <title>网易云音乐 NodeJS API Enhanced</title>
+  <meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js">
+  <meta name="description" content="网易云音乐 NodeJS API Enhanced · 全球边缘网络 · 母带解析">
+  <title>网易云音乐 NodeJS API Enhanced · 文档</title>
   <link rel="icon" href="netease.png">
-  <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta name="referrer" content="never">
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css">
 
   <style>
-    /* ===== 新增：视频背景 ===== */
+    /* ===== 设计变量 ===== */
+    :root {
+      --brand: #ec4141;
+      --brand-soft: #ff6b6b;
+      --bg: #0a0a0f;
+      --surface: rgba(18, 18, 26, 0.72);
+      --surface-elevated: rgba(26, 26, 36, 0.82);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-strong: rgba(255, 255, 255, 0.10);
+      --fg: #f0f0f5;
+      --fg-secondary: #c8c8d8;
+      --fg-tertiary: #8e8ea0;
+      --fg-quaternary: #5e5e72;
+      --radius-card: 20px;
+      --radius-sm: 10px;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    }
+
+    /* ===== 视频背景 ===== */
     #bg-video {
       position: fixed;
       top: 0;
@@ -20,54 +40,457 @@
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      z-index: -2;
+      z-index: -3;
       pointer-events: none;
     }
     #bg-overlay {
       position: fixed;
       inset: 0;
-      z-index: -1;
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
+      z-index: -2;
+      background: rgba(0, 0, 0, 0.55);
       pointer-events: none;
     }
+    #bg-gradient {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(
+        180deg,
+        rgba(10, 10, 15, 0.35) 0%,
+        rgba(10, 10, 15, 0.55) 40%,
+        rgba(10, 10, 15, 0.85) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* ===== 全局重置 ===== */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
       background: transparent !important;
+      color: var(--fg) !important;
+      font-family: var(--font-sans) !important;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin: 0;
+      padding: 0;
     }
+
+    /* ===== 覆盖 Docsify 默认背景 ===== */
     .sidebar,
     .content,
-    .markdown-section,
     .app-nav {
-      background: rgba(255, 255, 255, 0.06) !important;
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      background: transparent !important;
     }
-    .markdown-section {
+
+    /* ===== 侧边栏 ===== */
+    .sidebar {
+      background: rgba(10, 10, 15, 0.72) !important;
+      backdrop-filter: blur(24px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+      border-right: 1px solid var(--border) !important;
+      padding-top: 24px !important;
+      transition: transform 0.3s ease, background 0.3s ease !important;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2) !important;
+    }
+    .sidebar .app-name {
+      padding: 0 24px 20px !important;
+      margin: 0 !important;
+      border-bottom: 1px solid var(--border) !important;
+    }
+    .sidebar .app-name-link {
+      color: #fff !important;
+      font-size: 17px !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.3px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      text-decoration: none !important;
+    }
+    .sidebar .app-name-link::before {
+      content: '';
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--brand);
+      flex-shrink: 0;
+      box-shadow: 0 2px 12px rgba(236, 65, 65, 0.35);
+      background-image: url('netease.png');
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* 侧边栏导航 */
+    .sidebar-nav {
+      padding: 16px 12px !important;
+    }
+    .sidebar-nav ul {
+      margin: 0 !important;
+      padding: 0 !important;
+      list-style: none !important;
+    }
+    .sidebar-nav li {
+      margin: 2px 0 !important;
+    }
+    .sidebar-nav a {
+      color: var(--fg-tertiary) !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      padding: 9px 14px !important;
+      border-radius: 8px !important;
+      transition: all 0.2s ease !important;
+      display: block !important;
+      text-decoration: none !important;
+      border-left: 3px solid transparent !important;
+    }
+    .sidebar-nav a:hover {
+      color: #fff !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+    }
+    .sidebar-nav a.active {
+      color: #fff !important;
+      background: rgba(236, 65, 65, 0.12) !important;
+      border-left-color: var(--brand) !important;
+      font-weight: 600 !important;
+    }
+
+    /* 侧边栏折叠按钮 */
+    .sidebar-toggle {
+      background: rgba(10, 10, 15, 0.75) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid var(--border-strong) !important;
+      border-radius: 50% !important;
+      padding: 10px !important;
+      bottom: 24px !important;
+      left: 20px !important;
+      box-shadow: var(--shadow-md) !important;
+    }
+    .sidebar-toggle span {
+      background: #fff !important;
+    }
+
+    /* ===== 主内容区 ===== */
+    .content {
+      padding-top: 80px !important;
+      background: transparent !important;
+    }
+
+    /* 顶部导航 */
+    .app-nav {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      height: 64px !important;
+      background: rgba(10, 10, 15, 0.60) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      border-bottom: 1px solid var(--border) !important;
+      z-index: 100 !important;
+      padding: 0 32px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15) !important;
+    }
+    .app-nav a {
+      color: var(--fg-tertiary) !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      padding: 8px 16px !important;
+      border-radius: 100px !important;
+      transition: all 0.2s ease !important;
+      text-decoration: none !important;
+      margin-left: 4px !important;
+    }
+    .app-nav a:hover {
+      color: #fff !important;
       background: rgba(255, 255, 255, 0.08) !important;
     }
-    /* 原主题切换按钮保留 */
+
+    /* ===== Markdown 内容卡片 ===== */
+    .markdown-section {
+      background: var(--surface) !important;
+      backdrop-filter: blur(24px) saturate(160%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: var(--radius-card) !important;
+      padding: 48px 52px !important;
+      margin: 24px auto 48px !important;
+      max-width: 880px !important;
+      box-shadow: var(--shadow-md) !important;
+      color: var(--fg) !important;
+    }
+    @media (max-width: 768px) {
+      .markdown-section {
+        padding: 28px 20px !important;
+        margin: 16px 12px 32px !important;
+        border-radius: 16px !important;
+      }
+    }
+
+    /* ===== 排版 ===== */
+    .markdown-section h1,
+    .markdown-section h2,
+    .markdown-section h3,
+    .markdown-section h4,
+    .markdown-section h5,
+    .markdown-section h6 {
+      color: #fff !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.5px !important;
+      line-height: 1.3 !important;
+      margin-top: 1.8em !important;
+      margin-bottom: 0.6em !important;
+    }
+    .markdown-section h1 {
+      font-size: 32px !important;
+      letter-spacing: -0.8px !important;
+      padding-bottom: 16px !important;
+      border-bottom: 1px solid var(--border) !important;
+      margin-top: 0 !important;
+    }
+    .markdown-section h2 {
+      font-size: 24px !important;
+      padding-bottom: 10px !important;
+      border-bottom: 1px solid var(--border) !important;
+    }
+    .markdown-section h3 { font-size: 19px !important; }
+    .markdown-section h4 { font-size: 16px !important; }
+
+    .markdown-section p {
+      color: var(--fg-secondary) !important;
+      font-size: 15px !important;
+      line-height: 1.85 !important;
+      margin: 1em 0 !important;
+    }
+    .markdown-section a {
+      color: var(--brand-soft) !important;
+      text-decoration: none !important;
+      border-bottom: 1px solid rgba(255, 107, 107, 0.3) !important;
+      transition: all 0.2s ease !important;
+      font-weight: 500 !important;
+    }
+    .markdown-section a:hover {
+      color: #fff !important;
+      border-bottom-color: var(--brand) !important;
+    }
+    .markdown-section strong {
+      color: #fff !important;
+      font-weight: 650 !important;
+    }
+    .markdown-section ul,
+    .markdown-section ol {
+      color: var(--fg-secondary) !important;
+      padding-left: 1.6em !important;
+      margin: 1em 0 !important;
+    }
+    .markdown-section li {
+      margin: 6px 0 !important;
+      line-height: 1.7 !important;
+    }
+    .markdown-section li::marker {
+      color: var(--brand) !important;
+    }
+
+    /* 引用块 */
+    .markdown-section blockquote {
+      background: rgba(236, 65, 65, 0.06) !important;
+      border-left: 3px solid var(--brand) !important;
+      border-radius: 0 8px 8px 0 !important;
+      padding: 14px 20px !important;
+      margin: 1.2em 0 !important;
+      color: var(--fg-secondary) !important;
+    }
+    .markdown-section blockquote p {
+      margin: 0 !important;
+      color: var(--fg-secondary) !important;
+    }
+
+    /* 代码 */
+    .markdown-section code {
+      font-family: var(--font-mono) !important;
+      font-size: 13px !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: #ff9a9a !important;
+      padding: 3px 8px !important;
+      border-radius: 6px !important;
+      border: 1px solid var(--border) !important;
+    }
+    .markdown-section pre {
+      background: rgba(0, 0, 0, 0.40) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: var(--radius-sm) !important;
+      padding: 20px 24px !important;
+      margin: 1.4em 0 !important;
+      overflow-x: auto !important;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02) !important;
+    }
+    .markdown-section pre code {
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      color: var(--fg-secondary) !important;
+      font-size: 13px !important;
+      line-height: 1.75 !important;
+    }
+
+    /* 表格 */
+    .markdown-section table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin: 1.6em 0 !important;
+      border-radius: var(--radius-sm) !important;
+      overflow: hidden !important;
+      box-shadow: 0 0 0 1px var(--border) !important;
+      font-size: 14px !important;
+    }
+    .markdown-section table th {
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: #fff !important;
+      font-weight: 650 !important;
+      padding: 12px 18px !important;
+      text-align: left !important;
+      border-bottom: 1px solid var(--border-strong) !important;
+    }
+    .markdown-section table td {
+      padding: 11px 18px !important;
+      color: var(--fg-secondary) !important;
+      border-bottom: 1px solid var(--border) !important;
+    }
+    .markdown-section table tr:last-child td {
+      border-bottom: none !important;
+    }
+    .markdown-section table tr:hover td {
+      background: rgba(255, 255, 255, 0.02) !important;
+    }
+
+    /* 水平线 */
+    .markdown-section hr {
+      border: none !important;
+      border-top: 1px solid var(--border) !important;
+      margin: 2.4em 0 !important;
+    }
+
+    /* 图片 */
+    .markdown-section img {
+      max-width: 100% !important;
+      border-radius: var(--radius-sm) !important;
+      box-shadow: var(--shadow-sm) !important;
+    }
+
+    /* ===== 搜索框 ===== */
+    .search {
+      border-bottom: 1px solid var(--border) !important;
+      padding: 16px 20px !important;
+      margin-bottom: 8px !important;
+    }
+    .search input {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 100px !important;
+      color: #fff !important;
+      padding: 10px 18px !important;
+      font-size: 14px !important;
+      width: 100% !important;
+      outline: none !important;
+      transition: all 0.2s ease !important;
+    }
+    .search input:focus {
+      border-color: rgba(236, 65, 65, 0.4) !important;
+      background: rgba(255, 255, 255, 0.09) !important;
+      box-shadow: 0 0 0 3px rgba(236, 65, 65, 0.10) !important;
+    }
+    .search input::placeholder {
+      color: var(--fg-quaternary) !important;
+    }
+    .search .results-panel {
+      background: rgba(18, 18, 26, 0.96) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      border: 1px solid var(--border-strong) !important;
+      border-radius: var(--radius-sm) !important;
+      box-shadow: var(--shadow-md) !important;
+    }
+    .search .matching-post {
+      border-bottom: 1px solid var(--border) !important;
+    }
+    .search .matching-post:hover {
+      background: rgba(255, 255, 255, 0.04) !important;
+    }
+    .search .matching-post a {
+      color: var(--fg-secondary) !important;
+      font-size: 14px !important;
+    }
+    .search .matching-post a:hover {
+      color: #fff !important;
+    }
+    .search .matching-post .title {
+      color: #fff !important;
+      font-weight: 600 !important;
+    }
+    .search .matching-post .content {
+      color: var(--fg-tertiary) !important;
+      font-size: 13px !important;
+    }
+
+    /* ===== 分页 ===== */
+    .docsify-pagination-container {
+      border-top: 1px solid var(--border) !important;
+      margin-top: 40px !important;
+      padding-top: 24px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      gap: 16px !important;
+    }
+    .pagination-item {
+      background: rgba(255, 255, 255, 0.04) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: var(--radius-sm) !important;
+      padding: 14px 20px !important;
+      transition: all 0.2s ease !important;
+      flex: 1 !important;
+      text-decoration: none !important;
+    }
+    .pagination-item:hover {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border-color: var(--border-strong) !important;
+      transform: translateY(-2px) !important;
+    }
+    .pagination-item .pagination-item-title {
+      color: #fff !important;
+      font-size: 15px !important;
+      font-weight: 600 !important;
+    }
+    .pagination-item .pagination-item-label {
+      color: var(--fg-tertiary) !important;
+      font-size: 12px !important;
+      margin-bottom: 4px !important;
+    }
+
+    /* ===== 主题切换按钮 ===== */
     .theme-toggle {
       position: fixed;
       bottom: 24px;
       right: 24px;
       z-index: 999;
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(30,30,46,0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(30, 30, 46, 0.75);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
       color: #fff;
       font-size: 20px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       outline: none;
       padding: 0;
       line-height: 1;
@@ -75,19 +498,144 @@
     }
     .theme-toggle:hover {
       transform: scale(1.12) rotate(12deg);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      background: rgba(40, 40, 60, 0.85);
     }
     .theme-toggle:active {
       transform: scale(0.92);
     }
     .theme-toggle.light {
-      background: rgba(255,255,255,0.85);
+      background: rgba(255, 255, 255, 0.85);
       color: #333;
-      border-color: rgba(0,0,0,0.08);
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
     }
+    .theme-toggle.light:hover {
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* ===== 轻量模式（浅色）适配 ===== */
+    body.light-mode .markdown-section {
+      background: rgba(255, 255, 255, 0.88) !important;
+      border-color: rgba(0, 0, 0, 0.06) !important;
+    }
+    body.light-mode .markdown-section h1,
+    body.light-mode .markdown-section h2,
+    body.light-mode .markdown-section h3,
+    body.light-mode .markdown-section h4,
+    body.light-mode .markdown-section h5,
+    body.light-mode .markdown-section h6,
+    body.light-mode .markdown-section strong {
+      color: #111118 !important;
+    }
+    body.light-mode .markdown-section p,
+    body.light-mode .markdown-section li,
+    body.light-mode .markdown-section td {
+      color: #3d3d4e !important;
+    }
+    body.light-mode .markdown-section code {
+      background: rgba(0, 0, 0, 0.05) !important;
+      color: #d93a3a !important;
+      border-color: rgba(0, 0, 0, 0.06) !important;
+    }
+    body.light-mode .markdown-section pre {
+      background: rgba(0, 0, 0, 0.04) !important;
+      border-color: rgba(0, 0, 0, 0.06) !important;
+    }
+    body.light-mode .markdown-section pre code {
+      color: #3d3d4e !important;
+    }
+    body.light-mode .markdown-section blockquote {
+      background: rgba(236, 65, 65, 0.05) !important;
+      color: #3d3d4e !important;
+    }
+    body.light-mode .markdown-section blockquote p {
+      color: #3d3d4e !important;
+    }
+    body.light-mode .sidebar {
+      background: rgba(250, 250, 252, 0.85) !important;
+      border-right-color: rgba(0, 0, 0, 0.06) !important;
+    }
+    body.light-mode .sidebar .app-name-link {
+      color: #111118 !important;
+    }
+    body.light-mode .sidebar-nav a {
+      color: #7e7e92 !important;
+    }
+    body.light-mode .sidebar-nav a:hover {
+      color: #111118 !important;
+      background: rgba(0, 0, 0, 0.04) !important;
+    }
+    body.light-mode .sidebar-nav a.active {
+      color: #111118 !important;
+      background: rgba(236, 65, 65, 0.08) !important;
+    }
+    body.light-mode .app-nav {
+      background: rgba(250, 250, 252, 0.72) !important;
+      border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+    }
+    body.light-mode .app-nav a {
+      color: #7e7e92 !important;
+    }
+    body.light-mode .app-nav a:hover {
+      color: #111118 !important;
+      background: rgba(0, 0, 0, 0.04) !important;
+    }
+    body.light-mode .search input {
+      background: rgba(0, 0, 0, 0.04) !important;
+      border-color: rgba(0, 0, 0, 0.06) !important;
+      color: #111118 !important;
+    }
+    body.light-mode .search input::placeholder {
+      color: #aeaec0 !important;
+    }
+    body.light-mode .markdown-section table th {
+      background: rgba(0, 0, 0, 0.03) !important;
+      color: #111118 !important;
+      border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+    }
+    body.light-mode .markdown-section table td {
+      border-bottom-color: rgba(0, 0, 0, 0.05) !important;
+    }
+    body.light-mode .markdown-section table {
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
+    }
+    body.light-mode .markdown-section hr {
+      border-top-color: rgba(0, 0, 0, 0.06) !important;
+    }
+    body.light-mode .pagination-item {
+      background: rgba(0, 0, 0, 0.03) !important;
+      border-color: rgba(0, 0, 0, 0.06) !important;
+    }
+    body.light-mode .pagination-item .pagination-item-title {
+      color: #111118 !important;
+    }
+    body.light-mode #bg-overlay {
+      background: rgba(255, 255, 255, 0.65);
+    }
+    body.light-mode #bg-gradient {
+      background: linear-gradient(
+        180deg,
+        rgba(250, 250, 252, 0.35) 0%,
+        rgba(250, 250, 252, 0.55) 40%,
+        rgba(250, 250, 252, 0.85) 100%
+      );
+    }
+
+    /* ===== 滚动条 ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
+    body.light-mode ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.10); }
+    body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.18); }
+
+    /* ===== 过渡 ===== */
     html, body, .sidebar, .content, .markdown-section,
-    .sidebar-nav, .search, .docsify-pagination-container {
-      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    .sidebar-nav, .search, .docsify-pagination-container,
+    .app-nav, .theme-toggle {
+      transition: background-color 0.3s ease, color 0.2s ease,
+                  border-color 0.2s ease, box-shadow 0.3s ease;
     }
   </style>
 
@@ -101,18 +649,23 @@
 </head>
 <body>
 
-  <!-- ===== 视频背景（只改了这个） ===== -->
+  <!-- ===== 视频背景 ===== -->
   <video autoplay muted loop playsinline id="bg-video" poster="/bg_fufu_1080.png">
     <source src="/bg_fufu_1080.mp4" type="video/mp4">
-    <img src="/bg1.webp" alt="背景" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-2;pointer-events:none;">
+    <img src="/bg1.webp" alt="背景" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-3;pointer-events:none;">
   </video>
   <div id="bg-overlay"></div>
+  <div id="bg-gradient"></div>
 
+  <!-- Docsify 应用挂载点 -->
   <div id="app"></div>
+
+  <!-- 主题切换按钮 -->
   <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
 </body>
 
 <script>
+  /* ===== 主题切换 ===== */
   (function() {
     var STORAGE_KEY = 'docsify-theme';
     var link = document.getElementById('theme-css');
@@ -124,11 +677,12 @@
       link.href = theme === 'dark' ? DARK_URL : LIGHT_URL;
       btn.textContent = theme === 'dark' ? '☀️' : '🌙';
       btn.className = 'theme-toggle' + (theme === 'dark' ? '' : ' light');
+      document.body.classList.toggle('light-mode', theme === 'light');
       localStorage.setItem(STORAGE_KEY, theme);
     }
 
     function toggleTheme() {
-      var isDark = link.href.includes('dark');
+      var isDark = link.href.indexOf('dark') > -1;
       setTheme(isDark ? 'light' : 'dark');
     }
 
@@ -137,6 +691,8 @@
       setTheme(saved);
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setTheme('dark');
+    } else {
+      setTheme('light');
     }
 
     btn.addEventListener('click', toggleTheme);
@@ -157,10 +713,34 @@
     repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
     coverpage: true,
     homepage: 'home.md',
+    // 优化渲染
+    maxLevel: 4,
+    subMaxLevel: 3,
+    auto2top: true,
+    // 搜索
+    search: {
+      placeholder: '搜索文档...',
+      noData: '没有找到结果',
+      depth: 3,
+      maxAge: 86400000
+    },
+    // 分页
+    pagination: {
+      previousText: '上一篇',
+      nextText: '下一篇',
+      crossChapter: true
+    },
+    // 侧边栏
+    loadSidebar: true,
+    // 主题
+    themeColor: '#ec4141'
   }
 </script>
 
 <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js"></script>
+<script src="https://unpkg.com/docsify@4.11.3/lib/plugins/search.min.js"></script>
+<script src="https://unpkg.com/docsify-pagination@2.3.0/dist/docsify-pagination.min.js"></script>
+<script src="https://unpkg.com/docsify@4.11.3/lib/plugins/zoom-image.min.js"></script>
 
 <script>
   if (typeof navigator.serviceWorker !== 'undefined') {
@@ -168,7 +748,7 @@
   }
 </script>
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
+<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
