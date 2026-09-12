@@ -3,24 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js">
-  <meta name="description" content="网易云音乐 NodeJS API Enhanced">
+  <meta name="description" content="SilenceMusicAPI - 网易云音乐 NodeJS API Enhanced">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta name="referrer" content="never">
-  <title>网易云音乐 NodeJS API Enhanced</title>
+  <title>SilenceMusicAPI</title>
 
   <!-- 静态资源 baseURL：改这里即可（CDN / 子路径都行） -->
   <base href="/">
 
   <link rel="icon" href="netease.png">
-
-  <!-- docsify 基础主题（会被下面的覆盖层大量重写，只保留骨架） -->
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css">
 
   <style>
     /* ============ 设计令牌 ============ */
     :root {
       --red: #ec4141;
-      --red-dark: #c93333;
       --red-soft: rgba(236, 65, 65, 0.12);
 
       --bg-overlay: rgba(10, 10, 18, 0.55);
@@ -42,7 +39,6 @@
       --ease: cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* 浅色主题（点月亮时用） */
     body.theme-light {
       --bg-overlay: rgba(245, 245, 250, 0.55);
       --glass: rgba(255, 255, 255, 0.72);
@@ -94,21 +90,27 @@
       -webkit-backdrop-filter: blur(var(--blur)) saturate(160%) !important;
       border-right: 1px solid var(--glass-border) !important;
       color: var(--fg) !important;
-      padding-top: 28px !important;
+      padding-top: 24px !important;
       box-shadow: var(--shadow);
       transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
     }
 
+    /* 站点名 */
     .sidebar .app-name {
-      margin-bottom: 6px !important;
-      padding: 0 24px 18px !important;
+      margin: 0 0 8px 0 !important;
+      padding: 0 22px 16px !important;
       border-bottom: 1px solid var(--line);
+      font-size: 17px !important;
+      line-height: 1.3;
     }
     .sidebar .app-name-link {
       color: var(--fg) !important;
       font-weight: 700 !important;
       font-size: 17px !important;
       letter-spacing: -0.2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
     }
     .sidebar .app-name-link::before {
       content: "";
@@ -117,48 +119,65 @@
       height: 8px;
       border-radius: 50%;
       background: var(--red);
-      margin-right: 10px;
-      vertical-align: middle;
       box-shadow: 0 0 12px var(--red);
+      flex-shrink: 0;
     }
 
-    .sidebar ul {
-      margin: 12px 0 !important;
-      padding: 0 12px !important;
+    /* 导航区 */
+    .sidebar .sidebar-nav {
+      padding: 8px 12px 20px !important;
     }
-    .sidebar li { margin: 2px 0 !important; }
+    .sidebar .sidebar-nav ul {
+      margin: 0 !important;
+      padding: 0 !important;
+      list-style: none;
+    }
+    .sidebar .sidebar-nav ul ul {
+      padding-left: 10px !important;
+      margin: 2px 0 6px !important;
+    }
 
-    .sidebar a {
+    .sidebar .sidebar-nav li {
+      margin: 1px 0 !important;
+      list-style: none;
+    }
+
+    /* 链接 */
+    .sidebar .sidebar-nav a {
       color: var(--fg-muted) !important;
       font-size: 14px !important;
       font-weight: 500 !important;
-      padding: 8px 14px !important;
+      padding: 7px 12px !important;
       border-radius: var(--radius-sm) !important;
-      transition: all 0.2s var(--ease) !important;
+      transition: all 0.18s var(--ease) !important;
       display: block;
       border: none !important;
+      text-decoration: none !important;
+      line-height: 1.5;
     }
-    .sidebar a:hover {
+    .sidebar .sidebar-nav a:hover {
       color: var(--fg) !important;
       background: var(--glass-hover) !important;
       transform: translateX(2px);
     }
-    .sidebar li.active > a,
-    .sidebar li.active > a:hover {
+
+    /* 激活项 */
+    .sidebar .sidebar-nav li.active > a,
+    .sidebar .sidebar-nav li.active > a:hover {
       color: #fff !important;
       background: var(--red) !important;
       box-shadow: 0 4px 16px rgba(236, 65, 65, 0.4);
+      transform: none;
     }
-    /* 折叠箭头 */
-    .sidebar ul li p {
+
+    /* 分组标题（_sidebar.md 里的 ## 标题） */
+    .sidebar .sidebar-nav li > p {
       font-weight: 600 !important;
-      font-size: 13px !important;
-      color: var(--fg) !important;
-      letter-spacing: 0.3px;
-      padding: 10px 14px 6px !important;
+      font-size: 12px !important;
+      color: var(--fg-dim) !important;
+      letter-spacing: 0.6px;
+      padding: 12px 12px 6px !important;
       margin: 0 !important;
-      text-transform: uppercase;
-      opacity: 0.9;
     }
 
     /* ============ 主内容区 ============ */
@@ -183,7 +202,6 @@
       transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
     }
 
-    /* markdown 内部元素 */
     .markdown-section h1,
     .markdown-section h2,
     .markdown-section h3,
@@ -209,14 +227,10 @@
       border-bottom: 1px solid transparent;
       transition: border-color 0.2s var(--ease);
     }
-    .markdown-section a:hover {
-      border-bottom-color: var(--red);
-    }
+    .markdown-section a:hover { border-bottom-color: var(--red); }
 
     .markdown-section p,
-    .markdown-section li {
-      color: var(--fg-muted) !important;
-    }
+    .markdown-section li { color: var(--fg-muted) !important; }
 
     .markdown-section code {
       background: rgba(255, 255, 255, 0.08) !important;
@@ -288,7 +302,7 @@
       margin: 2em 0;
     }
 
-    /* ============ 侧边栏搜索框 ============ */
+    /* ============ 搜索框 ============ */
     .sidebar .search {
       margin: 12px 16px !important;
       border-radius: var(--radius-sm);
@@ -303,21 +317,17 @@
       font-size: 14px !important;
       border: none !important;
       outline: none !important;
+      width: 100%;
     }
-    .sidebar .search input::placeholder {
-      color: var(--fg-dim) !important;
-    }
+    .sidebar .search input::placeholder { color: var(--fg-dim) !important; }
     .sidebar .search .results-panel {
       background: var(--glass-strong) !important;
       backdrop-filter: blur(var(--blur));
     }
-    .sidebar .search h2 {
-      color: var(--fg-dim) !important;
-      font-size: 12px;
-      letter-spacing: 0.5px;
-    }
+    .sidebar .search h2 { color: var(--fg-dim) !important; font-size: 12px; }
+    .sidebar .search a { color: var(--red) !important; }
 
-    /* ============ 侧边栏切换按钮（移动端）============ */
+    /* ============ 移动端侧边栏切换按钮 ============ */
     .sidebar-toggle {
       background: var(--glass-strong) !important;
       backdrop-filter: blur(var(--blur));
@@ -325,25 +335,16 @@
       border-radius: var(--radius-sm) !important;
       padding: 8px !important;
     }
-    .sidebar-toggle span {
-      background: var(--fg) !important;
-    }
+    .sidebar-toggle span { background: var(--fg) !important; }
 
     /* ============ 分页 ============ */
     .docsify-pagination-container {
       border-top: 1px solid var(--line) !important;
       padding-top: 20px !important;
     }
-    .pagination-item-label {
-      color: var(--fg-dim) !important;
-      font-size: 12px !important;
-    }
-    .pagination-item-title {
-      color: var(--fg) !important;
-    }
-    .pagination-item a {
-      color: var(--red) !important;
-    }
+    .pagination-item-label { color: var(--fg-dim) !important; font-size: 12px !important; }
+    .pagination-item-title { color: var(--fg) !important; }
+    .pagination-item a { color: var(--red) !important; }
 
     /* ============ 滚动条 ============ */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -351,7 +352,6 @@
     ::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.16);
       border-radius: 4px;
-      transition: background 0.2s;
     }
     ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.28); }
     body.theme-light ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.16); }
@@ -402,15 +402,6 @@
       .sidebar { width: 260px; }
       .theme-toggle { bottom: 20px; right: 20px; width: 44px; height: 44px; }
     }
-
-    /* 加载完成前的淡入 */
-    body:not(.ready) .content,
-    body:not(.ready) .sidebar {
-      opacity: 0;
-    }
-    .content, .sidebar {
-      transition: opacity 0.4s var(--ease), background 0.3s var(--ease);
-    }
   </style>
 
   <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -448,7 +439,6 @@
         body.classList.toggle('theme-dark', theme === 'dark');
         body.classList.toggle('theme-light', theme === 'light');
         btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-        // 深色主题挂 dark.css，浅色挂 vue.css
         link.href = theme === 'dark' ? DARK_URL : LIGHT_URL;
         try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) {}
       }
@@ -461,7 +451,6 @@
         apply(current() === 'dark' ? 'light' : 'dark');
       });
 
-      // 初始主题：本地 > 系统 > 默认深色
       var saved = null;
       try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
       if (saved === 'light' || saved === 'dark') {
@@ -472,7 +461,6 @@
         apply('dark');
       }
 
-      // 跟随系统（用户没手动选过时）
       try {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
           if (!localStorage.getItem(STORAGE_KEY)) {
@@ -485,15 +473,24 @@
 
   <script>
     window.$docsify = {
-      name: '网易云音乐 API Enhanced',
+      name: 'SilenceMusicAPI',
       repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
-      coverpage: true,
       homepage: 'home.md',
+
+      /* 关键：加载侧边栏 */
       loadSidebar: true,
+      /* 显示到二级标题（## 会作为分组） */
       subMaxLevel: 2,
+      /* 侧边栏随页面滚动高亮 */
+      auto2top: true,
+      /* 侧边栏点击后自动折叠（移动端） */
+      mergeNavbar: true,
+
       search: {
         placeholder: '搜索文档…',
         noData: '没有找到结果',
+        paths: 'auto',
+        depth: 3,
       },
       copyCode: {
         buttonText: '复制',
