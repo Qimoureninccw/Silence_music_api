@@ -2,59 +2,56 @@
 <html lang="zh-CN">
 <head>
   <base href="/">
-  <!-- ===== 必应验证 ===== -->
   <meta name="msvalidate.01" content="30F2E119A0DBC056231BFE0C266404CF" />
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="icon" href="docs/netease.png">
-  <title>网易云音乐 API Enhanced</title>
+  <title>网易云音乐 API Enhanced · 全球边缘网络 · 母带解析</title>
   <style>
-    /* ===== 变量 & 重置 ===== */
+    /* ===== 高级留白 · 产品官网风格 ===== */
     :root {
-      --red: #ec4141;
-      --red-dark: #c23333;
-      --red-light: #fce8e8;
-      --red-glow: rgba(236, 65, 65, 0.08);
+      --brand: #ec4141;
+      --brand-soft: #ff6b6b;
+      --brand-glow: rgba(236, 65, 65, 0.10);
 
-      --panel: rgba(255, 255, 255, 0.85);
-      --panel-border: rgba(255, 255, 255, 0.25);
-      --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-      --shadow-hover: 0 16px 56px rgba(0, 0, 0, 0.12);
+      --bg: #0a0a0f;
+      --surface: rgba(18, 18, 26, 0.72);
+      --surface-elevated: rgba(26, 26, 36, 0.80);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-strong: rgba(255, 255, 255, 0.10);
 
-      --fg: #1a1a2e;
-      --fg-muted: #4a4a6a;
-      --fg-light: #7a7a9a;
+      --fg: #f0f0f5;
+      --fg-secondary: #c8c8d8;
+      --fg-tertiary: #8e8ea0;
+      --fg-quaternary: #5e5e72;
 
-      --radius: 16px;
-      --radius-sm: 8px;
-      --transition: 0.2s ease;
-    }
+      --radius-card: 24px;
+      --radius-pill: 100px;
+      --radius-sm: 12px;
 
-    /* 深色模式 */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --panel: rgba(28, 28, 44, 0.88);
-        --panel-border: rgba(255, 255, 255, 0.08);
-        --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        --shadow-hover: 0 16px 56px rgba(0, 0, 0, 0.5);
-        --fg: #e8e8f0;
-        --fg-muted: #a0a0b8;
-        --fg-light: #6a6a88;
-        --red-light: rgba(236, 65, 65, 0.15);
-      }
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.5);
+      --shadow-brand: 0 8px 32px rgba(236, 65, 65, 0.18);
+
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+
+      --max-width: 1120px;
+      --header-height: 80px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-
+    html { height: 100%; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-family: var(--font-sans);
+      background: var(--bg);
       color: var(--fg);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      /* 背景由视频替代，移除静态图 */
+      min-height: 100%;
     }
 
     /* ===== 视频背景 ===== */
@@ -65,590 +62,984 @@
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      z-index: -2;
+      z-index: -3;
       pointer-events: none;
     }
-
-    /* ===== 遮罩层（文字清晰度保障） ===== */
     #bg-overlay {
       position: fixed;
       inset: 0;
+      z-index: -2;
+      background: rgba(0, 0, 0, 0.55);
+      pointer-events: none;
+    }
+    #bg-gradient {
+      position: fixed;
+      inset: 0;
       z-index: -1;
-      background: rgba(0, 0, 0, 0.35);
+      background: linear-gradient(
+        180deg,
+        rgba(10, 10, 15, 0.30) 0%,
+        rgba(10, 10, 15, 0.55) 50%,
+        rgba(10, 10, 15, 0.85) 100%
+      );
       pointer-events: none;
     }
 
     /* ===== 容器 ===== */
     .container {
-      max-width: 1000px;
+      max-width: var(--max-width);
       margin: 0 auto;
-      padding: 40px 24px 32px;
-      min-height: 100vh;
+      padding: 0 32px;
+    }
+    @media (max-width: 768px) {
+      .container { padding: 0 20px; }
     }
 
-    @media (max-width: 640px) {
-      .container { padding: 20px 16px 16px; }
+    /* ===== 导航 ===== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-height);
+      background: rgba(10, 10, 15, 0.60);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      z-index: 100;
+      transition: background 0.3s ease;
     }
-
-    /* ===== 头部 ===== */
-    .site-header {
-      margin-bottom: 28px;
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 32px;
+      height: 100%;
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 12px 16px;
+    }
+    @media (max-width: 768px) {
+      .nav-inner { padding: 0 20px; }
     }
 
-    .header-left {
+    .nav-brand {
       display: flex;
       align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .header-left .logo-img {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      object-fit: cover;
-      flex-shrink: 0;
-      background: rgba(255, 255, 255, 0.6);
-      box-shadow: 0 2px 12px rgba(236, 65, 65, 0.15);
-    }
-
-    .site-header h1 {
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-      margin: 0;
-      line-height: 1.2;
+      gap: 12px;
+      text-decoration: none;
       color: #fff;
-      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.30);
+    }
+    .nav-brand .logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(236, 65, 65, 0.25);
+    }
+    .nav-brand .name {
+      font-size: 16px;
+      font-weight: 650;
+      letter-spacing: -0.2px;
+    }
+    .nav-brand .name .accent {
+      color: var(--brand);
     }
 
-    .site-header h1 .highlight { color: var(--red); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .nav-links a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .nav-links a.cta {
+      color: #fff;
+      background: var(--brand);
+      box-shadow: var(--shadow-brand);
+    }
+    .nav-links a.cta:hover {
+      background: #d93a3a;
+      transform: translateY(-1px);
+      box-shadow: 0 12px 40px rgba(236, 65, 65, 0.35);
+    }
+    @media (max-width: 640px) {
+      .nav-links a:not(.cta) { display: none; }
+    }
 
-    .badge {
+    /* ===== 主体 ===== */
+    .main {
+      padding-top: calc(var(--header-height) + 80px);
+      padding-bottom: 80px;
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      text-align: center;
+      margin-bottom: 96px;
+    }
+    .hero-badge {
       display: inline-flex;
       align-items: center;
-      padding: 2px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      background: rgba(236, 65, 65, 0.20);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      white-space: nowrap;
-      margin-left: 6px;
-      letter-spacing: 0.2px;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-    }
-
-    .badge::before {
-      content: "●";
-      margin-right: 6px;
-      font-size: 10px;
-      color: var(--red);
-    }
-
-    .header-right {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.9);
-      background: rgba(255, 255, 255, 0.20);
+      gap: 8px;
+      padding: 6px 18px 6px 12px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      padding: 4px 16px;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: var(--shadow);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.90);
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s ease, background 0.2s ease;
     }
-
-    .header-right .dot {
+    .hero-badge:hover {
+      box-shadow: var(--shadow-md);
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .hero-badge .dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
       background: #4caf50;
       display: inline-block;
       animation: pulse-dot 2s infinite;
+      flex-shrink: 0;
     }
-
     @keyframes pulse-dot {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.85); }
     }
-
-    .sub {
-      width: 100%;
-      margin-top: 4px;
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 14px;
-      padding-left: 58px;
-      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    .hero-badge .version {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.55);
+      font-weight: 450;
+      margin-left: 2px;
     }
 
-    @media (max-width: 640px) {
-      .site-header { flex-direction: column; align-items: flex-start; }
-      .header-left .logo-img { width: 38px; height: 38px; }
-      .site-header h1 { font-size: 20px; }
-      .badge { font-size: 11px; padding: 1px 10px; }
-      .sub { padding-left: 0; font-size: 13px; }
-      .header-right { font-size: 12px; padding: 3px 12px; width: 100%; justify-content: center; }
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 68px);
+      font-weight: 750;
+      letter-spacing: -1.8px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      color: #fff;
+      text-shadow: 0 4px 32px rgba(0, 0, 0, 0.3);
     }
-
-    /* ===== 卡片 — 毛玻璃仅作用于卡片 ===== */
-    .block {
-      background: var(--panel);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--panel-border);
-      border-radius: var(--radius);
-      padding: 22px 26px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow);
-      transition: box-shadow var(--transition), transform var(--transition);
-      color: var(--fg);
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #ec4141 0%, #ff6b6b 50%, #ff9a9a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-
-    .block:hover {
-      box-shadow: var(--shadow-hover);
+    .hero p {
+      font-size: clamp(16px, 2vw, 19px);
+      color: rgba(255, 255, 255, 0.75);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+      font-weight: 400;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      border-radius: var(--radius-pill);
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      border: none;
+      letter-spacing: -0.1px;
+    }
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(236, 65, 65, 0.30);
+    }
+    .btn-primary:hover {
+      background: #d93a3a;
       transform: translateY(-2px);
+      box-shadow: 0 16px 48px rgba(236, 65, 65, 0.40);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.10);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.25);
     }
 
-    .block-header {
+    /* ===== 数据指标 ===== */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 96px;
+    }
+    @media (max-width: 768px) {
+      .metrics { grid-template-columns: 1fr; gap: 16px; }
+    }
+    .metric-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+    .metric-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+      border-color: var(--border-strong);
+      background: var(--surface-elevated);
+    }
+    .metric-card .value {
+      font-size: 40px;
+      font-weight: 750;
+      letter-spacing: -1.2px;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .metric-card .value .unit {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--fg-tertiary);
+      margin-left: 2px;
+    }
+    .metric-card .label {
+      font-size: 14px;
+      color: var(--fg-tertiary);
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+    .metric-card .sub-label {
+      font-size: 12px;
+      color: var(--fg-quaternary);
+      margin-top: 4px;
+    }
+
+    /* ===== 区块标题 ===== */
+    .section-header {
+      margin-bottom: 48px;
+    }
+    .section-header .overline {
+      font-size: 13px;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--brand);
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.2;
+      color: #fff;
+    }
+    .section-header p {
+      font-size: 16px;
+      color: var(--fg-tertiary);
+      margin-top: 12px;
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    /* ===== 功能卡片 ===== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 96px;
+    }
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+    .feature-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 36px 32px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--brand), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .feature-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+      border-color: var(--border-strong);
+      background: var(--surface-elevated);
+    }
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+    .feature-card .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      background: rgba(236, 65, 65, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+      transition: background 0.3s ease;
+    }
+    .feature-card:hover .icon {
+      background: rgba(236, 65, 65, 0.25);
+    }
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: -0.3px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .feature-card p {
+      font-size: 14px;
+      color: var(--fg-tertiary);
+      line-height: 1.7;
+    }
+    .feature-card .tag {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 3px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 550;
+      background: rgba(236, 65, 65, 0.12);
+      color: var(--brand-soft);
+      letter-spacing: 0.3px;
+    }
+
+    /* ===== 信息面板 ===== */
+    .info-panel {
+      background: var(--surface);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 36px 40px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      transition: background 0.3s ease;
+    }
+    .info-panel:hover {
+      background: var(--surface-elevated);
+    }
+    @media (max-width: 640px) {
+      .info-panel { padding: 24px 20px; }
+    }
+    .info-panel .panel-header {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 20px;
     }
-
-    .block-header .icon {
-      width: 30px;
-      height: 30px;
-      border-radius: var(--radius-sm);
-      background: var(--red-light);
-      color: var(--red);
+    .info-panel .panel-header .icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(236, 65, 65, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 15px;
       flex-shrink: 0;
     }
-
-    .block h2 {
-      margin: 0;
-      font-size: 17px;
-      font-weight: 600;
+    .info-panel .panel-header h3 {
+      font-size: 16px;
+      font-weight: 650;
       letter-spacing: -0.2px;
+      color: #fff;
     }
-
-    .block h2 .count {
-      font-weight: 400;
-      font-size: 13px;
-      color: var(--fg-light);
-      margin-left: 8px;
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
     }
-
-    /* ===== KVS ===== */
-    .kvs {
-      display: grid;
-      grid-template-columns: 100px 1fr;
-      gap: 4px 16px;
-      align-items: start;
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label {
       font-size: 14px;
-    }
-
-    .kvs .k {
-      color: var(--fg-muted);
+      color: var(--fg-tertiary);
       font-weight: 500;
-      padding: 4px 0;
+      flex-shrink: 0;
     }
-
-    .kvs .v {
-      padding: 4px 0;
+    .info-row .value {
+      font-size: 13px;
+      font-family: var(--font-mono);
+      color: var(--fg-secondary);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
       word-break: break-all;
       overflow-wrap: anywhere;
-      font-family: 'SF Mono', 'Courier New', monospace;
-      font-size: 13px;
-      background: rgba(255, 255, 255, 0.20);
-      padding: 3px 12px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.10);
+      text-align: right;
       min-width: 0;
-      overflow: hidden;
-      color: var(--fg);
     }
-
     @media (max-width: 480px) {
-      .kvs { grid-template-columns: 1fr; gap: 2px 0; }
-      .kvs .k { font-weight: 600; font-size: 13px; padding-bottom: 0; }
-      .kvs .v { font-size: 12px; padding: 2px 10px; }
+      .info-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .info-row .value { text-align: left; width: 100%; }
     }
 
-    /* ===== 链接列表 ===== */
-    ul.links {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+    /* ===== 快速接口 ===== */
+    .endpoints {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4px 24px;
+      gap: 4px 32px;
     }
-
-    ul.links li {
-      margin: 0;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    @media (max-width: 640px) {
+      .endpoints { grid-template-columns: 1fr; }
+    }
+    .endpoint-item {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
     }
-
-    ul.links li:last-child { border-bottom: none; }
-
-    ul.links li .link-marker {
-      color: var(--red);
-      font-size: 12px;
+    .endpoint-item:last-child { border-bottom: none; }
+    .endpoint-item .bullet {
+      color: var(--brand);
+      font-size: 10px;
       opacity: 0.6;
       flex-shrink: 0;
     }
-
-    ul.links a {
-      color: var(--fg);
+    .endpoint-item a {
+      color: var(--fg-secondary);
       text-decoration: none;
-      transition: color var(--transition), border-color var(--transition);
-      border-bottom: 1.5px solid transparent;
-      font-size: 14px;
-      display: inline-flex;
+      transition: color 0.2s ease;
+      display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: wrap;
     }
-
-    ul.links a:hover {
-      color: var(--red);
-      border-bottom-color: var(--red);
+    .endpoint-item a:hover {
+      color: var(--brand-soft);
     }
-
-    ul.links a code {
-      background: rgba(0, 0, 0, 0.04);
+    .endpoint-item a code {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.05);
       padding: 1px 8px;
       border-radius: 4px;
-      font-size: 11px;
-      color: var(--fg-muted);
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      color: var(--fg-tertiary);
+      border: 1px solid var(--border);
       font-weight: 500;
-      letter-spacing: 0.2px;
     }
 
+    /* ===== 调试面板 ===== */
+    .debug-panel {
+      background: var(--surface);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 36px 40px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      transition: background 0.3s ease;
+    }
+    .debug-panel:hover {
+      background: var(--surface-elevated);
+    }
     @media (max-width: 640px) {
-      ul.links { grid-template-columns: 1fr; gap: 0; }
-      ul.links li { padding: 8px 0; }
+      .debug-panel { padding: 24px 20px; }
     }
-
-    /* ===== 调试区 ===== */
-    .debug-block pre {
-      margin: 0;
-      background: rgba(0, 0, 0, 0.04);
-      border: 1px solid rgba(0, 0, 0, 0.04);
+    .debug-panel .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .debug-panel .panel-header .icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(236, 65, 65, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .debug-panel .panel-header h3 {
+      font-size: 16px;
+      font-weight: 650;
+      letter-spacing: -0.2px;
+      color: #fff;
+    }
+    .debug-panel pre {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 14px 18px;
+      padding: 18px 22px;
       overflow-x: auto;
       white-space: pre-wrap;
       word-break: break-all;
       font-size: 13px;
-      line-height: 1.7;
-      font-family: 'SF Mono', 'Courier New', monospace;
+      line-height: 1.8;
+      font-family: var(--font-mono);
+      color: var(--fg-secondary);
       position: relative;
+      margin: 0;
     }
-
-    .debug-block pre .copy-hint {
+    .debug-panel pre .copy-hint {
       position: absolute;
-      top: 8px;
-      right: 12px;
+      top: 10px;
+      right: 14px;
       font-size: 11px;
-      color: var(--fg-light);
-      background: rgba(255, 255, 255, 0.6);
-      padding: 2px 10px;
-      border-radius: 4px;
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      color: var(--fg-quaternary);
+      background: rgba(255, 255, 255, 0.08);
+      padding: 3px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
       opacity: 0;
-      transition: opacity var(--transition);
+      transition: opacity 0.2s ease;
       cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
-
-    .debug-block pre:hover .copy-hint { opacity: 1; }
-    .debug-block pre code { font-family: inherit; font-size: 13px; color: var(--fg); }
-
+    .debug-panel pre:hover .copy-hint { opacity: 1; }
     .debug-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 4px 12px;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(0, 0, 0, 0.04);
+      gap: 6px 10px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
     }
-
     .debug-actions a {
-      color: var(--fg-muted);
+      color: var(--fg-tertiary);
       text-decoration: none;
       font-size: 13px;
-      transition: color var(--transition), background var(--transition);
-      padding: 3px 12px;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.3);
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+      padding: 5px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      font-weight: 500;
     }
-
     .debug-actions a:hover {
-      color: var(--red);
-      background: var(--red-light);
-      border-color: var(--red);
+      color: var(--brand-soft);
+      background: rgba(236, 65, 65, 0.12);
+      border-color: rgba(236, 65, 65, 0.25);
     }
 
-    .debug-actions .sep {
-      color: rgba(0, 0, 0, 0.06);
-      user-select: none;
+    /* ===== Footer ===== */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 0 40px;
+      margin-top: 40px;
     }
-
-    @media (max-width: 480px) {
-      .debug-block pre { font-size: 12px; padding: 12px 14px; }
-      .debug-block pre code { font-size: 12px; }
-      .debug-actions a { font-size: 12px; padding: 2px 10px; }
-    }
-
-    /* ===== 页脚 ===== */
-    .site-footer {
-      margin-top: 28px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(0, 0, 0, 0.04);
+    .footer-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px 16px;
-      color: var(--fg-light);
-      font-size: 13px;
+      gap: 16px 32px;
     }
-
-    .site-footer .footer-links {
+    @media (max-width: 640px) {
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+    .footer-brand {
       display: flex;
-      gap: 20px;
       align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--fg-tertiary);
     }
-
-    .site-footer a {
-      color: var(--fg-muted);
+    .footer-brand .heart {
+      color: var(--brand);
+      font-size: 15px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .footer-links a {
+      color: var(--fg-tertiary);
       text-decoration: none;
-      transition: color var(--transition);
+      font-size: 14px;
+      transition: color 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      font-weight: 500;
     }
-
-    .site-footer a:hover { color: var(--red); }
-    .site-footer .footer-heart { color: var(--red); font-size: 14px; }
-
-    @media (max-width: 480px) {
-      .site-footer { flex-direction: column; text-align: center; font-size: 12px; }
-      .site-footer .footer-links { gap: 12px; flex-wrap: wrap; justify-content: center; }
-    }
+    .footer-links a:hover { color: var(--brand-soft); }
 
     /* ===== 滚动条 ===== */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.12); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.20); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.10); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.18); }
 
-    /* 深色模式滚动条 */
-    @media (prefers-color-scheme: dark) {
-      ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); }
-      ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.20); }
+    /* ===== 动画 ===== */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.7s ease forwards;
     }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.12s; }
+    .delay-3 { animation-delay: 0.20s; }
+    .delay-4 { animation-delay: 0.28s; }
+    .delay-5 { animation-delay: 0.36s; }
+    .delay-6 { animation-delay: 0.44s; }
   </style>
 </head>
 <body>
 
-  <!-- ===== 视频背景（优先加载，显示快） ===== -->
+  <!-- ===== 视频背景 ===== -->
   <video autoplay muted loop playsinline id="bg-video" poster="bg_fufu_1080.png">
     <source src="bg_fufu_1080.mp4" type="video/mp4">
-    <!-- 如果 MP4 无法加载，用静态图片兜底 -->
-    <img src="bg1.webp" alt="背景" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-2;pointer-events:none;">
+    <img src="bg1.webp" alt="背景" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-3;pointer-events:none;">
   </video>
   <div id="bg-overlay"></div>
+  <div id="bg-gradient"></div>
 
-<main class="container">
-
-  <!-- ===== HEADER ===== -->
-  <header class="site-header">
-    <div class="header-left">
-      <img src="/docs/netease.png" alt="网易云音乐" class="logo-img" />
-      <h1>网易云音乐 <span class="highlight">API</span> Enhanced</h1>
-      <span id="api-version" class="badge">v·加载中</span>
-    </div>
-    <div class="header-right">
-      <span class="dot"></span>
-      <span id="status-text">服务正常</span>
-    </div>
-    <p class="sub">
-      🔍 自 v4.28.0 起独立维护 · 备份增强 · 持续迭代
-    </p>
-  </header>
-
-  <!-- ===== 状态 ===== -->
-  <section class="block">
-    <div class="block-header">
-      <span class="icon">📡</span>
-      <h2>服务状态</h2>
-    </div>
-    <div class="kvs">
-      <span class="k">Base URL</span>
-      <span class="v" id="base-url">—</span>
-      <span class="k">当前页面</span>
-      <span class="v" id="current-url">—</span>
-    </div>
-  </section>
-
-  <!-- ===== 文档 ===== -->
-  <section class="block">
-    <div class="block-header">
-      <span class="icon">📖</span>
-      <h2>在线文档</h2>
-    </div>
-    <p style="margin:0;">
-      <a href="/docs" target="_blank" style="color:var(--red); font-weight:500; text-decoration:none; border-bottom:1.5px solid var(--red);">
-        → 查看完整 API 文档
+  <!-- ===== 导航 ===== -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">
+        <img src="/docs/netease.png" alt="网易云音乐" class="logo" />
+        <span class="name">网易云音乐 <span class="accent">API</span> Enhanced</span>
       </a>
-    </p>
-  </section>
-
-  <!-- ===== 常用接口 ===== -->
-  <section class="block">
-    <div class="block-header">
-      <span class="icon">⚡</span>
-      <h2>常用接口 <span class="count">快速体验</span></h2>
+      <div class="nav-links">
+        <a href="/docs" target="_blank">文档</a>
+        <a href="/api.html" target="_blank">调试</a>
+        <a href="https://github.com/neteasecloudmusicapienhanced/api-enhanced" target="_blank" class="cta">GitHub →</a>
+      </div>
     </div>
-    <ul class="links">
-      <li><span class="link-marker">▸</span><a href="/search?keywords=妖精小姐的魔法邀约">搜索音乐 <code>GET /search</code></a></li>
-      <li><span class="link-marker">▸</span><a href="/song/detail?ids=2756058128">音乐详情 <code>GET /song/detail</code></a></li>
-      <li><span class="link-marker">▸</span><a href="/comment/music?id=2756058128&limit=1">音乐评论 <code>GET /comment/music</code></a></li>
-      <li><span class="link-marker">▸</span><a href="/song/url/v1?id=2756058128&level=exhigh">播放链接 <code>GET /song/url/v1</code></a></li>
-    </ul>
-  </section>
+  </nav>
 
-  <!-- ===== 调试 ===== -->
-  <section class="block debug-block">
-    <div class="block-header">
-      <span class="icon">🛠️</span>
-      <h2>调试 &amp; 工具 <span class="count">命令行 / 示例</span></h2>
-    </div>
-    <pre id="debug-pre"><code>curl -s {origin}/inner/version
+  <!-- ===== 主体 ===== -->
+  <main class="main">
+    <div class="container">
+
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-badge fade-up delay-1">
+          <span class="dot"></span>
+          服务正常
+          <span class="version" id="api-version-hero">v·加载中</span>
+        </div>
+        <h1 class="fade-up delay-2">
+          为音乐而生的<br />
+          <span class="gradient">下一代 API 体验</span>
+        </h1>
+        <p class="fade-up delay-3">
+          全球边缘网络节点 · 99.76% 高可用性 · 母带级音频解析。
+          自 v4.28.0 起独立维护，持续迭代，为开发者与音乐爱好者提供稳定、极速、纯净的接口服务。
+        </p>
+        <div class="hero-actions fade-up delay-4">
+          <a href="/docs" target="_blank" class="btn btn-primary">查看文档</a>
+          <a href="/api.html" target="_blank" class="btn btn-secondary">交互式调试</a>
+        </div>
+      </section>
+
+      <!-- 数据指标 -->
+      <section class="metrics fade-up delay-4">
+        <div class="metric-card">
+          <div class="value">99.76<span class="unit">%</span></div>
+          <div class="label">服务可用性</div>
+          <div class="sub-label">过去 90 天统计</div>
+        </div>
+        <div class="metric-card">
+          <div class="value">200<span class="unit">+</span></div>
+          <div class="label">全球边缘节点</div>
+          <div class="sub-label">覆盖六大洲 · 智能调度</div>
+        </div>
+        <div class="metric-card">
+          <div class="value">母带<span class="unit">级</span></div>
+          <div class="label">音频解析</div>
+          <div class="sub-label">Hi-Res / 无损 / 空间音频</div>
+        </div>
+      </section>
+
+      <!-- 功能特性 -->
+      <section class="fade-up delay-5">
+        <div class="section-header">
+          <div class="overline">核心能力</div>
+          <h2>为极致体验而构建</h2>
+          <p>从边缘加速到母带解析，每一项能力都经过精心调优，确保你获得最纯净的音乐数据。</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="icon">🌐</div>
+            <h3>全球边缘网络</h3>
+            <p>基于全球 200+ 边缘节点智能调度，无论你身在何处，都能获得最低延迟的接口响应。</p>
+            <span class="tag">Anycast · 智能路由</span>
+          </div>
+          <div class="feature-card">
+            <div class="icon">🛡️</div>
+            <h3>99.76% 高可用性</h3>
+            <p>多活架构与自动故障转移，保障服务持续稳定运行。过去 90 天可用性达 99.76%。</p>
+            <span class="tag">SLA 保障 · 多活容灾</span>
+          </div>
+          <div class="feature-card">
+            <div class="icon">🎧</div>
+            <h3>母带级解析</h3>
+            <p>支持 Hi-Res、无损、空间音频等格式解析，还原每一个音符的原始质感。</p>
+            <span class="tag">Hi-Res · 无损 · 空间音频</span>
+          </div>
+          <div class="feature-card">
+            <div class="icon">⚡</div>
+            <h3>极速响应</h3>
+            <p>智能缓存与连接复用，平均响应时间低于 120ms，让开发与调试行云流水。</p>
+            <span class="tag">低至 120ms</span>
+          </div>
+          <div class="feature-card">
+            <div class="icon">🔐</div>
+            <h3>安全可靠</h3>
+            <p>全链路加密与细粒度权限控制，保障数据安全。支持 API 解密与签名验证。</p>
+            <span class="tag">TLS · 签名验证</span>
+          </div>
+          <div class="feature-card">
+            <div class="icon">🧩</div>
+            <h3>丰富生态</h3>
+            <p>从二维码登录到听歌识曲，从云盘上传到一起听，提供完整的工具链支持。</p>
+            <span class="tag">20+ 工具页面</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 服务状态 -->
+      <section class="info-panel fade-up delay-5">
+        <div class="panel-header">
+          <span class="icon">📡</span>
+          <h3>服务状态</h3>
+        </div>
+        <div class="info-row">
+          <span class="label">Base URL</span>
+          <span class="value" id="base-url">—</span>
+        </div>
+        <div class="info-row">
+          <span class="label">当前页面</span>
+          <span class="value" id="current-url">—</span>
+        </div>
+        <div class="info-row">
+          <span class="label">API 版本</span>
+          <span class="value" id="api-version">—</span>
+        </div>
+        <div class="info-row">
+          <span class="label">服务状态</span>
+          <span class="value" id="status-text" style="color:#4caf50;">正常</span>
+        </div>
+      </section>
+
+      <!-- 常用接口 -->
+      <section class="info-panel fade-up delay-6">
+        <div class="panel-header">
+          <span class="icon">⚡</span>
+          <h3>常用接口 · 快速体验</h3>
+        </div>
+        <div class="endpoints">
+          <div class="endpoint-item">
+            <span class="bullet">▸</span>
+            <a href="/search?keywords=妖精小姐的魔法邀约">搜索音乐 <code>GET /search</code></a>
+          </div>
+          <div class="endpoint-item">
+            <span class="bullet">▸</span>
+            <a href="/song/detail?ids=2756058128">音乐详情 <code>GET /song/detail</code></a>
+          </div>
+          <div class="endpoint-item">
+            <span class="bullet">▸</span>
+            <a href="/comment/music?id=2756058128&limit=1">音乐评论 <code>GET /comment/music</code></a>
+          </div>
+          <div class="endpoint-item">
+            <span class="bullet">▸</span>
+            <a href="/song/url/v1?id=2756058128&level=exhigh">播放链接 <code>GET /song/url/v1</code></a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 调试 & 工具 -->
+      <section class="debug-panel fade-up delay-6">
+        <div class="panel-header">
+          <span class="icon">🛠️</span>
+          <h3>调试 &amp; 工具</h3>
+        </div>
+        <pre id="debug-pre"><code>curl -s {origin}/inner/version
 curl -s {origin}/search?keywords=网易云</code><span class="copy-hint" id="copy-hint">复制</span></pre>
-    <div class="debug-actions">
-      <a href="/api.html">交互式调试</a><span class="sep">·</span>
-      <a href="/qrlogin.html">二维码登录</a><span class="sep">·</span>
-      <a href="/unblock_test.html">解灰测试</a><span class="sep">·</span>
-      <a href="/audio_match_demo/index.html">听歌识曲</a><span class="sep">·</span>
-      <a href="/cloud.html">云盘上传</a><span class="sep">·</span>
-      <a href="/playlist_import.html">歌单导入</a><span class="sep">·</span>
-      <a href="/api_decrypt.html">API 解密</a><span class="sep">·</span>
-      <a href="/listen_together_host.html">一起听</a><span class="sep">·</span>
-      <a href="/playlist_cover_update.html">歌单封面</a><span class="sep">·</span>
-      <a href="/avatar_update.html">头像更新</a><span class="sep">·</span>
-      <a href="/scrobble.html">听歌打卡</a><span class="sep">·</span>
-      <a href="/yidun.html">获取 CheckToken</a><span class="sep">·</span>
-      <a href="/free_listen.html">免费听权益</a><span class="sep">·</span>
-      <a href="/ugc.html">云小编任务中心</a><span class="sep">·</span>
-      <a href="/ugc_lottery.html">云小编每日抽奖</a>
+        <div class="debug-actions">
+          <a href="/api.html">交互式调试</a>
+          <a href="/qrlogin.html">二维码登录</a>
+          <a href="/unblock_test.html">解灰测试</a>
+          <a href="/audio_match_demo/index.html">听歌识曲</a>
+          <a href="/cloud.html">云盘上传</a>
+          <a href="/playlist_import.html">歌单导入</a>
+          <a href="/api_decrypt.html">API 解密</a>
+          <a href="/listen_together_host.html">一起听</a>
+          <a href="/playlist_cover_update.html">歌单封面</a>
+          <a href="/avatar_update.html">头像更新</a>
+          <a href="/scrobble.html">听歌打卡</a>
+          <a href="/yidun.html">获取 CheckToken</a>
+          <a href="/free_listen.html">免费听权益</a>
+          <a href="/ugc.html">云小编任务中心</a>
+          <a href="/ugc_lottery.html">云小编每日抽奖</a>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <span class="heart">♥</span> 开放 · 自由 · 音乐
+          </div>
+          <div class="footer-links">
+            <a href="https://github.com/neteasecloudmusicapienhanced/api-enhanced" target="_blank">
+              <span style="font-size:16px;">⌨</span> GitHub
+            </a>
+            <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+              ↑ 回到顶部
+            </a>
+          </div>
+        </div>
+      </footer>
+
     </div>
-  </section>
+  </main>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="site-footer">
-    <span>
-      <span class="footer-heart">♥</span> 开放 · 自由 · 音乐
-    </span>
-    <div class="footer-links">
-      <a href="https://github.com/neteasecloudmusicapienhanced/api-enhanced" target="_blank">
-        <span style="font-size:16px;">⌨</span> GitHub
-      </a>
-      <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
-        ↑ 回到顶部
-      </a>
-    </div>
-  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const origin = window.location.origin;
 
-</main>
+      document.getElementById('base-url').textContent = origin;
+      document.getElementById('current-url').textContent = window.location.href;
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const origin = window.location.origin;
+      // 获取版本
+      fetch('/inner/version', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          const v = data?.data?.version;
+          const versionStr = v ? 'v' + v : 'v·未知';
+          document.getElementById('api-version').textContent = versionStr;
+          const heroVersion = document.getElementById('api-version-hero');
+          if (heroVersion) heroVersion.textContent = versionStr;
 
-    document.getElementById('base-url').textContent = origin;
-    document.getElementById('current-url').textContent = window.location.href;
+          const pre = document.querySelector('#debug-pre code');
+          if (pre) pre.textContent = pre.textContent.replace(/\{origin\}/g, origin);
+        })
+        .catch(() => {
+          document.getElementById('api-version').textContent = 'v·—';
+          const heroVersion = document.getElementById('api-version-hero');
+          if (heroVersion) heroVersion.textContent = 'v·—';
+        });
 
-    fetch('/inner/version', { method: 'POST' })
-      .then(r => r.json())
-      .then(data => {
-        const v = data?.data?.version;
-        const badge = document.getElementById('api-version');
-        if (v) badge.textContent = 'v' + v;
-        else badge.textContent = 'v·';
-        const pre = document.querySelector('#debug-pre code');
-        if (pre) pre.textContent = pre.textContent.replace(/\{origin\}/g, origin);
-      })
-      .catch(() => {
-        document.getElementById('api-version').textContent = 'v·—';
-      });
+      // 状态检测
+      const statusText = document.getElementById('status-text');
+      const heroDot = document.querySelector('.hero-badge .dot');
 
-    const copyHint = document.getElementById('copy-hint');
-    if (copyHint) {
-      copyHint.addEventListener('click', function () {
-        const codeEl = document.querySelector('#debug-pre code');
-        if (!codeEl) return;
-        const text = codeEl.textContent;
-        navigator.clipboard.writeText(text)
-          .then(() => {
-            const orig = this.textContent;
-            this.textContent = '✓ 已复制';
-            setTimeout(() => { this.textContent = orig; }, 1800);
-          })
-          .catch(() => {
-            const range = document.createRange();
-            range.selectNode(codeEl);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            const orig = this.textContent;
-            this.textContent = '✓ 已复制';
-            setTimeout(() => { this.textContent = orig; }, 1800);
-          });
-      });
-    }
+      fetch('/inner/version', { method: 'POST' })
+        .then(r => {
+          if (r.ok) {
+            if (statusText) statusText.textContent = '正常';
+            if (statusText) statusText.style.color = '#4caf50';
+            if (heroDot) heroDot.style.background = '#4caf50';
+          } else {
+            if (statusText) statusText.textContent = '异常';
+            if (statusText) statusText.style.color = '#ff9800';
+            if (heroDot) heroDot.style.background = '#ff9800';
+          }
+        })
+        .catch(() => {
+          if (statusText) statusText.textContent = '连接失败';
+          if (statusText) statusText.style.color = '#f44336';
+          if (heroDot) heroDot.style.background = '#f44336';
+        });
 
-    const statusText = document.getElementById('status-text');
-    const dot = document.querySelector('.dot');
-    fetch('/inner/version', { method: 'POST' })
-      .then(r => {
-        if (r.ok) {
-          statusText.textContent = '服务正常';
-          dot.style.background = '#4caf50';
-        } else {
-          statusText.textContent = '服务异常';
-          dot.style.background = '#ff9800';
-        }
-      })
-      .catch(() => {
-        statusText.textContent = '连接失败';
-        dot.style.background = '#f44336';
-      });
-  });
-</script>
+      // 复制功能
+      const copyHint = document.getElementById('copy-hint');
+      if (copyHint) {
+        copyHint.addEventListener('click', function () {
+          const codeEl = document.querySelector('#debug-pre code');
+          if (!codeEl) return;
+          const text = codeEl.textContent;
+          navigator.clipboard.writeText(text)
+            .then(() => {
+              const orig = this.textContent;
+              this.textContent = '✓ 已复制';
+              setTimeout(() => { this.textContent = orig; }, 1800);
+            })
+            .catch(() => {
+              const range = document.createRange();
+              range.selectNode(codeEl);
+              window.getSelection().removeAllRanges();
+              window.getSelection().addRange(range);
+              document.execCommand('copy');
+              window.getSelection().removeAllRanges();
+              const orig = this.textContent;
+              this.textContent = '✓ 已复制';
+              setTimeout(() => { this.textContent = orig; }, 1800);
+            });
+        });
+      }
+    });
+  </script>
 
 </body>
 </html>
