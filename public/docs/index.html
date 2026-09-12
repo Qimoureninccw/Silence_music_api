@@ -64,16 +64,20 @@
       margin: 0; padding: 0;
     }
 
-    /* ===== 彻底隐藏 coverpage（双保险） ===== */
     .cover,
-    section.cover {
-      display: none !important;
-    }
+    section.cover { display: none !important; }
 
     .sidebar, .content, .app-nav { background: transparent !important; }
 
-    /* ===== 侧边栏 ===== */
+    /* ===== 侧边栏：固定定位 + 独立滚动 ===== */
     .sidebar {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      bottom: 0 !important;
+      width: 300px !important;
+      height: 100vh !important;
+      overflow-y: auto !important;
       background: rgba(10, 10, 15, 0.78) !important;
       backdrop-filter: blur(24px) saturate(180%) !important;
       -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
@@ -81,8 +85,6 @@
       padding-top: 24px !important;
       box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25) !important;
       z-index: 50 !important;
-      /* 侧边栏内部独立滚动，不随主内容滚动 */
-      overflow-y: auto !important;
     }
     .sidebar .app-name {
       padding: 0 24px 20px !important;
@@ -111,7 +113,7 @@
       background-position: center;
     }
 
-    .sidebar-nav { padding: 16px 12px !important; }
+    .sidebar-nav { padding: 16px 12px 32px !important; }
     .sidebar-nav ul { margin: 0 !important; padding: 0 !important; list-style: none !important; }
     .sidebar-nav li { margin: 2px 0 !important; }
     .sidebar-nav a {
@@ -146,18 +148,25 @@
       bottom: 24px !important;
       left: 20px !important;
       box-shadow: var(--shadow-md) !important;
+      z-index: 60 !important;
     }
     .sidebar-toggle span { background: #fff !important; }
 
     /* ===== 主内容区 ===== */
     .content {
+      margin-left: 300px !important;
       padding-top: 80px !important;
       background: transparent !important;
+    }
+    @media (max-width: 768px) {
+      .content { margin-left: 0 !important; }
     }
 
     .app-nav {
       position: fixed !important;
-      top: 0 !important; left: 0 !important; right: 0 !important;
+      top: 0 !important;
+      left: 300px !important;
+      right: 0 !important;
       height: 64px !important;
       background: rgba(10, 10, 15, 0.60) !important;
       backdrop-filter: blur(20px) saturate(180%) !important;
@@ -169,6 +178,9 @@
       align-items: center !important;
       justify-content: flex-end !important;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15) !important;
+    }
+    @media (max-width: 768px) {
+      .app-nav { left: 0 !important; }
     }
     .app-nav a {
       color: var(--fg-tertiary) !important;
@@ -185,7 +197,6 @@
       background: rgba(255, 255, 255, 0.08) !important;
     }
 
-    /* ===== Markdown 内容卡片 ===== */
     .markdown-section {
       background: var(--surface) !important;
       backdrop-filter: blur(24px) saturate(160%) !important;
@@ -334,7 +345,7 @@
       box-shadow: var(--shadow-sm) !important;
     }
 
-    /* ===== 搜索框（结果字体压小，弱化 md 符号） ===== */
+    /* ===== 搜索 ===== */
     .search {
       border-bottom: 1px solid var(--border) !important;
       padding: 16px 20px !important;
@@ -389,12 +400,10 @@
       color: var(--fg-tertiary) !important;
       font-size: 12px !important;
       line-height: 1.55 !important;
-      /* 弱化 md 原文符号的视觉冲击 */
       opacity: 0.8;
       white-space: normal !important;
       word-break: break-word !important;
     }
-    /* 高亮匹配词 */
     .search .matching-post .content em,
     .search .matching-post .title em {
       font-style: normal !important;
@@ -404,7 +413,6 @@
       padding: 0 2px !important;
     }
 
-    /* ===== 分页 ===== */
     .docsify-pagination-container {
       border-top: 1px solid var(--border) !important;
       margin-top: 40px !important;
@@ -438,7 +446,6 @@
       margin-bottom: 4px !important;
     }
 
-    /* ===== 主题切换按钮 ===== */
     .theme-toggle {
       position: fixed;
       bottom: 24px; right: 24px;
@@ -635,19 +642,17 @@
   window.$docsify = {
     name: '网易云音乐 API Enhanced',
     repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
-    /* ✅ 已删除 coverpage: true —— 不再渲染封面页 */
     homepage: 'home.md',
     loadSidebar: true,
     subMaxLevel: 3,
     maxLevel: 4,
-    auto2top: true,          /* 路由切换时自动滚到顶部 */
+    auto2top: false,   /* ← 关掉 Docsify 自带的回顶，改用我们自己的逻辑 */
     notFoundPage: false,
     search: {
       placeholder: '搜索文档...',
       noData: '没有找到结果',
       depth: 3,
       maxAge: 86400000,
-      /* 限制搜索范围，减少 md 原文干扰（仅搜 home.md） */
       paths: ['home.md']
     },
     pagination: {
@@ -656,20 +661,59 @@
       crossChapter: true
     },
     themeColor: '#ec4141',
-    /* 每次路由变化后：主内容滚顶 + 侧边栏滚顶 */
     plugins: [
       function(hook) {
+        /* 工具：把 hash 解析成 DOM 元素并滚动过去 */
+        function scrollToHash(hash, smooth) {
+          if (!hash || hash === '#' || hash === '#/') return false;
+          // 去掉开头的 #、#/、?id= 等前缀，取出真正的锚点 id
+          var raw = hash.replace(/^#\/?/, '');
+          // Docsify 首页锚点可能是 /?id=xxx 形式
+          var idMatch = raw.match(/[?&]id=([^&]+)/);
+          var id = idMatch ? decodeURIComponent(idMatch[1]) : decodeURIComponent(raw);
+          if (!id) return false;
+
+          var el = document.getElementById(id);
+          if (!el) {
+            // 兜底：用属性选择器再找一次
+            try {
+              el = document.querySelector('[id="' + id.replace(/"/g, '\\"') + '"]');
+            } catch (e) { el = null; }
+          }
+          if (el) {
+            var top = el.getBoundingClientRect().top + window.pageYOffset - 80;
+            window.scrollTo({ top: top, behavior: smooth ? 'smooth' : 'auto' });
+            return true;
+          }
+          return false;
+        }
+
+        // 每次内容渲染完成后
         hook.doneEach(function() {
-          // 1. 主内容区滚到顶部
+          var hash = window.location.hash;
+          if (hash && hash.length > 1 && hash !== '#/' && hash !== '#') {
+            // 有锚点：延迟一帧等 DOM 稳定，然后滚到目标
+            setTimeout(function() {
+              var ok = scrollToHash(hash, false);
+              if (!ok) {
+                var content = document.querySelector('.content');
+                if (content) content.scrollTop = 0;
+                window.scrollTo({ top: 0, behavior: 'auto' });
+              }
+            }, 0);
+            return;
+          }
+          // 没有锚点（首页/路由切换）：回顶
           var content = document.querySelector('.content');
           if (content) content.scrollTop = 0;
-          // 2. 页面整体滚到顶部（保险）
-          if (window.scrollY > 0) {
-            window.scrollTo({ top: 0, behavior: 'auto' });
-          }
-          // 3. 侧边栏自身滚到顶部
-          var sidebar = document.querySelector('.sidebar');
-          if (sidebar) sidebar.scrollTop = 0;
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+
+        // 用户点击侧边栏/搜索结果时，hash 变化触发这里
+        window.addEventListener('hashchange', function() {
+          setTimeout(function() {
+            scrollToHash(window.location.hash, true);
+          }, 30);
         });
       }
     ]
