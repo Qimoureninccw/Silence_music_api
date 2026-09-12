@@ -1,4 +1,4 @@
-- [NeteaseCloudMusicApiEnhanced](#neteasecloudmusicapienhanced)
+- [SilenceMusicAPI](#SilenceMusicAPI)
   - [灵感来自](#灵感来自)
   - [工作原理](#工作原理)
   - [安装](#安装)
