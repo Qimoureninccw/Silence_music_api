@@ -1,741 +1,825 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js">
-  <meta name="description" content="网易云音乐 NodeJS API Enhanced · 全球边缘网络 · 母带解析">
-  <title>网易云音乐 NodeJS API Enhanced · 文档</title>
-  <link rel="icon" href="netease.png">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta name="referrer" content="never">
-  <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css">
-
-  <style>
-    :root {
-      --brand: #ec4141;
-      --brand-soft: #ff6b6b;
-      --bg: #0a0a0f;
-      --surface: rgba(18, 18, 26, 0.72);
-      --surface-elevated: rgba(26, 26, 36, 0.82);
-      --border: rgba(255, 255, 255, 0.06);
-      --border-strong: rgba(255, 255, 255, 0.10);
-      --fg: #f0f0f5;
-      --fg-secondary: #c8c8d8;
-      --fg-tertiary: #8e8ea0;
-      --fg-quaternary: #5e5e72;
-      --radius-card: 20px;
-      --radius-sm: 10px;
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
-      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-      --font-mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
-    }
-
-    #bg-video {
-      position: fixed; top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      object-fit: cover;
-      z-index: -3; pointer-events: none;
-    }
-    #bg-overlay {
-      position: fixed; inset: 0;
-      z-index: -2;
-      background: rgba(0, 0, 0, 0.55);
-      pointer-events: none;
-    }
-    #bg-gradient {
-      position: fixed; inset: 0;
-      z-index: -1;
-      background: linear-gradient(180deg,
-        rgba(10,10,15,0.35) 0%,
-        rgba(10,10,15,0.55) 40%,
-        rgba(10,10,15,0.85) 100%);
-      pointer-events: none;
-    }
-
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      background: transparent !important;
-      color: var(--fg) !important;
-      font-family: var(--font-sans) !important;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      margin: 0; padding: 0;
-    }
-
-    .cover,
-    section.cover { display: none !important; }
-
-    .sidebar, .content, .app-nav { background: transparent !important; }
-
-    /* ===== 侧边栏：固定定位 + 独立滚动 ===== */
-    .sidebar {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      bottom: 0 !important;
-      width: 300px !important;
-      height: 100vh !important;
-      overflow-y: auto !important;
-      background: rgba(10, 10, 15, 0.78) !important;
-      backdrop-filter: blur(24px) saturate(180%) !important;
-      -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-      border-right: 1px solid var(--border) !important;
-      padding-top: 24px !important;
-      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25) !important;
-      z-index: 50 !important;
-    }
-    .sidebar .app-name {
-      padding: 0 24px 20px !important;
-      margin: 0 !important;
-      border-bottom: 1px solid var(--border) !important;
-    }
-    .sidebar .app-name-link {
-      color: #fff !important;
-      font-size: 17px !important;
-      font-weight: 700 !important;
-      letter-spacing: -0.3px !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 10px !important;
-      text-decoration: none !important;
-    }
-    .sidebar .app-name-link::before {
-      content: '';
-      width: 30px; height: 30px;
-      border-radius: 8px;
-      background: var(--brand);
-      flex-shrink: 0;
-      box-shadow: 0 2px 12px rgba(236, 65, 65, 0.35);
-      background-image: url('netease.png');
-      background-size: cover;
-      background-position: center;
-    }
-
-    .sidebar-nav { padding: 16px 12px 32px !important; }
-    .sidebar-nav ul { margin: 0 !important; padding: 0 !important; list-style: none !important; }
-    .sidebar-nav li { margin: 2px 0 !important; }
-    .sidebar-nav a {
-      color: var(--fg-tertiary) !important;
-      font-size: 14px !important;
-      font-weight: 500 !important;
-      padding: 9px 14px !important;
-      border-radius: 8px !important;
-      transition: all 0.2s ease !important;
-      display: block !important;
-      text-decoration: none !important;
-      border-left: 3px solid transparent !important;
-    }
-    .sidebar-nav a:hover {
-      color: #fff !important;
-      background: rgba(255, 255, 255, 0.06) !important;
-    }
-    .sidebar-nav a.active {
-      color: #fff !important;
-      background: rgba(236, 65, 65, 0.12) !important;
-      border-left-color: var(--brand) !important;
-      font-weight: 600 !important;
-    }
-
-    .sidebar-toggle {
-      background: rgba(10, 10, 15, 0.80) !important;
-      backdrop-filter: blur(16px) !important;
-      -webkit-backdrop-filter: blur(16px) !important;
-      border: 1px solid var(--border-strong) !important;
-      border-radius: 50% !important;
-      padding: 10px !important;
-      bottom: 24px !important;
-      left: 20px !important;
-      box-shadow: var(--shadow-md) !important;
-      z-index: 60 !important;
-    }
-    .sidebar-toggle span { background: #fff !important; }
-
-    /* ===== 主内容区 ===== */
-    .content {
-      margin-left: 300px !important;
-      padding-top: 80px !important;
-      background: transparent !important;
-    }
-    @media (max-width: 768px) {
-      .content { margin-left: 0 !important; }
-    }
-
-    .app-nav {
-      position: fixed !important;
-      top: 0 !important;
-      left: 300px !important;
-      right: 0 !important;
-      height: 64px !important;
-      background: rgba(10, 10, 15, 0.60) !important;
-      backdrop-filter: blur(20px) saturate(180%) !important;
-      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-      border-bottom: 1px solid var(--border) !important;
-      z-index: 100 !important;
-      padding: 0 32px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: flex-end !important;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15) !important;
-    }
-    @media (max-width: 768px) {
-      .app-nav { left: 0 !important; }
-    }
-    .app-nav a {
-      color: var(--fg-tertiary) !important;
-      font-size: 14px !important;
-      font-weight: 500 !important;
-      padding: 8px 16px !important;
-      border-radius: 100px !important;
-      transition: all 0.2s ease !important;
-      text-decoration: none !important;
-      margin-left: 4px !important;
-    }
-    .app-nav a:hover {
-      color: #fff !important;
-      background: rgba(255, 255, 255, 0.08) !important;
-    }
-
-    .markdown-section {
-      background: var(--surface) !important;
-      backdrop-filter: blur(24px) saturate(160%) !important;
-      -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
-      border: 1px solid var(--border) !important;
-      border-radius: var(--radius-card) !important;
-      padding: 48px 52px !important;
-      margin: 24px auto 48px !important;
-      max-width: 880px !important;
-      box-shadow: var(--shadow-md) !important;
-      color: var(--fg) !important;
-    }
-    @media (max-width: 768px) {
-      .markdown-section {
-        padding: 28px 20px !important;
-        margin: 16px 12px 32px !important;
-        border-radius: 16px !important;
-      }
-    }
-
-    .markdown-section h1,
-    .markdown-section h2,
-    .markdown-section h3,
-    .markdown-section h4,
-    .markdown-section h5,
-    .markdown-section h6 {
-      color: #fff !important;
-      font-weight: 700 !important;
-      letter-spacing: -0.5px !important;
-      line-height: 1.3 !important;
-      margin-top: 1.8em !important;
-      margin-bottom: 0.6em !important;
-      scroll-margin-top: 80px !important;
-    }
-    .markdown-section h1 {
-      font-size: 32px !important;
-      letter-spacing: -0.8px !important;
-      padding-bottom: 16px !important;
-      border-bottom: 1px solid var(--border) !important;
-      margin-top: 0 !important;
-    }
-    .markdown-section h2 {
-      font-size: 24px !important;
-      padding-bottom: 10px !important;
-      border-bottom: 1px solid var(--border) !important;
-    }
-    .markdown-section h3 { font-size: 19px !important; }
-    .markdown-section h4 { font-size: 16px !important; }
-
-    .markdown-section p {
-      color: var(--fg-secondary) !important;
-      font-size: 15px !important;
-      line-height: 1.85 !important;
-      margin: 1em 0 !important;
-    }
-    .markdown-section a {
-      color: var(--brand-soft) !important;
-      text-decoration: none !important;
-      border-bottom: 1px solid rgba(255, 107, 107, 0.3) !important;
-      transition: all 0.2s ease !important;
-      font-weight: 500 !important;
-    }
-    .markdown-section a:hover {
-      color: #fff !important;
-      border-bottom-color: var(--brand) !important;
-    }
-    .markdown-section strong { color: #fff !important; font-weight: 650 !important; }
-    .markdown-section ul,
-    .markdown-section ol {
-      color: var(--fg-secondary) !important;
-      padding-left: 1.6em !important;
-      margin: 1em 0 !important;
-    }
-    .markdown-section li { margin: 6px 0 !important; line-height: 1.7 !important; }
-    .markdown-section li::marker { color: var(--brand) !important; }
-
-    .markdown-section blockquote {
-      background: rgba(236, 65, 65, 0.06) !important;
-      border-left: 3px solid var(--brand) !important;
-      border-radius: 0 8px 8px 0 !important;
-      padding: 14px 20px !important;
-      margin: 1.2em 0 !important;
-      color: var(--fg-secondary) !important;
-    }
-    .markdown-section blockquote p { margin: 0 !important; color: var(--fg-secondary) !important; }
-
-    .markdown-section code {
-      font-family: var(--font-mono) !important;
-      font-size: 13px !important;
-      background: rgba(255, 255, 255, 0.06) !important;
-      color: #ff9a9a !important;
-      padding: 3px 8px !important;
-      border-radius: 6px !important;
-      border: 1px solid var(--border) !important;
-    }
-    .markdown-section pre {
-      background: rgba(0, 0, 0, 0.40) !important;
-      border: 1px solid var(--border) !important;
-      border-radius: var(--radius-sm) !important;
-      padding: 20px 24px !important;
-      margin: 1.4em 0 !important;
-      overflow-x: auto !important;
-    }
-    .markdown-section pre code {
-      background: transparent !important;
-      border: none !important;
-      padding: 0 !important;
-      color: var(--fg-secondary) !important;
-      font-size: 13px !important;
-      line-height: 1.75 !important;
-    }
-
-    .markdown-section table {
-      width: 100% !important;
-      border-collapse: collapse !important;
-      margin: 1.6em 0 !important;
-      border-radius: var(--radius-sm) !important;
-      overflow: hidden !important;
-      box-shadow: 0 0 0 1px var(--border) !important;
-      font-size: 14px !important;
-    }
-    .markdown-section table th {
-      background: rgba(255, 255, 255, 0.05) !important;
-      color: #fff !important;
-      font-weight: 650 !important;
-      padding: 12px 18px !important;
-      text-align: left !important;
-      border-bottom: 1px solid var(--border-strong) !important;
-    }
-    .markdown-section table td {
-      padding: 11px 18px !important;
-      color: var(--fg-secondary) !important;
-      border-bottom: 1px solid var(--border) !important;
-    }
-    .markdown-section table tr:last-child td { border-bottom: none !important; }
-    .markdown-section table tr:hover td { background: rgba(255, 255, 255, 0.02) !important; }
-
-    .markdown-section hr {
-      border: none !important;
-      border-top: 1px solid var(--border) !important;
-      margin: 2.4em 0 !important;
-    }
-    .markdown-section img {
-      max-width: 100% !important;
-      border-radius: var(--radius-sm) !important;
-      box-shadow: var(--shadow-sm) !important;
-    }
-
-    /* ===== 搜索 ===== */
-    .search {
-      border-bottom: 1px solid var(--border) !important;
-      padding: 16px 20px !important;
-      margin-bottom: 8px !important;
-    }
-    .search input {
-      background: rgba(255, 255, 255, 0.06) !important;
-      border: 1px solid var(--border) !important;
-      border-radius: 100px !important;
-      color: #fff !important;
-      padding: 10px 18px !important;
-      font-size: 14px !important;
-      width: 100% !important;
-      outline: none !important;
-      transition: all 0.2s ease !important;
-    }
-    .search input:focus {
-      border-color: rgba(236, 65, 65, 0.4) !important;
-      background: rgba(255, 255, 255, 0.09) !important;
-      box-shadow: 0 0 0 3px rgba(236, 65, 65, 0.10) !important;
-    }
-    .search input::placeholder { color: var(--fg-quaternary) !important; }
-
-    .search .results-panel {
-      background: rgba(18, 18, 26, 0.96) !important;
-      backdrop-filter: blur(24px) !important;
-      -webkit-backdrop-filter: blur(24px) !important;
-      border: 1px solid var(--border-strong) !important;
-      border-radius: var(--radius-sm) !important;
-      box-shadow: var(--shadow-md) !important;
-    }
-    .search .matching-post {
-      border-bottom: 1px solid var(--border) !important;
-      padding: 10px 14px !important;
-    }
-    .search .matching-post:hover {
-      background: rgba(255, 255, 255, 0.04) !important;
-    }
-    .search .matching-post a {
-      color: var(--fg-secondary) !important;
-      font-size: 13px !important;
-      line-height: 1.6 !important;
-    }
-    .search .matching-post a:hover { color: #fff !important; }
-    .search .matching-post .title {
-      color: #fff !important;
-      font-weight: 600 !important;
-      font-size: 13px !important;
-      margin-bottom: 2px !important;
-    }
-    .search .matching-post .content {
-      color: var(--fg-tertiary) !important;
-      font-size: 12px !important;
-      line-height: 1.55 !important;
-      opacity: 0.8;
-      white-space: normal !important;
-      word-break: break-word !important;
-    }
-    .search .matching-post .content em,
-    .search .matching-post .title em {
-      font-style: normal !important;
-      color: var(--brand-soft) !important;
-      background: rgba(236, 65, 65, 0.10) !important;
-      border-radius: 3px !important;
-      padding: 0 2px !important;
-    }
-
-    .docsify-pagination-container {
-      border-top: 1px solid var(--border) !important;
-      margin-top: 40px !important;
-      padding-top: 24px !important;
-      display: flex !important;
-      justify-content: space-between !important;
-      gap: 16px !important;
-    }
-    .pagination-item {
-      background: rgba(255, 255, 255, 0.04) !important;
-      border: 1px solid var(--border) !important;
-      border-radius: var(--radius-sm) !important;
-      padding: 14px 20px !important;
-      transition: all 0.2s ease !important;
-      flex: 1 !important;
-      text-decoration: none !important;
-    }
-    .pagination-item:hover {
-      background: rgba(255, 255, 255, 0.08) !important;
-      border-color: var(--border-strong) !important;
-      transform: translateY(-2px) !important;
-    }
-    .pagination-item .pagination-item-title {
-      color: #fff !important;
-      font-size: 15px !important;
-      font-weight: 600 !important;
-    }
-    .pagination-item .pagination-item-label {
-      color: var(--fg-tertiary) !important;
-      font-size: 12px !important;
-      margin-bottom: 4px !important;
-    }
-
-    .theme-toggle {
-      position: fixed;
-      bottom: 24px; right: 24px;
-      z-index: 999;
-      width: 46px; height: 46px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(30, 30, 46, 0.75);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-md);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      outline: none;
-      padding: 0;
-      line-height: 1;
-      user-select: none;
-    }
-    .theme-toggle:hover {
-      transform: scale(1.12) rotate(12deg);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-      background: rgba(40, 40, 60, 0.85);
-    }
-    .theme-toggle:active { transform: scale(0.92); }
-    .theme-toggle.light {
-      background: rgba(255, 255, 255, 0.85);
-      color: #333;
-      border-color: rgba(0, 0, 0, 0.08);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
-    }
-    .theme-toggle.light:hover { background: rgba(255, 255, 255, 0.95); }
-
-    /* ===== 浅色模式 ===== */
-    body.light-mode .markdown-section {
-      background: rgba(255, 255, 255, 0.90) !important;
-      border-color: rgba(0, 0, 0, 0.06) !important;
-    }
-    body.light-mode .markdown-section h1,
-    body.light-mode .markdown-section h2,
-    body.light-mode .markdown-section h3,
-    body.light-mode .markdown-section h4,
-    body.light-mode .markdown-section h5,
-    body.light-mode .markdown-section h6,
-    body.light-mode .markdown-section strong { color: #111118 !important; }
-    body.light-mode .markdown-section p,
-    body.light-mode .markdown-section li,
-    body.light-mode .markdown-section td { color: #3d3d4e !important; }
-    body.light-mode .markdown-section code {
-      background: rgba(0, 0, 0, 0.05) !important;
-      color: #d93a3a !important;
-      border-color: rgba(0, 0, 0, 0.06) !important;
-    }
-    body.light-mode .markdown-section pre {
-      background: rgba(0, 0, 0, 0.04) !important;
-      border-color: rgba(0, 0, 0, 0.06) !important;
-    }
-    body.light-mode .markdown-section pre code { color: #3d3d4e !important; }
-    body.light-mode .markdown-section blockquote {
-      background: rgba(236, 65, 65, 0.05) !important;
-      color: #3d3d4e !important;
-    }
-    body.light-mode .markdown-section blockquote p { color: #3d3d4e !important; }
-    body.light-mode .sidebar {
-      background: rgba(250, 250, 252, 0.90) !important;
-      border-right-color: rgba(0, 0, 0, 0.06) !important;
-    }
-    body.light-mode .sidebar .app-name-link { color: #111118 !important; }
-    body.light-mode .sidebar-nav a { color: #7e7e92 !important; }
-    body.light-mode .sidebar-nav a:hover {
-      color: #111118 !important;
-      background: rgba(0, 0, 0, 0.04) !important;
-    }
-    body.light-mode .sidebar-nav a.active {
-      color: #111118 !important;
-      background: rgba(236, 65, 65, 0.08) !important;
-    }
-    body.light-mode .app-nav {
-      background: rgba(250, 250, 252, 0.75) !important;
-      border-bottom-color: rgba(0, 0, 0, 0.06) !important;
-    }
-    body.light-mode .app-nav a { color: #7e7e92 !important; }
-    body.light-mode .app-nav a:hover {
-      color: #111118 !important;
-      background: rgba(0, 0, 0, 0.04) !important;
-    }
-    body.light-mode .search input {
-      background: rgba(0, 0, 0, 0.04) !important;
-      border-color: rgba(0, 0, 0, 0.06) !important;
-      color: #111118 !important;
-    }
-    body.light-mode .search input::placeholder { color: #aeaec0 !important; }
-    body.light-mode .search .results-panel {
-      background: rgba(255, 255, 255, 0.98) !important;
-    }
-    body.light-mode .search .matching-post .title { color: #111118 !important; }
-    body.light-mode .search .matching-post a { color: #3d3d4e !important; }
-    body.light-mode .search .matching-post .content { color: #7e7e92 !important; }
-    body.light-mode .markdown-section table th {
-      background: rgba(0, 0, 0, 0.03) !important;
-      color: #111118 !important;
-      border-bottom-color: rgba(0, 0, 0, 0.08) !important;
-    }
-    body.light-mode .markdown-section table td { border-bottom-color: rgba(0, 0, 0, 0.05) !important; }
-    body.light-mode .markdown-section table { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06) !important; }
-    body.light-mode .markdown-section hr { border-top-color: rgba(0, 0, 0, 0.06) !important; }
-    body.light-mode .pagination-item {
-      background: rgba(0, 0, 0, 0.03) !important;
-      border-color: rgba(0, 0, 0, 0.06) !important;
-    }
-    body.light-mode .pagination-item .pagination-item-title { color: #111118 !important; }
-    body.light-mode #bg-overlay { background: rgba(255, 255, 255, 0.70); }
-    body.light-mode #bg-gradient {
-      background: linear-gradient(180deg,
-        rgba(250,250,252,0.35) 0%,
-        rgba(250,250,252,0.55) 40%,
-        rgba(250,250,252,0.85) 100%);
-    }
-
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
-    body.light-mode ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.10); }
-    body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.18); }
-
-    html, body, .sidebar, .content, .markdown-section,
-    .sidebar-nav, .search, .docsify-pagination-container,
-    .app-nav, .theme-toggle {
-      transition: background-color 0.3s ease, color 0.2s ease,
-                  border-color 0.2s ease, box-shadow 0.3s ease;
-    }
-  </style>
-
-  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-5159844745975514",
-      enable_page_level_ads: true
-    });
-  </script>
+	<meta charset="UTF-8">
+	<meta name="keywords" content="网易云音乐,网易云音乐 api,网易云音乐 nodejs,网易云音乐 node.js">
+	<meta name="description" content="网易云音乐 NodeJS API Enhanced · 全球边缘网络 · 母带解析">
+	<title>网易云音乐 NodeJS API Enhanced · 文档</title>
+	<link rel="icon" href="netease.png">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="referrer" content="never">
+	<link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" id="theme-css">
+	<style>
+		:root {
+		  --brand: #ec4141;
+		  --brand-soft: #ff6b6b;
+		  --bg: #0a0a0f;
+		  --surface: rgba(18, 18, 26, 0.72);
+		  --surface-elevated: rgba(26, 26, 36, 0.82);
+		  --border: rgba(255, 255, 255, 0.06);
+		  --border-strong: rgba(255, 255, 255, 0.10);
+		  --fg: #f0f0f5;
+		  --fg-secondary: #c8c8d8;
+		  --fg-tertiary: #8e8ea0;
+		  --fg-quaternary: #5e5e72;
+		  --radius-card: 20px;
+		  --radius-sm: 10px;
+		  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+		  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+		  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+		  --font-mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+		}
+		
+		#bg-video {
+		  position: fixed; top: 0; left: 0;
+		  width: 100vw; height: 100vh;
+		  object-fit: cover;
+		  z-index: -3; pointer-events: none;
+		}
+		#bg-overlay {
+		  position: fixed; inset: 0;
+		  z-index: -2;
+		  background: rgba(0, 0, 0, 0.55);
+		  pointer-events: none;
+		}
+		#bg-gradient {
+		  position: fixed; inset: 0;
+		  z-index: -1;
+		  background: linear-gradient(180deg,
+		    rgba(10,10,15,0.35) 0%,
+		    rgba(10,10,15,0.55) 40%,
+		    rgba(10,10,15,0.85) 100%);
+		  pointer-events: none;
+		}
+		
+		* { box-sizing: border-box; }
+		html, body { height: 100%; }
+		body {
+		  background: transparent !important;
+		  color: var(--fg) !important;
+		  font-family: var(--font-sans) !important;
+		  -webkit-font-smoothing: antialiased;
+		  -moz-osx-font-smoothing: grayscale;
+		  margin: 0; padding: 0;
+		}
+		
+		/* ===== 彻底隐藏 coverpage（双保险） ===== */
+		.cover,
+		section.cover { display: none !important; }
+		
+		.sidebar, .content, .app-nav { background: transparent !important; }
+		
+		/* ===== 主内容区（默认桌面端） ===== */
+		.content {
+		  padding-top: 80px !important;
+		  background: transparent !important;
+		}
+		
+		/* ===== 顶部导航 ===== */
+		.app-nav {
+		  position: fixed !important;
+		  top: 0 !important;
+		  right: 0 !important;
+		  height: 64px !important;
+		  background: rgba(10, 10, 15, 0.60) !important;
+		  backdrop-filter: blur(20px) saturate(180%) !important;
+		  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+		  border-bottom: 1px solid var(--border) !important;
+		  z-index: 100 !important;
+		  padding: 0 32px !important;
+		  display: flex !important;
+		  align-items: center !important;
+		  justify-content: flex-end !important;
+		  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15) !important;
+		}
+		.app-nav a {
+		  color: var(--fg-tertiary) !important;
+		  font-size: 14px !important;
+		  font-weight: 500 !important;
+		  padding: 8px 16px !important;
+		  border-radius: 100px !important;
+		  transition: all 0.2s ease !important;
+		  text-decoration: none !important;
+		  margin-left: 4px !important;
+		}
+		.app-nav a:hover {
+		  color: #fff !important;
+		  background: rgba(255, 255, 255, 0.08) !important;
+		}
+		
+		/* ===== 侧边栏通用（内部结构样式） ===== */
+		.sidebar .app-name {
+		  padding: 0 24px 20px !important;
+		  margin: 0 !important;
+		  border-bottom: 1px solid var(--border) !important;
+		}
+		.sidebar .app-name-link {
+		  color: #fff !important;
+		  font-size: 17px !important;
+		  font-weight: 700 !important;
+		  letter-spacing: -0.3px !important;
+		  display: flex !important;
+		  align-items: center !important;
+		  gap: 10px !important;
+		  text-decoration: none !important;
+		}
+		.sidebar .app-name-link::before {
+		  content: '';
+		  width: 30px; height: 30px;
+		  border-radius: 8px;
+		  background: var(--brand);
+		  flex-shrink: 0;
+		  box-shadow: 0 2px 12px rgba(236, 65, 65, 0.35);
+		  background-image: url('netease.png');
+		  background-size: cover;
+		  background-position: center;
+		}
+		
+		.sidebar-nav { padding: 16px 12px 32px !important; }
+		.sidebar-nav ul { margin: 0 !important; padding: 0 !important; list-style: none !important; }
+		.sidebar-nav li { margin: 2px 0 !important; }
+		.sidebar-nav a {
+		  color: var(--fg-tertiary) !important;
+		  font-size: 14px !important;
+		  font-weight: 500 !important;
+		  padding: 9px 14px !important;
+		  border-radius: 8px !important;
+		  transition: all 0.2s ease !important;
+		  display: block !important;
+		  text-decoration: none !important;
+		  border-left: 3px solid transparent !important;
+		}
+		.sidebar-nav a:hover {
+		  color: #fff !important;
+		  background: rgba(255, 255, 255, 0.06) !important;
+		}
+		.sidebar-nav a.active {
+		  color: #fff !important;
+		  background: rgba(236, 65, 65, 0.12) !important;
+		  border-left-color: var(--brand) !important;
+		  font-weight: 600 !important;
+		}
+		
+		.sidebar-toggle {
+		  width: 44px !important;
+		  height: 44px !important;
+		  min-width: 44px !important;
+		  min-height: 44px !important;
+		  max-width: 44px !important;
+		  max-height: 44px !important;
+		  display: flex !important;
+		  align-items: center !important;
+		  justify-content: center !important;
+		  padding: 0 !important;
+		  background: rgba(10, 10, 15, 0.80) !important;
+		  backdrop-filter: blur(16px) !important;
+		  -webkit-backdrop-filter: blur(16px) !important;
+		  border: 1px solid var(--border-strong) !important;
+		  border-radius: 50% !important;
+		  bottom: 24px !important;
+		  left: 20px !important;
+		  box-shadow: var(--shadow-md) !important;
+		  z-index: 210 !important;
+		  transition: transform 0.2s ease, background 0.2s ease !important;
+		}
+		.sidebar-toggle:hover {
+		  transform: scale(1.08) !important;
+		  background: rgba(30, 30, 46, 0.90) !important;
+		}
+		.sidebar-toggle:active {
+		  transform: scale(0.92) !important;
+		}
+		/* 里面的汉堡横线也锁死尺寸，防止动画把容器撑长 */
+		.sidebar-toggle span {
+		  background: #fff !important;
+		  width: 20px !important;
+		  height: 2px !important;
+		  display: block !important;
+		  border-radius: 2px !important;
+		}
+		
+		/* ===== 桌面端：固定侧边栏 ===== */
+		@media (min-width: 769px) {
+		  .sidebar {
+		    position: fixed !important;
+		    top: 0 !important;
+		    left: 0 !important;
+		    bottom: 0 !important;
+		    width: 300px !important;
+		    height: 100vh !important;
+		    overflow-y: auto !important;
+		    transform: none !important;
+		    background: rgba(10, 10, 15, 0.78) !important;
+		    backdrop-filter: blur(24px) saturate(180%) !important;
+		    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+		    border-right: 1px solid var(--border) !important;
+		    padding-top: 24px !important;
+		    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25) !important;
+		    z-index: 50 !important;
+		  }
+		  .content {
+		    margin-left: 300px !important;
+		  }
+		  .app-nav {
+		    left: 300px !important;
+		  }
+		}
+		
+		/* ===== 移动端：交还 Docsify 响应式控制 ===== */
+		@media (max-width: 768px) {
+		  .sidebar {
+		    position: fixed !important;
+		    top: 0 !important;
+		    left: 0 !important;
+		    bottom: 0 !important;
+		    width: 300px !important;
+		    height: 100vh !important;
+		    overflow-y: auto !important;
+		    transform: translateX(-300px) !important;
+		    transition: transform 0.3s ease !important;
+		    background: rgba(10, 10, 15, 0.92) !important;
+		    backdrop-filter: blur(24px) saturate(180%) !important;
+		    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+		    border-right: 1px solid var(--border) !important;
+		    padding-top: 24px !important;
+		    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25) !important;
+		    z-index: 200 !important;
+		  }
+		    .sidebar-toggle {
+		width: 40px !important;
+		height: 40px !important;
+		min-width: 40px !important;
+		min-height: 40px !important;
+		max-width: 40px !important;
+		max-height: 40px !important;
+		left: 16px !important;
+		bottom: 20px !important;
+		  }
+		}
+		  body:not(.close) .sidebar {
+		    transform: translateX(0) !important;
+		  }
+		  .content {
+		    margin-left: 0 !important;
+		  }
+		  .app-nav {
+		    left: 0 !important;
+		  }
+		}
+		
+		/* ===== Markdown 内容卡片 ===== */
+		.markdown-section {
+		  background: var(--surface) !important;
+		  backdrop-filter: blur(24px) saturate(160%) !important;
+		  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+		  border: 1px solid var(--border) !important;
+		  border-radius: var(--radius-card) !important;
+		  padding: 48px 52px !important;
+		  margin: 24px auto 48px !important;
+		  max-width: 880px !important;
+		  box-shadow: var(--shadow-md) !important;
+		  color: var(--fg) !important;
+		}
+		@media (max-width: 768px) {
+		  .markdown-section {
+		    padding: 28px 20px !important;
+		    margin: 16px 12px 32px !important;
+		    border-radius: 16px !important;
+		  }
+		}
+		
+		.markdown-section h1,
+		.markdown-section h2,
+		.markdown-section h3,
+		.markdown-section h4,
+		.markdown-section h5,
+		.markdown-section h6 {
+		  color: #fff !important;
+		  font-weight: 700 !important;
+		  letter-spacing: -0.5px !important;
+		  line-height: 1.3 !important;
+		  margin-top: 1.8em !important;
+		  margin-bottom: 0.6em !important;
+		  scroll-margin-top: 80px !important;
+		}
+		.markdown-section h1 {
+		  font-size: 32px !important;
+		  letter-spacing: -0.8px !important;
+		  padding-bottom: 16px !important;
+		  border-bottom: 1px solid var(--border) !important;
+		  margin-top: 0 !important;
+		}
+		.markdown-section h2 {
+		  font-size: 24px !important;
+		  padding-bottom: 10px !important;
+		  border-bottom: 1px solid var(--border) !important;
+		}
+		.markdown-section h3 { font-size: 19px !important; }
+		.markdown-section h4 { font-size: 16px !important; }
+		
+		.markdown-section p {
+		  color: var(--fg-secondary) !important;
+		  font-size: 15px !important;
+		  line-height: 1.85 !important;
+		  margin: 1em 0 !important;
+		}
+		.markdown-section a {
+		  color: var(--brand-soft) !important;
+		  text-decoration: none !important;
+		  border-bottom: 1px solid rgba(255, 107, 107, 0.3) !important;
+		  transition: all 0.2s ease !important;
+		  font-weight: 500 !important;
+		}
+		.markdown-section a:hover {
+		  color: #fff !important;
+		  border-bottom-color: var(--brand) !important;
+		}
+		.markdown-section strong { color: #fff !important; font-weight: 650 !important; }
+		.markdown-section ul,
+		.markdown-section ol {
+		  color: var(--fg-secondary) !important;
+		  padding-left: 1.6em !important;
+		  margin: 1em 0 !important;
+		}
+		.markdown-section li { margin: 6px 0 !important; line-height: 1.7 !important; }
+		.markdown-section li::marker { color: var(--brand) !important; }
+		
+		.markdown-section blockquote {
+		  background: rgba(236, 65, 65, 0.06) !important;
+		  border-left: 3px solid var(--brand) !important;
+		  border-radius: 0 8px 8px 0 !important;
+		  padding: 14px 20px !important;
+		  margin: 1.2em 0 !important;
+		  color: var(--fg-secondary) !important;
+		}
+		.markdown-section blockquote p { margin: 0 !important; color: var(--fg-secondary) !important; }
+		
+		.markdown-section code {
+		  font-family: var(--font-mono) !important;
+		  font-size: 13px !important;
+		  background: rgba(255, 255, 255, 0.06) !important;
+		  color: #ff9a9a !important;
+		  padding: 3px 8px !important;
+		  border-radius: 6px !important;
+		  border: 1px solid var(--border) !important;
+		}
+		.markdown-section pre {
+		  background: rgba(0, 0, 0, 0.40) !important;
+		  border: 1px solid var(--border) !important;
+		  border-radius: var(--radius-sm) !important;
+		  padding: 20px 24px !important;
+		  margin: 1.4em 0 !important;
+		  overflow-x: auto !important;
+		}
+		.markdown-section pre code {
+		  background: transparent !important;
+		  border: none !important;
+		  padding: 0 !important;
+		  color: var(--fg-secondary) !important;
+		  font-size: 13px !important;
+		  line-height: 1.75 !important;
+		}
+		
+		.markdown-section table {
+		  width: 100% !important;
+		  border-collapse: collapse !important;
+		  margin: 1.6em 0 !important;
+		  border-radius: var(--radius-sm) !important;
+		  overflow: hidden !important;
+		  box-shadow: 0 0 0 1px var(--border) !important;
+		  font-size: 14px !important;
+		}
+		.markdown-section table th {
+		  background: rgba(255, 255, 255, 0.05) !important;
+		  color: #fff !important;
+		  font-weight: 650 !important;
+		  padding: 12px 18px !important;
+		  text-align: left !important;
+		  border-bottom: 1px solid var(--border-strong) !important;
+		}
+		.markdown-section table td {
+		  padding: 11px 18px !important;
+		  color: var(--fg-secondary) !important;
+		  border-bottom: 1px solid var(--border) !important;
+		}
+		.markdown-section table tr:last-child td { border-bottom: none !important; }
+		.markdown-section table tr:hover td { background: rgba(255, 255, 255, 0.02) !important; }
+		
+		.markdown-section hr {
+		  border: none !important;
+		  border-top: 1px solid var(--border) !important;
+		  margin: 2.4em 0 !important;
+		}
+		.markdown-section img {
+		  max-width: 100% !important;
+		  border-radius: var(--radius-sm) !important;
+		  box-shadow: var(--shadow-sm) !important;
+		}
+		
+		/* ===== 搜索框 ===== */
+		.search {
+		  border-bottom: 1px solid var(--border) !important;
+		  padding: 16px 20px !important;
+		  margin-bottom: 8px !important;
+		}
+		.search input {
+		  background: rgba(255, 255, 255, 0.06) !important;
+		  border: 1px solid var(--border) !important;
+		  border-radius: 100px !important;
+		  color: #fff !important;
+		  padding: 10px 18px !important;
+		  font-size: 14px !important;
+		  width: 100% !important;
+		  outline: none !important;
+		  transition: all 0.2s ease !important;
+		}
+		.search input:focus {
+		  border-color: rgba(236, 65, 65, 0.4) !important;
+		  background: rgba(255, 255, 255, 0.09) !important;
+		  box-shadow: 0 0 0 3px rgba(236, 65, 65, 0.10) !important;
+		}
+		.search input::placeholder { color: var(--fg-quaternary) !important; }
+		
+		.search .results-panel {
+		  background: rgba(18, 18, 26, 0.96) !important;
+		  backdrop-filter: blur(24px) !important;
+		  -webkit-backdrop-filter: blur(24px) !important;
+		  border: 1px solid var(--border-strong) !important;
+		  border-radius: var(--radius-sm) !important;
+		  box-shadow: var(--shadow-md) !important;
+		}
+		.search .matching-post {
+		  border-bottom: 1px solid var(--border) !important;
+		  padding: 10px 14px !important;
+		}
+		.search .matching-post:hover {
+		  background: rgba(255, 255, 255, 0.04) !important;
+		}
+		.search .matching-post a {
+		  color: var(--fg-secondary) !important;
+		  font-size: 13px !important;
+		  line-height: 1.6 !important;
+		}
+		.search .matching-post a:hover { color: #fff !important; }
+		.search .matching-post .title {
+		  color: #fff !important;
+		  font-weight: 600 !important;
+		  font-size: 13px !important;
+		  margin-bottom: 2px !important;
+		}
+		.search .matching-post .content {
+		  color: var(--fg-tertiary) !important;
+		  font-size: 12px !important;
+		  line-height: 1.55 !important;
+		  opacity: 0.8;
+		  white-space: normal !important;
+		  word-break: break-word !important;
+		}
+		.search .matching-post .content em,
+		.search .matching-post .title em {
+		  font-style: normal !important;
+		  color: var(--brand-soft) !important;
+		  background: rgba(236, 65, 65, 0.10) !important;
+		  border-radius: 3px !important;
+		  padding: 0 2px !important;
+		}
+		
+		/* ===== 分页 ===== */
+		.docsify-pagination-container {
+		  border-top: 1px solid var(--border) !important;
+		  margin-top: 40px !important;
+		  padding-top: 24px !important;
+		  display: flex !important;
+		  justify-content: space-between !important;
+		  gap: 16px !important;
+		}
+		.pagination-item {
+		  background: rgba(255, 255, 255, 0.04) !important;
+		  border: 1px solid var(--border) !important;
+		  border-radius: var(--radius-sm) !important;
+		  padding: 14px 20px !important;
+		  transition: all 0.2s ease !important;
+		  flex: 1 !important;
+		  text-decoration: none !important;
+		}
+		.pagination-item:hover {
+		  background: rgba(255, 255, 255, 0.08) !important;
+		  border-color: var(--border-strong) !important;
+		  transform: translateY(-2px) !important;
+		}
+		.pagination-item .pagination-item-title {
+		  color: #fff !important;
+		  font-size: 15px !important;
+		  font-weight: 600 !important;
+		}
+		.pagination-item .pagination-item-label {
+		  color: var(--fg-tertiary) !important;
+		  font-size: 12px !important;
+		  margin-bottom: 4px !important;
+		}
+		
+		/* ===== 主题切换按钮 ===== */
+		.theme-toggle {
+		  position: fixed;
+		  bottom: 24px; right: 24px;
+		  z-index: 999;
+		  width: 46px; height: 46px;
+		  border-radius: 50%;
+		  border: 1px solid rgba(255, 255, 255, 0.12);
+		  background: rgba(30, 30, 46, 0.75);
+		  backdrop-filter: blur(16px) saturate(180%);
+		  -webkit-backdrop-filter: blur(16px) saturate(180%);
+		  color: #fff;
+		  font-size: 20px;
+		  cursor: pointer;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  box-shadow: var(--shadow-md);
+		  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		  outline: none;
+		  padding: 0;
+		  line-height: 1;
+		  user-select: none;
+		}
+		.theme-toggle:hover {
+		  transform: scale(1.12) rotate(12deg);
+		  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+		  background: rgba(40, 40, 60, 0.85);
+		}
+		.theme-toggle:active { transform: scale(0.92); }
+		.theme-toggle.light {
+		  background: rgba(255, 255, 255, 0.85);
+		  color: #333;
+		  border-color: rgba(0, 0, 0, 0.08);
+		  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
+		}
+		.theme-toggle.light:hover { background: rgba(255, 255, 255, 0.95); }
+		
+		/* ===== 浅色模式 ===== */
+		body.light-mode .markdown-section {
+		  background: rgba(255, 255, 255, 0.90) !important;
+		  border-color: rgba(0, 0, 0, 0.06) !important;
+		}
+		body.light-mode .markdown-section h1,
+		body.light-mode .markdown-section h2,
+		body.light-mode .markdown-section h3,
+		body.light-mode .markdown-section h4,
+		body.light-mode .markdown-section h5,
+		body.light-mode .markdown-section h6,
+		body.light-mode .markdown-section strong { color: #111118 !important; }
+		body.light-mode .markdown-section p,
+		body.light-mode .markdown-section li,
+		body.light-mode .markdown-section td { color: #3d3d4e !important; }
+		body.light-mode .markdown-section code {
+		  background: rgba(0, 0, 0, 0.05) !important;
+		  color: #d93a3a !important;
+		  border-color: rgba(0, 0, 0, 0.06) !important;
+		}
+		body.light-mode .markdown-section pre {
+		  background: rgba(0, 0, 0, 0.04) !important;
+		  border-color: rgba(0, 0, 0, 0.06) !important;
+		}
+		body.light-mode .markdown-section pre code { color: #3d3d4e !important; }
+		body.light-mode .markdown-section blockquote {
+		  background: rgba(236, 65, 65, 0.05) !important;
+		  color: #3d3d4e !important;
+		}
+		body.light-mode .markdown-section blockquote p { color: #3d3d4e !important; }
+		body.light-mode .sidebar {
+		  background: rgba(250, 250, 252, 0.92) !important;
+		  border-right-color: rgba(0, 0, 0, 0.06) !important;
+		}
+		body.light-mode .sidebar .app-name-link { color: #111118 !important; }
+		body.light-mode .sidebar-nav a { color: #7e7e92 !important; }
+		body.light-mode .sidebar-nav a:hover {
+		  color: #111118 !important;
+		  background: rgba(0, 0, 0, 0.04) !important;
+		}
+		body.light-mode .sidebar-nav a.active {
+		  color: #111118 !important;
+		  background: rgba(236, 65, 65, 0.08) !important;
+		}
+		body.light-mode .app-nav {
+		  background: rgba(250, 250, 252, 0.75) !important;
+		  border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+		}
+		body.light-mode .app-nav a { color: #7e7e92 !important; }
+		body.light-mode .app-nav a:hover {
+		  color: #111118 !important;
+		  background: rgba(0, 0, 0, 0.04) !important;
+		}
+		body.light-mode .search input {
+		  background: rgba(0, 0, 0, 0.04) !important;
+		  border-color: rgba(0, 0, 0, 0.06) !important;
+		  color: #111118 !important;
+		}
+		body.light-mode .search input::placeholder { color: #aeaec0 !important; }
+		body.light-mode .search .results-panel {
+		  background: rgba(255, 255, 255, 0.98) !important;
+		}
+		body.light-mode .search .matching-post .title { color: #111118 !important; }
+		body.light-mode .search .matching-post a { color: #3d3d4e !important; }
+		body.light-mode .search .matching-post .content { color: #7e7e92 !important; }
+		body.light-mode .markdown-section table th {
+		  background: rgba(0, 0, 0, 0.03) !important;
+		  color: #111118 !important;
+		  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+		}
+		body.light-mode .markdown-section table td { border-bottom-color: rgba(0, 0, 0, 0.05) !important; }
+		body.light-mode .markdown-section table { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06) !important; }
+		body.light-mode .markdown-section hr { border-top-color: rgba(0, 0, 0, 0.06) !important; }
+		body.light-mode .pagination-item {
+		  background: rgba(0, 0, 0, 0.03) !important;
+		  border-color: rgba(0, 0, 0, 0.06) !important;
+		}
+		body.light-mode .pagination-item .pagination-item-title { color: #111118 !important; }
+		body.light-mode #bg-overlay { background: rgba(255, 255, 255, 0.70); }
+		body.light-mode #bg-gradient {
+		  background: linear-gradient(180deg,
+		    rgba(250,250,252,0.35) 0%,
+		    rgba(250,250,252,0.55) 40%,
+		    rgba(250,250,252,0.85) 100%);
+		}
+		
+		::-webkit-scrollbar { width: 6px; height: 6px; }
+		::-webkit-scrollbar-track { background: transparent; }
+		::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
+		::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
+		body.light-mode ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.10); }
+		body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.18); }
+		
+		html, body, .sidebar, .content, .markdown-section,
+		.sidebar-nav, .search, .docsify-pagination-container,
+		.app-nav, .theme-toggle {
+		  transition: background-color 0.3s ease, color 0.2s ease,
+		              border-color 0.2s ease, box-shadow 0.3s ease;
+		}
+	</style>
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+	<script>
+		(adsbygoogle = window.adsbygoogle || []).push({
+		  google_ad_client: "ca-pub-5159844745975514",
+		  enable_page_level_ads: true
+		});
+	</script>
 </head>
 <body>
-
-  <video autoplay muted loop playsinline id="bg-video" poster="/bg_fufu_1080.png">
-    <source src="/bg_fufu_1080.mp4" type="video/mp4">
-    <img src="/bg1.webp" alt="背景" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-3;pointer-events:none;">
-  </video>
-  <div id="bg-overlay"></div>
-  <div id="bg-gradient"></div>
-
-  <div id="app"></div>
-  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+	<video autoplay muted loop playsinline id="bg-video" poster="/bg_fufu_1080.png">
+		<source src="/bg_fufu_1080.mp4" type="video/mp4">
+		<img src="/bg1.webp" alt="背景" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:-3;pointer-events:none;">
+	</video>
+	<div id="bg-overlay"></div>
+	<div id="bg-gradient"></div>
+	<div id="app"></div>
+	<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
 </body>
-
 <script>
-  /* ===== 主题切换 ===== */
-  (function() {
-    var STORAGE_KEY = 'docsify-theme';
-    var link = document.getElementById('theme-css');
-    var btn = document.getElementById('themeToggle');
-    var LIGHT_URL = '//unpkg.com/docsify/lib/themes/vue.css';
-    var DARK_URL = '//unpkg.com/docsify/lib/themes/dark.css';
-
-    function setTheme(theme) {
-      link.href = theme === 'dark' ? DARK_URL : LIGHT_URL;
-      btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-      btn.className = 'theme-toggle' + (theme === 'dark' ? '' : ' light');
-      document.body.classList.toggle('light-mode', theme === 'light');
-      localStorage.setItem(STORAGE_KEY, theme);
-    }
-    function toggleTheme() {
-      var isDark = link.href.indexOf('dark') > -1;
-      setTheme(isDark ? 'light' : 'dark');
-    }
-    var saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) { setTheme(saved); }
-    else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
-    else { setTheme('light'); }
-    btn.addEventListener('click', toggleTheme);
-    try {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-        if (!localStorage.getItem(STORAGE_KEY)) setTheme(e.matches ? 'dark' : 'light');
-      });
-    } catch(e) {}
-  })();
+	/* ===== 主题切换（不重载 CSS，避免响应式错乱） ===== */
+	(function() {
+	  var STORAGE_KEY = 'docsify-theme';
+	  var btn = document.getElementById('themeToggle');
+	  var LIGHT_URL = '//unpkg.com/docsify/lib/themes/vue.css';
+	  var DARK_URL = '//unpkg.com/docsify/lib/themes/dark.css';
+	
+	  function setTheme(theme) {
+	    var newHref = theme === 'dark' ? DARK_URL : LIGHT_URL;
+	    var currentLink = document.getElementById('theme-css');
+	
+	    var isCurrentlyDark = currentLink.href.indexOf('dark') > -1;
+	    var wantDark = theme === 'dark';
+	
+	    if (isCurrentlyDark !== wantDark) {
+	      // 创建新 link，加载完再移除旧的，避免布局空窗
+	      var newLink = document.createElement('link');
+	      newLink.rel = 'stylesheet';
+	      newLink.href = newHref;
+	      newLink.id = 'theme-css';
+	      newLink.onload = function() {
+	        if (currentLink && currentLink.parentNode) {
+	          currentLink.parentNode.removeChild(currentLink);
+	        }
+	        // 强制浏览器重算布局，修复响应式状态
+	        document.body.style.display = 'none';
+	        void document.body.offsetHeight;
+	        document.body.style.display = '';
+	      };
+	      currentLink.parentNode.insertBefore(newLink, currentLink);
+	    }
+	
+	    btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+	    btn.className = 'theme-toggle' + (theme === 'dark' ? '' : ' light');
+	    document.body.classList.toggle('light-mode', theme === 'light');
+	    localStorage.setItem(STORAGE_KEY, theme);
+	  }
+	
+	  function toggleTheme() {
+	    var link = document.getElementById('theme-css');
+	    var isDark = link.href.indexOf('dark') > -1;
+	    setTheme(isDark ? 'light' : 'dark');
+	  }
+	
+	  var saved = localStorage.getItem(STORAGE_KEY);
+	  if (saved) { setTheme(saved); }
+	  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
+	  else { setTheme('light'); }
+	
+	  btn.addEventListener('click', toggleTheme);
+	
+	  try {
+	    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+	      if (!localStorage.getItem(STORAGE_KEY)) setTheme(e.matches ? 'dark' : 'light');
+	    });
+	  } catch(e) {}
+	})();
 </script>
-
 <script>
-  window.$docsify = {
-    name: '网易云音乐 API Enhanced',
-    repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
-    homepage: 'home.md',
-    loadSidebar: true,
-    subMaxLevel: 3,
-    maxLevel: 4,
-    auto2top: false,   /* ← 关掉 Docsify 自带的回顶，改用我们自己的逻辑 */
-    notFoundPage: false,
-    search: {
-      placeholder: '搜索文档...',
-      noData: '没有找到结果',
-      depth: 3,
-      maxAge: 86400000,
-      paths: ['home.md']
-    },
-    pagination: {
-      previousText: '上一篇',
-      nextText: '下一篇',
-      crossChapter: true
-    },
-    themeColor: '#ec4141',
-    plugins: [
-      function(hook) {
-        /* 工具：把 hash 解析成 DOM 元素并滚动过去 */
-        function scrollToHash(hash, smooth) {
-          if (!hash || hash === '#' || hash === '#/') return false;
-          // 去掉开头的 #、#/、?id= 等前缀，取出真正的锚点 id
-          var raw = hash.replace(/^#\/?/, '');
-          // Docsify 首页锚点可能是 /?id=xxx 形式
-          var idMatch = raw.match(/[?&]id=([^&]+)/);
-          var id = idMatch ? decodeURIComponent(idMatch[1]) : decodeURIComponent(raw);
-          if (!id) return false;
-
-          var el = document.getElementById(id);
-          if (!el) {
-            // 兜底：用属性选择器再找一次
-            try {
-              el = document.querySelector('[id="' + id.replace(/"/g, '\\"') + '"]');
-            } catch (e) { el = null; }
-          }
-          if (el) {
-            var top = el.getBoundingClientRect().top + window.pageYOffset - 80;
-            window.scrollTo({ top: top, behavior: smooth ? 'smooth' : 'auto' });
-            return true;
-          }
-          return false;
-        }
-
-        // 每次内容渲染完成后
-        hook.doneEach(function() {
-          var hash = window.location.hash;
-          if (hash && hash.length > 1 && hash !== '#/' && hash !== '#') {
-            // 有锚点：延迟一帧等 DOM 稳定，然后滚到目标
-            setTimeout(function() {
-              var ok = scrollToHash(hash, false);
-              if (!ok) {
-                var content = document.querySelector('.content');
-                if (content) content.scrollTop = 0;
-                window.scrollTo({ top: 0, behavior: 'auto' });
-              }
-            }, 0);
-            return;
-          }
-          // 没有锚点（首页/路由切换）：回顶
-          var content = document.querySelector('.content');
-          if (content) content.scrollTop = 0;
-          window.scrollTo({ top: 0, behavior: 'auto' });
-        });
-
-        // 用户点击侧边栏/搜索结果时，hash 变化触发这里
-        window.addEventListener('hashchange', function() {
-          setTimeout(function() {
-            scrollToHash(window.location.hash, true);
-          }, 30);
-        });
-      }
-    ]
-  }
+	window.$docsify = {
+	  name: '网易云音乐 API Enhanced',
+	  repo: 'https://github.com/neteasecloudmusicapienhanced/api-enhanced',
+	  homepage: 'home.md',
+	  loadSidebar: true,
+	  subMaxLevel: 3,
+	  maxLevel: 4,
+	  auto2top: false,
+	  notFoundPage: false,
+	  search: {
+	    placeholder: '搜索文档...',
+	    noData: '没有找到结果',
+	    depth: 3,
+	    maxAge: 86400000,
+	    paths: ['home.md']
+	  },
+	  pagination: {
+	    previousText: '上一篇',
+	    nextText: '下一篇',
+	    crossChapter: true
+	  },
+	  themeColor: '#ec4141',
+	  plugins: [
+	    function(hook) {
+	      function scrollToHash(hash, smooth) {
+	        if (!hash || hash === '#' || hash === '#/') return false;
+	        var raw = hash.replace(/^#\/?/, '');
+	        var idMatch = raw.match(/[?&]id=([^&]+)/);
+	        var id = idMatch ? decodeURIComponent(idMatch[1]) : decodeURIComponent(raw);
+	        if (!id) return false;
+	
+	        var el = document.getElementById(id);
+	        if (!el) {
+	          try {
+	            el = document.querySelector('[id="' + id.replace(/"/g, '\\"') + '"]');
+	          } catch (e) { el = null; }
+	        }
+	        if (el) {
+	          var top = el.getBoundingClientRect().top + window.pageYOffset - 80;
+	          window.scrollTo({ top: top, behavior: smooth ? 'smooth' : 'auto' });
+	          return true;
+	        }
+	        return false;
+	      }
+	
+	      hook.doneEach(function() {
+	        var hash = window.location.hash;
+	        if (hash && hash.length > 1 && hash !== '#/' && hash !== '#') {
+	          setTimeout(function() {
+	            var ok = scrollToHash(hash, false);
+	            if (!ok) {
+	              var content = document.querySelector('.content');
+	              if (content) content.scrollTop = 0;
+	              window.scrollTo({ top: 0, behavior: 'auto' });
+	            }
+	          }, 0);
+	          return;
+	        }
+	        var content = document.querySelector('.content');
+	        if (content) content.scrollTop = 0;
+	        window.scrollTo({ top: 0, behavior: 'auto' });
+	      });
+	
+	      window.addEventListener('hashchange', function() {
+	        setTimeout(function() {
+	          scrollToHash(window.location.hash, true);
+	        }, 30);
+	      });
+	    }
+	  ]
+	}
 </script>
-
 <script src="https://unpkg.com/docsify@4.11.3/lib/docsify.min.js"></script>
 <script src="https://unpkg.com/docsify@4.11.3/lib/plugins/search.min.js"></script>
 <script src="https://unpkg.com/docsify-pagination@2.3.0/dist/docsify-pagination.min.js"></script>
 <script src="https://unpkg.com/docsify@4.11.3/lib/plugins/zoom-image.min.js"></script>
-
 <script>
-  if (typeof navigator.serviceWorker !== 'undefined') {
-    navigator.serviceWorker.register('sw.js')
-  }
+	if (typeof navigator.serviceWorker !== 'undefined') {
+	  navigator.serviceWorker.register('sw.js')
+	}
 </script>
-
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPRGR23JEG"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag() { dataLayer.push(arguments); }
-  gtag('js', new Date());
-  gtag('config', 'G-BPRGR23JEG');
+	window.dataLayer = window.dataLayer || [];
+	function gtag() { dataLayer.push(arguments); }
+	gtag('js', new Date());
+	gtag('config', 'G-BPRGR23JEG');
 </script>
 </html>
