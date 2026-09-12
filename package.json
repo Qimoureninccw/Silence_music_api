@@ -60,6 +60,12 @@
       "git add"
     ]
   },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "core-js",
+      "es5-ext"
+    ]
+  },
   "author": "MoeFurina",
   "license": "MIT",
   "files": [
